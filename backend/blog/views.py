@@ -3,6 +3,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework.exceptions import NotFound
 from .models import BlogPost, Tag
 from .serializers import BlogPostSerializer
 
@@ -17,6 +18,17 @@ class BlogPostViewSet(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
     pagination_class = BlogPostPagination
 
+    def get_queryset(self):
+        """Aplica filtros dinâmicos."""
+        queryset = self.queryset
+        tag = self.request.query_params.get('tag')
+
+        if tag:
+            queryset = queryset.filter(tags__nome=tag)
+
+        return queryset
+
+        
     @action(detail=False, methods=['get'], url_path='tag/(?P<tag>[^/.]+)')
     def by_tag(self, request, tag=None):
         posts = BlogPost.objects.filter(tags__nome=tag, status=BlogPost.PUBLICADO)
