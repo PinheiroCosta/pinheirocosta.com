@@ -1,0 +1,9 @@
+{% extends "admin/change_form.html" %}
+{% block after_field_sets %}
+    {{ block.super }}
+    {% if original.about_image %}
+        <input type="submit" class="button" value="Remover Imagem" 
+               formaction="{% url 'admin:remove_about_image' original.pk %}" 
+               formmethod="post">
+    {% endif %}
+{% endblock %}

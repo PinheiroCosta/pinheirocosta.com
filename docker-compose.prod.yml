@@ -1,0 +1,75 @@
+version: '3.5'
+
+services:
+  db:
+    image: "postgres:alpine"
+    env_file: backend/.env.prod
+    ports:
+      - "5432"
+    volumes:
+      - dbdata:/var/lib/postgresql/data:delegated
+
+  broker:
+    image: "rabbitmq:alpine"
+
+  result:
+    image: "redis:alpine"
+    ports:
+    - "6379:6379"
+
+  frontend:
+    build:
+      dockerfile: frontend/Dockerfile.prod
+      context: .
+    deploy:
+      replicas: 2
+      update_config:
+        parallelism: 1
+    volumes:
+      - .:/app/
+      - /app/node_modules
+    ports:
+      - "3000-3001:3000"
+
+  backend:
+    build:
+      dockerfile: backend/Dockerfile.prod
+      context: .
+    deploy:
+      replicas: 2
+      update_config:
+        parallelism: 1
+    ports:
+      - "8000-8001:8000"
+    volumes:
+      - ./:/home/user/app/
+    env_file: backend/.env.prod
+    depends_on:
+      - db
+      - broker
+      - result
+      - frontend
+
+  celery:
+    build:
+      dockerfile: backend/Dockerfile.prod
+      context: .
+    command: celery --app=romweb worker --loglevel=info
+    volumes:
+      - ./:/home/user/app/
+    env_file: backend/.env.prod
+    depends_on:
+      - db
+      - broker
+      - result
+
+  mailhog: # service for faking a SMTP server
+    image: mailhog/mailhog
+    ports:
+      - '1025:1025' # smtp server
+      - '8025:8025' # web ui
+
+volumes:
+  dbdata:
+    name: romweb_dbdata
+    external: true

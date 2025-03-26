@@ -1,0 +1,42 @@
+.blog-post-container {
+  max-width: 800px;
+  margin: 10px auto;
+}
+
+.blog-post-title {
+  font-size: 2.2rem;
+  font-weight: bold;
+  text-align: center;
+}
+
+.blog-post-date {
+  color: #6c757d;
+  text-align: center;
+  font-size: 0.9rem;
+  margin-bottom: 30px;
+}
+
+.blog-post-content {
+  font-size: 1.2rem;
+  line-height: 1.8;
+  text-align: justify;
+  text-indent: 2rem;
+  margin-top: 50px;
+}
+
+.blog-post-tag-list {
+  margin-top: 50px;
+}
+
+.blog-post-tag {
+  display: inline-block;
+  color: $verde;
+  font-weight: bold;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  margin-right: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+

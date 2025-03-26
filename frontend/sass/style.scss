@@ -1,0 +1,72 @@
+// Main Style
+
+// General
+@import "variables";
+@import "vendor/bootstrap-includes";
+@import "helpers/all";
+@import "global";
+@import "components/all";
+@import "pages/all";
+
+body {
+    background-color:$websiteBackgroundColor;
+}
+
+a {
+  color: $verde;
+}
+
+.card {
+    background-color: $bege-claro;
+}
+
+.icon-code-branch {
+    color: $verde;
+}
+
+.nav-link {
+    color: $verde;
+    border-radius: 5px;
+}
+
+.nav-link.active {
+    background-color: $verde;
+    color: $websiteBackgroundColor !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .5), 0 1px 5px rgba(0, 0, 0, .5);
+    text-shadow: 0 1px 0 rgba(255, 255, 255, .3);
+}
+
+.nav-link.active:has(img) {
+    background-color: transparent;
+    color: initial;
+    box-shadow: none;
+    text-shadow: none;
+}
+
+.footer-text a {
+    color: $verde;
+}
+
+// Cores
+
+.fg-primary {
+  color: $verde
+}
+
+.bg-primary {
+  background-color: $verde
+}
+
+.fg-secondary {
+  color: $bege
+}
+
+.bg-secondary {
+  background-color: $bege
+}
+
+// Texto
+.text-justify {
+  text-align: justify;
+  text-justify: inter-word;
+}
