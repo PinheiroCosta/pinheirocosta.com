@@ -47,7 +47,6 @@ docker_test_reset:
 docker_wipe:
 	sudo chown -R ${USER}:${USER} .
 	@git clean -fd
-	@git checkout frontend/js/api/index.ts
 	@rm -rf backend/staticfiles/ frontend/webpack_bundles/
 	@docker system prune -a --volumes -f
 	@docker volume ls -qf dangling=true | xargs -r docker volume rm
