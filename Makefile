@@ -99,17 +99,17 @@ docker_frontend_update_api:
 	docker-compose -f ${DOCKER_COMPOSE_FILE} run --rm frontend npm run openapi-ts
 
 docker_db_save:
-	@mkdir -p bkp
+	@mkdir -p backend/checkpoint/db
 	@DATE=$$(date +"%Y-%m-%d_%H-%M-%S") && \
-	docker-compose -f ${DOCKER_COMPOSE_FILE} exec db sh -c "pg_dump -U ${POSTGRES_USER} -d ${POSTGRES_DB} > db-backup.sql" && \
-	docker cp $$(docker-compose -f ${DOCKER_COMPOSE_FILE} ps -q db):db-backup.sql bkp/$$DATE-db-backup.sql && \
-	echo "Backup da base de dados salvo em bkp/$$DATE-db-backup.sql"
-	@ls -tp bkp/ | grep -v '/$$' | tail -n +4 | xargs -I {} rm -- "bkp/{}"
+	docker-compose -f ${DOCKER_COMPOSE_FILE} exec db sh -c "pg_dump -U ${POSTGRES_USER} -d ${POSTGRES_DB} --clean --create > db-backup.sql" && \
+	docker cp $$(docker-compose -f ${DOCKER_COMPOSE_FILE} ps -q db):db-backup.sql backend/checkpoint/db/$$DATE-db-backup.sql && \
+	echo "Backup salvo em backend/checkpoint/db/$$DATE-db-backup.sql"
+	@ls -tp backend/checkpoint/db/ | grep -v '/$$' | tail -n +4 | xargs -I {} rm -- "backend/checkpoint/db/{}"
 
 docker_db_restore:
-	@LAST_BKP=$$(ls -t bkp/ | head -n 1) && \
-	echo "Restaurando a partir de bkp/$$LAST_BKP" && \
-	docker cp bkp/$$LAST_BKP $$(docker-compose -f ${DOCKER_COMPOSE_FILE} ps -q db):/tmp/db-backup.sql && \
+	@LAST_BKP=$$(ls -t backend/checkpoint/db | grep "db-backup.sql" | head -n 1) && \
+	echo "Restaurando a partir de backend/checkpoint/db/$$LAST_BKP" && \
+	docker cp backend/checkpoint/db/$$LAST_BKP $$(docker-compose -f ${DOCKER_COMPOSE_FILE} ps -q db):/tmp/db-backup.sql && \
 	docker-compose -f ${DOCKER_COMPOSE_FILE} exec db sh -c "psql -U ${POSTGRES_USER} -d ${POSTGRES_DB} < /tmp/db-backup.sql"
 	@echo "Restauração concluída!"
 

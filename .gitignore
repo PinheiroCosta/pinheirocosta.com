@@ -51,4 +51,4 @@ tmp_email/
 .envrc
 .tool-versions
 
-bkp/
+backend/checkpoint/db/*
