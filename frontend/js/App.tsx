@@ -1,7 +1,7 @@
 import * as Sentry from "@sentry/react";
 import cookie from "cookie";
 
-import { OpenAPI } from "./api";
+import { OpenAPI } from "./api/core/OpenAPI";
 import AppRoutes from "./routes";
 
 OpenAPI.interceptors.request.use((request) => {
