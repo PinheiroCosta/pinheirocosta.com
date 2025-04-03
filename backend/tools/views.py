@@ -1,11 +1,17 @@
 import requests
 from django.http import JsonResponse
+from django_ratelimit.decorators import ratelimit
+from django.utils.decorators import method_decorator
 from rest_framework import viewsets
-from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework.permissions import AllowAny
 from .models import Tool
 from .serializers import ToolSerializer
+
+
+TIMEOUT_SECONDS = 5
+MAX_RETRIES = 3
 
 class ToolViewSet(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
@@ -17,18 +23,30 @@ class ToolViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(tools, many=True)
         return Response(serializer.data)
 
+    @method_decorator(ratelimit(key='ip', rate='30/m', method='POST', block=True))
+    @method_decorator(ratelimit(key='ip', rate='60/m', method='POST', group='global', block=True))
     @action(detail=False, methods=["post"], url_path="(?P<tool_name>[^/.]+)")
     def proxy_tool(self, request, tool_name):
         """Encaminha a requisição para a API da ferramenta"""
 
-        tool = Tool.objects.filter(name=tool_name, active=True).first()
-        if not tool:
+        try: # Valida existencia da ferramenta no banco
+            tool = Tool.objects.filter(name=tool_name, active=True).first()
+        except Tool.DoesNotExist:
             return JsonResponse({"error": f"Tool '{tool_name}' not found"}, status=404)
 
-        api_url = tool.api_url
-        try:
-            response = requests.post(api_url, json=request.data, headers=request.headers)
-            return JsonResponse(response.json(), status=response.status_code)
-        except requests.exceptions.RequestException as e:
-            return JsonResponse({"error": f"Failed to connect to '{tool_name}' API", "details": str(e)}, status=500)
-
+        for attempt in range(MAX_RETRIES):
+            try:
+                response = requests.post(
+                    tool.api_url,
+                    json=request.data,
+                    headers=request.headers,
+                    timeout=TIMEOUT_SECONDS
+                )
+                return JsonResponse(response.json(), status=response.status_code)
+            except requests.Timeout:
+                if attempt == MAX_RETRIES - 1:
+                    return JsonResponse({"error": "Request timeout"}, status=504)
+            except requests.RequestException as e:
+                if attempt == MAX_RETRIES - 1:
+                    return JsonResponse({"error": "Service unavailable"}, status=503)
+        
