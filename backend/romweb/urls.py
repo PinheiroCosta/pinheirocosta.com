@@ -11,10 +11,11 @@ from rest_framework.routers import DefaultRouter
 from common.routes import routes as common_routes
 from users.routes import routes as users_routes
 from blog.routes import routes as blog_routes
+from tools.routes import routes as tool_routes
 
 
 router = DefaultRouter()
-routes = common_routes + users_routes + blog_routes
+routes = common_routes + users_routes + blog_routes + tool_routes
 for route in routes:
     router.register(route["regex"], route["viewset"], basename=route["basename"])
 
