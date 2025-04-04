@@ -17,7 +17,6 @@ const Ferramentas = () => {
     setLoading(true);
     ToolsService.toolsList()
       .then((data) => {
-        console.log("deu tudo certo", data);
         setTools(data || []); // Garante que tools sempre seja um array
         setLoading(false);
       })
