@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "tinymce",
     "corsheaders",
     "tools",
+    "django_filters",
 ]
 
 MIDDLEWARE = [

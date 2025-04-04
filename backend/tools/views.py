@@ -2,6 +2,7 @@ import requests
 from django.http import JsonResponse
 from django_ratelimit.decorators import ratelimit
 from django.utils.decorators import method_decorator
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -15,13 +16,10 @@ MAX_RETRIES = 3
 
 class ToolViewSet(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
-    queryset = Tool.objects.all()
+    queryset = Tool.objects.filter(active=True)
     serializer_class = ToolSerializer
-
-    def list(self, request):
-        tools = Tool.objects.filter(active=True)
-        serializer = self.get_serializer(tools, many=True)
-        return Response(serializer.data)
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['id']
 
     @method_decorator(ratelimit(key='ip', rate='30/m', method='POST', block=True))
     @method_decorator(ratelimit(key='ip', rate='60/m', method='POST', group='global', block=True))
