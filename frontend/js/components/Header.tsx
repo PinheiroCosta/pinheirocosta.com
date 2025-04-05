@@ -27,7 +27,7 @@ const Header = () => {
               />
             </CustomNavLink>
           </Navbar.Brand>
-          <CustomNavLink to="/ferramentas" >Apps</CustomNavLink>
+          <CustomNavLink to="/tools" >Tools</CustomNavLink>
           <CustomNavLink to="/sobre">Sobre</CustomNavLink>
           </Navbar.Collapse>
         </Nav>
