@@ -3,10 +3,12 @@ from django.http import JsonResponse
 from django_ratelimit.decorators import ratelimit
 from django.utils.decorators import method_decorator
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
+from drf_spectacular.utils import extend_schema
+from drf_spectacular.types import OpenApiTypes
 from .models import Tool
 from .serializers import ToolSerializer
 
@@ -19,18 +21,19 @@ class ToolViewSet(viewsets.ModelViewSet):
     queryset = Tool.objects.filter(active=True)
     serializer_class = ToolSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['id']
+    filterset_fields = ['id'] 
 
     @method_decorator(ratelimit(key='ip', rate='30/m', method='POST', block=True))
     @method_decorator(ratelimit(key='ip', rate='60/m', method='POST', group='global', block=True))
-    @action(detail=False, methods=["post"], url_path="(?P<tool_name>[^/.]+)")
-    def proxy_tool(self, request, tool_name):
-        """Encaminha a requisição para a API da ferramenta"""
+    @extend_schema(operation_id="proxyTool", request=OpenApiTypes.OBJECT, responses=OpenApiTypes.OBJECT)
+    @action(detail=False, methods=["post"], url_path="(?P<slug>[^/.]+)")
+    def proxy_tool(self, request, slug):
+        """Encaminha a requisição para a API da ferramenta usando slug"""
 
         try: # Valida existencia da ferramenta no banco
-            tool = Tool.objects.filter(name=tool_name, active=True).first()
+            tool = Tool.objects.get(slug=slug, active=True)
         except Tool.DoesNotExist:
-            return JsonResponse({"error": f"Tool '{tool_name}' not found"}, status=404)
+            return JsonResponse({"error": f"Tool '{slug}' not found"}, status=404)
 
         for attempt in range(MAX_RETRIES):
             try:
@@ -48,3 +51,11 @@ class ToolViewSet(viewsets.ModelViewSet):
                 if attempt == MAX_RETRIES - 1:
                     return JsonResponse({"error": "Service unavailable"}, status=503)
         
+    @action(detail=False, methods=['get'], url_path='slug/(?P<slug>[^/.]+)')
+    def by_slug(self, request, slug=None):
+        try:
+            tool = Tool.objects.get(slug=slug, active=True)
+            serializer = ToolSerializer(tool)
+            return Response(serializer.data)
+        except Tool.DoesNotExist:
+            return Response({'detail': 'Ferramenta não encontrada'}, status=status.HTTP_NOT_FOUND)
