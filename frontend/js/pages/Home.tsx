@@ -4,7 +4,7 @@ import PhilosophySection from "../components/PhilosophySection";
 import LatestArticle from "../components/LatestArticle";
 
 import logoMain from "../../assets/images/logo-website.svg";
-import { RestService } from "../api/services.gen.ts";
+import { RestService } from "../api/services.gen";
 
 const Home = () => {
   const [restCheck, setRestCheck] =

@@ -1,13 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Container, Table, Spinner, Alert } from "react-bootstrap";
-import { ToolsService } from "../api/services.gen.ts"; 
+import { ToolsService } from "../api/services.gen"; 
 import { Link } from "react-router-dom";
+import type { Tool } from "../api/types.gen";
 
-interface Tool {
-  id: number;
-  name: string;
-  description: string;
-}
 
 const Tools = () => {
   const [tools, setTools] = useState<Tool[]>([]); // Inicializa com um array vazio

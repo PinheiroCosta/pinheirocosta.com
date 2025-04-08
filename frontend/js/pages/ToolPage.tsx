@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
-import GenericCalculatorTool from "../components/DynamicToolForm";
-import { ToolsRetrieveResponse, ToolsService } from "../api/services.gen.ts";
+import DynamicToolForm from "../components/DynamicToolForm";
+import { ToolsService } from "../api/services.gen.ts";
+import { ToolsRetrieveResponse } from "../api/types.gen";
 
 const ToolPage = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -31,7 +32,7 @@ const ToolPage = () => {
 
   switch (tool.category) {
     case "calculadora":
-      return <GenericCalculatorTool tool={tool} />;
+      return <DynamicToolForm tool={tool} />;
     default:
       return <p>Categoria não suportada ainda.</p>;
   }

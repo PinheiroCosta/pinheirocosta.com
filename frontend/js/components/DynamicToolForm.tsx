@@ -1,16 +1,13 @@
 import React, { useState } from "react";
-import {
-  Container, Col, Card, Form, Button, Alert
-} from "react-bootstrap";
-import {
-  ToolsService, ToolsRetrieveResponse, ProxyToolData, ProxyToolResponse
-} from "../api/services.gen.ts";
+import { Container, Col, Card, Form, Button, Alert } from "react-bootstrap";
+import { ToolsRetrieveResponse, ProxyToolData, ProxyToolResponse } from "../api/types.gen";
+import { ToolsService } from "../api/services.gen.ts";
 
-interface GenericCalculatorToolProps {
+interface DynamicToolFormProps {
   tool: ToolsRetrieveResponse;
 }
 
-const GenericCalculatorTool: React.FC<GenericCalculatorToolProps> = ({ tool }) => {
+const DynamicToolForm: React.FC<DynamicToolFormProps> = ({ tool }) => {
   const [formData, setFormData] = useState<{ [key: string]: any }>({});
   const [result, setResult] = useState<ProxyToolResponse | null>(null);
   const [loading, setLoading] = useState(false);
@@ -22,6 +19,11 @@ const GenericCalculatorTool: React.FC<GenericCalculatorToolProps> = ({ tool }) =
     setFormData(prev => ({ ...prev, [name]: parsedValue }));
   };
 
+  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -29,7 +31,10 @@ const GenericCalculatorTool: React.FC<GenericCalculatorToolProps> = ({ tool }) =
     setResult(null);
 
     try {
-      const payload: ProxyToolData = formData;
+      const payload: ProxyToolData ={
+        ...formData,
+        slug: tool.slug,
+      };
       const data = await ToolsService.proxyTool({
         slug: tool.slug,
         requestBody: payload
@@ -77,14 +82,19 @@ const renderInputField = (field: any) => {
       return (
         <Form.Group className="mb-3" controlId={field.name} key={field.name}>
           <Form.Label>{field.label}</Form.Label>
-          <Form.Select {...commonProps}>
-            <option value="">Selecione uma opção</option>
-            {field.options?.map((opt: any) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </Form.Select>
+          <Form.Select
+              name={field.name}
+              value={formData[field.name] ?? ""}
+              onChange={handleSelectChange}
+              required={field.required}
+            >
+              <option value="">Selecione uma opção</option>
+              {field.options?.map((opt: any) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </Form.Select>
         </Form.Group>
       );
 
@@ -127,7 +137,7 @@ const renderInputField = (field: any) => {
   }
 };
 
-  const getDisplayValue = (value: any, fieldType: string): string | number => {
+  const getDisplayValue = (value: any, fieldType: string): React.ReactNode => {
     if (value !== undefined && value !== null) {
         return value;
     }
@@ -178,12 +188,14 @@ const renderInputField = (field: any) => {
 
             {tool.outputs?.length > 0 && (
               <div className="mb-4">
-                {tool.outputs.map(renderOutputField)}
+                {Array.isArray(tool.outputs) &&
+                     (tool.outputs as any[]).map(renderOutputField)}
               </div>
             )}
 
             <Form onSubmit={handleSubmit}>
-              {tool.inputs?.map(renderInputField)}
+              {Array.isArray(tool.inputs) &&
+                (tool.inputs as any[]).map(renderInputField)}
 
               <Button
                 variant="primary"
@@ -203,5 +215,5 @@ const renderInputField = (field: any) => {
   );
 };
 
-export default GenericCalculatorTool;
+export default DynamicToolForm;
 
