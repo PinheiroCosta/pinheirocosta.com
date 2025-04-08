@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import DynamicToolForm from "../components/DynamicToolForm";
-import { ToolsService } from "../api/services.gen.ts";
+import { ToolsService } from "../api/services.gen";
 import { ToolsRetrieveResponse } from "../api/types.gen";
 
 const ToolPage = () => {

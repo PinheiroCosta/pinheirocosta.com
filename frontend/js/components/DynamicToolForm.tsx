@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Container, Col, Card, Form, Button, Alert } from "react-bootstrap";
 import { ToolsRetrieveResponse, ProxyToolData, ProxyToolResponse } from "../api/types.gen";
-import { ToolsService } from "../api/services.gen.ts";
+import { ToolsService } from "../api/services.gen";
 
 interface DynamicToolFormProps {
   tool: ToolsRetrieveResponse;
