@@ -23,7 +23,7 @@ class ToolSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tool
-        fields = ["id", "name", "slug", "description", "category", "api_url", "active", "inputs", "outputs"]
+        fields = ["id", "name", "slug", "description", "category", "active", "inputs", "outputs"]
 
     def get_inputs(self, obj):
         """ Retorna apenas os campos de entrada. """
