@@ -32,8 +32,7 @@ const Home = () => {
             <Card.Body>
               <Card.Header className="text-center fs-5">Novidades</Card.Header>
               <Card.Text className="text-truncate-card">
-                Em breve, vou adicionar aqui um feed com as últimas publicações que fiz nas redes. Como vou integrar isso de forma segura?
-                Ainda não faço ideia, mas vou pensar num jeito. 
+                Em breve, vou adicionar aqui um feed com as últimas publicações que fiz nas redes.
               </Card.Text>
             </Card.Body>
           </Card>

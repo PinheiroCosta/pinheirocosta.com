@@ -41,9 +41,9 @@ const RandomToolCard: React.FC = () => {
             </h5>
             <Card.Text className="text-justify">{tool.description}</Card.Text>
             <div className="text-center">
-              <Button className="nav-link active" as={Link} to={`/tools/${tool.slug}`}>
+              <Link className="nav-link active" to={`/tools/${tool.slug}`}>
                 Acessar Ferramenta
-              </Button>
+              </Link>
             </div>
           </>
         ) : (

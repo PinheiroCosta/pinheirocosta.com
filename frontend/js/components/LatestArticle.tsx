@@ -43,7 +43,7 @@ const LatestArticle: React.FC = () => {
             </h5>
             <Card.Text
               dangerouslySetInnerHTML={{
-                __html: latestPost.conteudo.substring(0, 150) + "...",
+                __html: latestPost.conteudo.substring(0, 330) + "...",
               }}
             />
           </>
