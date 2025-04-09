@@ -80,7 +80,7 @@ const renderInputField = (field: any) => {
 
     case "select":
       return (
-        <Form.Group className="mb-3" controlId={field.name} key={field.name}>
+        <Form.Group className="mb-1" controlId={field.name} key={field.name}>
           <Form.Label>{field.label}</Form.Label>
           <Form.Select
               name={field.name}
@@ -101,11 +101,11 @@ const renderInputField = (field: any) => {
     case "textarea":
     case "text":
       return (
-        <Form.Group className="mb-3" controlId={field.name} key={field.name}>
-          <Form.Label>{field.label}</Form.Label>
+        <Form.Group className="mb-1" controlId={field.name} key={field.name}>
+          <Form.Label className="fw-bold">{field.label}:</Form.Label>
           <Form.Control
             as="textarea"
-            rows={12}
+            rows={10}
             {...commonProps}
             style={{
               minHeight: "240px",
@@ -121,16 +121,16 @@ const renderInputField = (field: any) => {
     case "int":
     case "float":
       return (
-        <Form.Group className="mb-3" controlId={field.name} key={field.name}>
-          <Form.Label>{field.label}</Form.Label>
+        <Form.Group className="mb-1" controlId={field.name} key={field.name}>
+          <Form.Label className="fw-bold">{field.label}</Form.Label>
           <Form.Control type="number" {...commonProps} />
         </Form.Group>
       );
 
     default: // fallback para input text padrão
       return (
-        <Form.Group className="mb-3" controlId={field.name} key={field.name}>
-          <Form.Label>{field.label}</Form.Label>
+        <Form.Group className="mb-1" controlId={field.name} key={field.name}>
+          <Form.Label className="fw-bold">{field.label}</Form.Label>
           <Form.Control type="text" {...commonProps} />
         </Form.Group>
       );
@@ -158,7 +158,7 @@ const renderInputField = (field: any) => {
 
   const renderOutputField = (field: any) => {
     const value = result?.[field.name];
-    const displayValue = getDisplayValue(value, field.field_type);
+    const displayValue = getDisplayValue(value, field.field_type) | 0;
     const formatedValue = new Intl.NumberFormat('pt-BR').format(displayValue);
 
     return (
@@ -174,7 +174,7 @@ const renderInputField = (field: any) => {
           alignItems: "center",
         }}
       >
-        <strong>{field.label}</strong>
+        <strong>{field.label}:</strong>
         <span>{formatedValue}</span>
       </div>
     );
@@ -199,7 +199,7 @@ const renderInputField = (field: any) => {
 
               <Button
                 type="submit"
-                className="w-100"
+                className="w-100 fs-4"
                 disabled={loading}
               >
                 {loading ? "Calculando..." : "Calcular"}
