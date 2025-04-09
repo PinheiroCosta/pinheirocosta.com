@@ -13,7 +13,7 @@ class TextInput(BaseModel):
 
 @app.post("/count/")
 def count_characters(data: TextInput):
-    text = bytes(data.text, "utf-8").decode("unicode_escape")  # ← aqui
+    text = data.text
     escaped_chars = {"\n", "\t", "\r", "\f", "\v"}
     filtered = []
 
@@ -33,7 +33,6 @@ def count_characters(data: TextInput):
                 filtered.append(ch)
             continue
 
-        # alfanuméricos sempre entram
         filtered.append(ch)
 
     return {
