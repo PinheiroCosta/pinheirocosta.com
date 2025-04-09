@@ -70,3 +70,57 @@ a {
   text-align: justify;
   text-justify: inter-word;
 }
+
+.btn {
+  background-color: $verde;
+  border-color: $verde;
+  color: white;
+}
+
+// Inputs
+.btn:hover {
+  background-color: $verde;
+  border-color: $verde;
+}
+
+.form-check-input:checked {
+  background-color: $verde;
+  border-color: $verde;
+}
+
+// Cards
+.card {
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
+}
+.card-header {
+  margin: 0;
+}
+
+// Table
+.table-wrapper {
+  border-radius: 10px;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
+}
+table {
+  border-collapse: separate;
+  border-spacing: 2px 0;
+}
+table thead tr th {
+  background-color: $verde !important;
+  color: white !important;
+}
+table thead tr th:first-child {
+  border-top-left-radius: 10px;
+}
+table thead tr th:last-child {
+  border-top-right-radius: 10px;
+}
+table tbody tr td {
+  background-color: $bege-claro !important;
+}
+table tbody tr:last-child td:last-child{
+  border-bottom-right-radius: 10px;
+}
+table tbody tr:last-child td:nth-last-child(2){
+  border-bottom-left-radius: 10px;
+}

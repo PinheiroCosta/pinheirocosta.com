@@ -25,8 +25,8 @@ const RandomToolCard: React.FC = () => {
 
   return (
     <Card className="text-start">
+    <Card.Header className="text-center mb-2 pb-3 pt-3 fs-5">Ferramenta em Destaque</Card.Header>
       <Card.Body>
-        <Card.Header className="text-center mb-2 fs-5">Ferramenta em Destaque</Card.Header>
 
         {loading ? (
           <p>Carregando ferramenta...</p>

@@ -43,9 +43,10 @@ const Tools = () => {
   }
 
   return (
-    <Container className="mt-5">
+    <Container className="mt-5 ">
       <h2 className="my-4 text-center">Lista de Ferramentas</h2>
-      <Table striped bordered hover >
+      <div className="table-wrapper">
+      <Table className="my-table">
         <thead>
           <tr>
             <th>Nome</th>
@@ -55,7 +56,7 @@ const Tools = () => {
         <tbody>
           {tools.map((tool) => (
             <tr key={tool.id}>
-              <td className="align-middle">
+              <td className="align-middle fw-bold">
                 <Link to={`/tools/${tool.slug}`} state={{ tool }}>
                     {tool.name}
                 </Link>
@@ -65,6 +66,7 @@ const Tools = () => {
           ))}
         </tbody>
       </Table>
+    </div>
     </Container>
   );
 };

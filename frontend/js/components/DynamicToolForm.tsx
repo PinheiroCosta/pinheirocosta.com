@@ -198,7 +198,6 @@ const renderInputField = (field: any) => {
                 (tool.inputs as any[]).map(renderInputField)}
 
               <Button
-                variant="primary"
                 type="submit"
                 className="w-100"
                 disabled={loading}

@@ -32,8 +32,8 @@ const LatestArticle: React.FC = () => {
 
   return (
     <Card className="text-start">
+      <Card.Header className="text-center mb-2 pb-3 pt-3 fs-5">Última Publicação</Card.Header>
       <Card.Body>
-        <Card.Header className="text-center mb-2 fs-5">Última Publicação</Card.Header>
         {loading ? (
           <p>Carregando última publicação do blog...</p>
         ) : latestPost ? (

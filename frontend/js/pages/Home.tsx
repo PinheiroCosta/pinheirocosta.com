@@ -29,8 +29,8 @@ const Home = () => {
       <Row className="justify-content-center">
         <Col md={4} className="d-flex mb-2">
           <Card className="text-start ">
+          <Card.Header className="text-center mb-2 pb-3 pt-3 fs-5">Novidades</Card.Header>
             <Card.Body>
-              <Card.Header className="text-center fs-5">Novidades</Card.Header>
               <Card.Text className="text-truncate-card">
                 Em breve, vou adicionar aqui um feed com as últimas publicações que fiz nas redes.
               </Card.Text>
