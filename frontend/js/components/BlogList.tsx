@@ -55,10 +55,10 @@ const BlogList: React.FC<BlogListProps> = ({ posts, loading, error }) => {
                     </CustomNavLink>
                   ))}
                 </div>
+              </Card.Body>
                 <Card.Footer className="text-muted">
                   Publicado em: {new Date(post.criado_em).toLocaleDateString()} Por: <Link className="text-decoration-none" to="/sobre">{post.nome_autor}</Link>
                 </Card.Footer>
-              </Card.Body>
             </Card>
           </Col>
         ))}
