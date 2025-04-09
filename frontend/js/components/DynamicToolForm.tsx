@@ -138,28 +138,37 @@ const renderInputField = (field: any) => {
 };
 
   const getDisplayValue = (value: any, fieldType: string): React.ReactNode => {
-    if (value !== undefined && value !== null) {
-        return value;
-    }
+    if (value === undefined || value === null) return "";
     
     switch (fieldType) {
-        case "string":
-        case "text":
-            return <textarea />;
         case "int":
         case "float":
-            return <input type="number" />;
+            return new Intl.NumberFormat("pt-BR").format(Number(value));
         case "boolean":
-            return <input type="checkbox" />;
+            return value ? "Sim" : "Não";
+        case "date":
+        case "datetime":
+            try {
+                const date = new Date(value);
+                return date.toLocaleDateString("pt-BR", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric", 
+                });
+            } catch {
+                return String(value);
+            }
+        case "string":
+        case "text":
         case "select":
-            return <select>...</select>;
+        default:
+            return String(value);
     }
   };
 
   const renderOutputField = (field: any) => {
     const value = result?.[field.name];
-    const displayValue = getDisplayValue(value, field.field_type) | 0;
-    const formatedValue = new Intl.NumberFormat('pt-BR').format(displayValue);
+    const displayValue = Number(getDisplayValue(value, field.field_type)) || 0;
 
     return (
       <div
@@ -175,7 +184,7 @@ const renderInputField = (field: any) => {
         }}
       >
         <strong>{field.label}:</strong>
-        <span>{formatedValue}</span>
+        <span>{displayValue}</span>
       </div>
     );
   };
