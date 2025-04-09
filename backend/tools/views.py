@@ -1,3 +1,4 @@
+import random
 import requests
 from django.http import JsonResponse
 from django_ratelimit.decorators import ratelimit
@@ -26,7 +27,7 @@ class ToolViewSet(viewsets.ModelViewSet):
     @method_decorator(ratelimit(key='ip', rate='30/m', method='POST', block=True))
     @method_decorator(ratelimit(key='ip', rate='60/m', method='POST', group='global', block=True))
     @extend_schema(operation_id="proxyTool", request=OpenApiTypes.OBJECT, responses=OpenApiTypes.OBJECT)
-    @action(detail=False, methods=["post"], url_path="(?P<slug>[^/.]+)")
+    @action(detail=False, methods=["post"], url_path="proxy/(?P<slug>[^/.]+)")
     def proxy_tool(self, request, slug):
         """Encaminha a requisição para a API da ferramenta usando slug"""
 
@@ -59,3 +60,14 @@ class ToolViewSet(viewsets.ModelViewSet):
             return Response(serializer.data)
         except Tool.DoesNotExist:
             return Response({'detail': 'Ferramenta não encontrada'}, status=status.HTTP_NOT_FOUND)
+
+    @action(detail=False, methods=["get"], url_path="random")
+    def random_tool(self, request):
+        count = self.queryset.count()
+        if count == 0:
+            return Response({"detail": "Nenhuma ferramenta disponível."}, status=404)
+        random_index = random.randint(0, count - 1)
+        tool = self.queryset.all()[random_index]
+        serializer = self.get_serializer(tool)
+        return Response(serializer.data)
+        

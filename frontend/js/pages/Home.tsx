@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Card} from "react-bootstrap";
 import PhilosophySection from "../components/PhilosophySection";
 import LatestArticle from "../components/LatestArticle";
+import RandomToolCard from "../components/RandomToolCard";
 
 import logoMain from "../../assets/images/logo-website.svg";
 import { RestService } from "../api/services.gen";
@@ -42,16 +43,7 @@ const Home = () => {
             <LatestArticle />
         </Col>
         <Col md={4} className="d-flex mb-2">
-          <Card className="text-start ">
-            <Card.Body>
-              <Card.Header className="text-center fs-5">Ferramentas</Card.Header>
-              <Card.Text>
-                Este card será dedicado à uma das ferramentas que disponibilizarei de forma gratuita nesse site. 
-                A ideia é exibir uma ferramenta aleatoria que ta no repositório com uma breve descrição do que ela faz, e como
-                utilizar.
-              </Card.Text>
-            </Card.Body>
-          </Card>
+            <RandomToolCard />
         </Col>
       </Row>
     </Container>

@@ -184,7 +184,7 @@ const renderInputField = (field: any) => {
       <Col xs={12} md={8} lg={6}>
         <Card className="shadow p-4">
           <Card.Body>
-            <Card.Title className="text-center mb-5">{tool.description}</Card.Title>
+            <Card.Title className="text-center mb-5">{tool.name.charAt(0).toUpperCase() + tool.name.slice(1)}</Card.Title>
 
             {tool.outputs?.length > 0 && (
               <div className="mb-4">
