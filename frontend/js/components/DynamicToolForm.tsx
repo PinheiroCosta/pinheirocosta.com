@@ -60,7 +60,7 @@ const renderInputField = (field: any) => {
     case "checkbox":
     case "bool":
       return (
-        <Form.Group className="mb-3" controlId={field.name} key={field.name}>
+        <Form.Group className="mb-1" controlId={field.name} key={field.name}>
           <Form.Check
             type="checkbox"
             label={field.label}
@@ -159,33 +159,33 @@ const renderInputField = (field: any) => {
   const renderOutputField = (field: any) => {
     const value = result?.[field.name];
     const displayValue = getDisplayValue(value, field.field_type);
+    const formatedValue = new Intl.NumberFormat('pt-BR').format(displayValue);
 
     return (
       <div
         key={field.name}
-        className="mb-2 p-3 rounded"
+        className="mb-1 p-1 rounded"
         style={{
           backgroundColor: "#f8f9fa",
-          border: "1px solid #ced4da",
-          fontSize: "1.2rem",
+          border: "1px solid #aeb4ba",
+          fontSize: "1.0rem",
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
         }}
       >
         <strong>{field.label}</strong>
-        <span>{displayValue}</span>
+        <span>{formatedValue}</span>
       </div>
     );
   };
 
   return (
     <Container className="d-flex justify-content-center align-items-start mt-5">
-      <Col xs={12} md={8} lg={6}>
-        <Card className="shadow p-4">
+      <Col xs={12} md={8} lg={5}>
+        <Card className="shadow">
+            <Card.Header className="text-center p-1 mb-1 fs-3 fw-bold">{tool.name.charAt(0).toUpperCase() + tool.name.slice(1)}</Card.Header>
           <Card.Body>
-            <Card.Title className="text-center mb-5">{tool.name.charAt(0).toUpperCase() + tool.name.slice(1)}</Card.Title>
-
             {tool.outputs?.length > 0 && (
               <div className="mb-4">
                 {Array.isArray(tool.outputs) &&
