@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Image, Card } from "react-bootstrap";
 import axios from "axios";
-import AtualizarIdade from "../components/AtualizarIdade";
 
 
 const Sobre = () => {
@@ -61,7 +60,6 @@ const Sobre = () => {
           </Card>
         </Col>
       </Row>
-    <AtualizarIdade />
     </Container>
   );
 };
