@@ -12,10 +12,11 @@ from common.routes import routes as common_routes
 from users.routes import routes as users_routes
 from blog.routes import routes as blog_routes
 from tools.routes import routes as tool_routes
+from motd.routes import routes as motd_routes
 
 
 router = DefaultRouter()
-routes = common_routes + users_routes + blog_routes + tool_routes
+routes = common_routes + users_routes + blog_routes + tool_routes + motd_routes
 for route in routes:
     router.register(route["regex"], route["viewset"], basename=route["basename"])
 

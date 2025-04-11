@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "tools",
     "django_filters",
+    "motd",
 ]
 
 MIDDLEWARE = [

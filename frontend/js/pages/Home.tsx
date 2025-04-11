@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Card} from "react-bootstrap";
-import PhilosophySection from "../components/PhilosophySection";
+import Motd from "../components/Motd";
 import LatestArticle from "../components/LatestArticle";
 import RandomToolCard from "../components/RandomToolCard";
 
@@ -25,7 +25,7 @@ const Home = () => {
 
   return (
     <Container className="p-4">
-    <PhilosophySection />
+    <Motd />
       <Row className="justify-content-center">
         <Col md={4} className="d-flex mb-2">
           <Card className="text-start ">
