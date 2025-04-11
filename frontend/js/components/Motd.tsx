@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Container, Row, Col, Spinner, Badge } from "react-bootstrap";
-import { FaCodeBranch } from "react-icons/fa";
+import { Container, Row, Col, Spinner } from "react-bootstrap";
 import { MotdService, MotdConfigService } from "../api/services.gen";
 
 const Motd = () => {
