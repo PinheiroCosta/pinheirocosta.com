@@ -50,7 +50,7 @@ const Motd = () => {
         <Row>
           <Col md={4} className="my-auto">
             <div className="d-flex mb-2 justify-content-end">
-              <div title="Mensagem do dia" className="px-2 py-1 nav-link active fw-bold fs-5">
+              <div title="Mensagem do dia" className="px-2 py-1 fw-bold fs-5 border border-dark rounded">
                 MOTD
               </div>
             </div>
