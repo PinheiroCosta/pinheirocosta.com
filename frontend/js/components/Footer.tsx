@@ -6,7 +6,7 @@ const Footer = () => {
   return (
     <footer className="mt-5 py-4">
       <Container>
-        <Row xs="auto" className="justify-content-center mb-1">
+        <Row xs="auto" className="justify-content-center mb-2">
           {/* Links para redes sociais */}
           <Col >
             <a
@@ -41,7 +41,19 @@ const Footer = () => {
         </Row>
         {/* Texto do footer */}
         <Row className="footer-text">
-          <Col className="text-center mt-2">
+          <Col className="text-center">
+            <small className="text-muted">
+              Fork do 
+              <a href="https://github.com/vintasoftware/django-react-boilerplate" 
+                 target="_blank" 
+                 rel="noopener noreferrer"
+                 className="text-decoration-none"
+              > boilerplate da Vinta</a>.
+            </small>
+          </Col>
+        </Row>
+        <Row className="footer-text">
+          <Col className="text-center">
             <small className="text-muted">
               &copy; {new Date().getFullYear()} PinheiroCosta. 
               Todos os direitos reservados.
@@ -51,8 +63,10 @@ const Footer = () => {
         <Row className="footer-text">
           <Col className="text-center">
             <small className="text-muted">
-              Desenvolvido com o 
-              <a href="https://github.com/vintasoftware/django-react-boilerplate" target="_blank" rel="noopener noreferrer"> boilerplate da Vinta</a>.
+             Ao utilizar este site, você concorda com nossa{" "}
+              <a href="/privacidade" className="text-decoration-underline">
+                 Política de Privacidade
+              </a>.
             </small>
           </Col>
         </Row>
