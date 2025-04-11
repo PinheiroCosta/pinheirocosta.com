@@ -16,8 +16,8 @@ const Motd = () => {
           messageHtml = config.message_override_text;
         } else {
           const motds = await MotdService.motdRandomRetrieve();
-          if (motds.message) {
-            messageHtml = motds.message;
+          if (motds.text) {
+            messageHtml = motds.text;
           }
         }
       } catch (error: any) {
@@ -26,8 +26,8 @@ const Motd = () => {
         if (status === 404) {
           try {
             const motds = await MotdService.motdRandomRetrieve();
-            if (motds.message) {
-              messageHtml = motds.message;
+            if (motds.text) {
+              messageHtml = motds.text;
             }
           } catch (innerError) {
             console.error("Erro ao buscar MOTD aleatória:", innerError);

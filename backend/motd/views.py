@@ -24,14 +24,15 @@ class MOTDViewSet(viewsets.ModelViewSet):
                 motd = config.message_override.text
             else:
                 messages = MOTD.objects.filter(active=True)
-                if messages.exists():
-                    motd = random.choice(messages).text
-                else:
-                    motd = "Nenhuma mensagem disponível no momento."
+                motd = random.choice(messages) if messages.exists() else None
 
             cache.set('motd_of_the_day', motd, timeout=60 * 60 * 24)
 
-        return Response({"message": motd})
+        if motd is None:
+            return Response({"detail": "Nenhuma mensagem disponível"}, status=204) 
+
+        serializer = MOTDSerializer(motd)
+        return Response(serializer.data)
 
 
 class MOTDConfigViewSet(viewsets.ModelViewSet):
