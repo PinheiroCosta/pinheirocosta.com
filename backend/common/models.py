@@ -1,11 +1,13 @@
-import imghdr
-import base64
+from django.core.files.uploadedfile import UploadedFile
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
 from tinymce.models import HTMLField
 from model_utils.fields import AutoCreatedField, AutoLastModifiedField
+import base64
+from PIL import Image
+import io
 
 
 class IndexedTimeStampedModel(models.Model):
@@ -40,24 +42,35 @@ class AboutMe(models.Model):
         validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'gif'])]
     )
 
+    def process_temp_image(self):
+        if not self.temp_image:
+            return
+        
+        try:
+            if hasattr(self.temp_image, 'seek') and hasattr(self.temp_image, 'read'):
+                self.temp_image.seek(0) # Garante que está no inicio da leitura
+                img = Image.open(self.temp_image)
+                img_format = img.format.lower()
+
+                if img_format not in ["jpg", "jpeg", "png", "gif"]:
+                    raise ValidationError(f"Formato inválido: {img_format}. Use JPG, JPEG, PNG, ou GIF.")
+
+                buffered = io.BytesIO()
+                img.save(buffered, format=img_format.upper())
+                encoded_string = base64.b64encode(buffered.getvalue()).decode("utf-8")
+                self.about_image = f"data:image/{img_format};base64,{encoded_string}"
+            else:
+                raise ValidationError("Imagem inválida ou ausente.")
+
+            self.temp_image = None
+        except Exception as e:
+            raise ValidationError(f"Erro ao processar a imagem: {str(e)}")
+
     def save(self, *args, **kwargs):
         if not self.pk and AboutMe.objects.exists():
             raise ValidationError("Só pode existir um único registro de 'Sobre Mim'.")
-        if self.temp_image:
-            self.temp_image.save(self.temp_image.name, self.temp_image, save=False)
-            try:
-                file_format = imghdr.what(self.temp_image.path)
-                if file_format not in ["jpg", "jpeg", "png", "gif"]:
-                    raise ValueError("Formato de imagem inválido. Use JPG, JPEG, PNG, ou GIF.")
 
-                with self.temp_image.open("rb") as image_file:
-                    encoded_string = base64.b64encode(image_file.read()).decode("utf-8")
-                    self.about_image = f"data:image/{file_format};base64,{encoded_string}"
-
-                self.temp_image.delete(save=False)
-            except Exception as e:
-                raise ValidationError(f"Erro ao processar a imagem: {str(e)}")
-
+        self.process_temp_image()
         super().save(*args, **kwargs)
 
     def __str__(self):
