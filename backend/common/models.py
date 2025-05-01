@@ -1,13 +1,11 @@
-from django.core.files.uploadedfile import UploadedFile
+import os
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
 from tinymce.models import HTMLField
 from model_utils.fields import AutoCreatedField, AutoLastModifiedField
-import base64
-from PIL import Image
-import io
+from django.dispatch import receiver
 
 
 class IndexedTimeStampedModel(models.Model):
@@ -29,7 +27,12 @@ class ParametroSistema(models.Model):
 
 
 class AboutMe(models.Model):
-    about_image = models.TextField(null=True, blank=True)
+    about_image = models.ImageField(
+        upload_to="about_me/",
+        null=True, 
+        blank=True,
+        validators=[FileExtensionValidator(allowed_extensions=['jpeg', 'jpg', 'png', 'gif'])]
+    )
     about_text = HTMLField()  
     social_links = models.JSONField(default=dict, blank=True)
     meta_description = models.CharField(max_length=160, blank=True, null=True)  # Meta descrição para SEO
@@ -37,41 +40,23 @@ class AboutMe(models.Model):
     last_modified = models.DateTimeField(auto_now=True) 
     created_at = models.DateTimeField(auto_now_add=True)
     slug = models.SlugField(unique=True, blank=True, null=True)  # Slug para URL amigável
-    temp_image = models.ImageField(
-        upload_to="temp_uploads/", null=True, blank=True,
-        validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'gif'])]
-    )
-
-    def process_temp_image(self):
-        if not self.temp_image:
-            return
-        
-        try:
-            if hasattr(self.temp_image, 'seek') and hasattr(self.temp_image, 'read'):
-                self.temp_image.seek(0) # Garante que está no inicio da leitura
-                img = Image.open(self.temp_image)
-                img_format = img.format.lower()
-
-                if img_format not in ["jpg", "jpeg", "png", "gif"]:
-                    raise ValidationError(f"Formato inválido: {img_format}. Use JPG, JPEG, PNG, ou GIF.")
-
-                buffered = io.BytesIO()
-                img.save(buffered, format=img_format.upper())
-                encoded_string = base64.b64encode(buffered.getvalue()).decode("utf-8")
-                self.about_image = f"data:image/{img_format};base64,{encoded_string}"
-            else:
-                raise ValidationError("Imagem inválida ou ausente.")
-
-            self.temp_image = None
-        except Exception as e:
-            raise ValidationError(f"Erro ao processar a imagem: {str(e)}")
 
     def save(self, *args, **kwargs):
-        if not self.pk and AboutMe.objects.exists():
-            raise ValidationError("Só pode existir um único registro de 'Sobre Mim'.")
-
-        self.process_temp_image()
+        try:
+            old = AboutMe.objects.get(id=self.id)
+            if old.about_image and old.about_image != self.about_image:
+                if os.path.isfile(old.about_image.path):
+                    os.remove(old.about_image.path)
+        except AboutMe.DoesNotExist:
+            pass
         super().save(*args, **kwargs)
 
     def __str__(self):
         return "Informações sobre o dono do site"
+
+
+@receiver(models.signals.post_delete, sender=AboutMe)
+def auto_delete_file_on_delete(sender, instance, **kwargs):
+    """Deleta arquivo do sistema quando o objeto AboutMe é removido."""
+    if instance.about_image and os.path.isfile(instance.about_image.path):
+        os.remove(instance.about_image.path)

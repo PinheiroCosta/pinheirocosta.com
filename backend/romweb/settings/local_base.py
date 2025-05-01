@@ -10,8 +10,8 @@ SECRET_KEY = "secret"  # noqa: S105
 STATIC_ROOT = base_dir_join("staticfiles")
 STATIC_URL = "/static/"
 
-MEDIA_ROOT = base_dir_join("mediafiles")
-MEDIA_URL = "/media/"
+MEDIA_ROOT = base_dir_join("media")
+MEDIA_URL = '/media/'
 
 STORAGES = {
     "default": {

@@ -29,7 +29,7 @@ const Sobre = () => {
               src={aboutMeData.about_image}
               roundedCircle
               fluid
-              className="shadow-lg"
+              className="shadow about-me-img"
               alt="Foto do dono do site"
             />
         </Col>

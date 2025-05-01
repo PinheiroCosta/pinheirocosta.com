@@ -52,3 +52,6 @@ tmp_email/
 .tool-versions
 
 backend/checkpoint/db/*
+
+# Diretório de midia
+backend/media/
