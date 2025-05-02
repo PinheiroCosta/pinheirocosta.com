@@ -70,8 +70,8 @@ docker_prod_up:
 	@docker-compose -f ${DOCKER_COMPOSE_FILE} run --rm backend poetry run ./manage.py collectstatic --clear --noinput
 	@echo -e "\033[32m[INFO] Aguardando as novas versões estarem ativas...\033[0m"
 	@docker-compose -f ${DOCKER_COMPOSE_FILE} up -d --no-deps --scale backend=2
-	@docker-compose -f ${DOCKER_COMPOSE_FILE} up -d --no-deps --scale frontend=2
 	@echo -e "\033[32m[INFO] Contêineres atualizados!\033[0m"
+	@make docker_cleanup_frontend
 
 docker_update_dependencies:
 	docker-compose -f ${DOCKER_COMPOSE_FILE} down
@@ -122,3 +122,6 @@ deploy_rolling_update:
 	@make docker_db_restore  
 	@echo -e "\033[32m[DEPLOY] Rolling Update concluído!\033[0m"
 
+docker_cleanup_frontend:
+	@docker-compose -f ${DOCKER_COMPOSE_FILE} stop frontend
+	@docker-compose -f ${DOCKER_COMPOSE_FILE} rm -sf frontend

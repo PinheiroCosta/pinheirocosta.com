@@ -26,15 +26,11 @@ services:
     build:
       dockerfile: frontend/Dockerfile.prod
       context: .
-    deploy:
-      replicas: 2
-      update_config:
-        parallelism: 1
     volumes:
       - .:/app/
       - /app/node_modules
     ports:
-      - "3000-3001:3000"
+      - "3000:3000"
 
   backend:
     build:
