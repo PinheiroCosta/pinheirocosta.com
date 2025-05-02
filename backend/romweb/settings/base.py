@@ -145,12 +145,12 @@ USE_I18N = True
 
 USE_TZ = True
 
-STATICFILES_DIRS = (base_dir_join("../frontend"),)
+STATICFILES_DIRS = (base_dir_join("../frontend/webpack_bundles"),)
 
 # Webpack
 WEBPACK_LOADER = {
     "DEFAULT": {
-        "BUNDLE_DIR_NAME": "webpack_bundles/",
+        "BUNDLE_DIR_NAME": "assets/",
         "CACHE": False,  # on DEBUG should be False
         "STATS_FILE": base_dir_join("../webpack-stats.json"),
         "POLL_INTERVAL": 0.1,

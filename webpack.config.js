@@ -13,13 +13,13 @@ module.exports = (env, argv) => {
     : process.env.REACT_APP_API_URL || "";
   const nodeModulesDir = path.resolve(__dirname, "node_modules");
   const localhostOutput = {
-    path: path.resolve("./frontend/webpack_bundles/"),
-    publicPath: "http://localhost:3000/frontend/webpack_bundles/",
+    path: path.resolve("./frontend/webpack_bundles/assets/"),
+    publicPath: "http://localhost:3000/frontend/assets/",
     filename: "[name].js",
   };
   const productionOutput = {
-    path: path.resolve("./frontend/webpack_bundles/"),
-    publicPath: "auto",
+    path: path.resolve("./frontend/webpack_bundles/assets/"),
+    publicPath: "/static/assets/",
     filename: "[name]-[chunkhash].js",
   };
 
