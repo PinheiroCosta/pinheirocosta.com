@@ -56,8 +56,13 @@ const BlogList: React.FC<BlogListProps> = ({ posts, loading, error }) => {
                   ))}
                 </div>
               </Card.Body>
-                <Card.Footer className="text-muted">
-                  Publicado em: {new Date(post.criado_em).toLocaleDateString()} Por: <Link className="text-decoration-none" to="/sobre">{post.nome_autor}</Link>
+                <Card.Footer className="text-muted d-flex justify-content-between">
+                  <span>
+                    Publicado em: {new Date(post.criado_em).toLocaleDateString()}
+                  </span>
+                  <span>
+                    <Link className="text-decoration-none" to="/sobre">Por: {post.nome_autor}</Link>
+                  </span>
                 </Card.Footer>
             </Card>
           </Col>
