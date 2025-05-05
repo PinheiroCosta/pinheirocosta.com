@@ -5,6 +5,7 @@ const DotEnv = require("dotenv-webpack");
 const ReactRefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const BundleTracker = require("webpack-bundle-tracker");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 module.exports = (env, argv) => {
   const isDev = argv.mode === "development";
@@ -106,6 +107,15 @@ module.exports = (env, argv) => {
       new BundleTracker({
         path: __dirname,
         filename: "webpack-stats.json",
+      }),
+      new CopyWebpackPlugin({
+        patterns: [
+            {
+                from: path.resolve(__dirname, "frontend/assets/images/favicon.ico"),
+                to: "favicon.ico",
+                noErrorOnMissing: true,
+            },
+        ],
       }),
     ].filter(Boolean),
     resolve: {
