@@ -1,8 +1,16 @@
 import React from "react";
 import { Form } from "react-bootstrap";
+import { ToolField } from "../../api/types.gen";
 
-export const SelectInput = ({ field, value, onChange }) => {
-  const handleChange = (e) => {
+
+interface SelectInputProps {
+    field: ToolField
+    value: string | number;
+    onChange: (name: string, value: string | number) => void;
+}
+
+export const SelectInput: React.FC<SelectInputProps> = ({ field, value, onChange }) => {
+  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const rawValue = e.target.value;
 
     let finalValue;

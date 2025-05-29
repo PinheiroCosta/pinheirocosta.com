@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Tool, ToolField, ToolFieldOption
+from drf_spectacular.utils import extend_schema_field
 
 
 class ToolFieldOptionSerializer(serializers.ModelSerializer):
@@ -25,11 +26,13 @@ class ToolSerializer(serializers.ModelSerializer):
         model = Tool
         fields = ["id", "name", "slug", "description", "category", "active", "inputs", "outputs"]
 
+    @extend_schema_field(ToolFieldSerializer(many=True))
     def get_inputs(self, obj):
         """ Retorna apenas os campos de entrada. """
         inputs = obj.fields.filter(io_type="input")
         return ToolFieldSerializer(inputs, many=True).data
 
+    @extend_schema_field(ToolFieldSerializer(many=True))
     def get_outputs(self, obj):
         """ Retorna apenas os campos de saída. """
         outputs = obj.fields.filter(io_type="output")

@@ -32,7 +32,7 @@ export const renderInputField = ({
         <BoolInput
           field={field}
           value={formData[field.name] !== undefined ? formData[field.name] : true}
-          onChange={(name, val) => setFormData((prev) => ({ ...prev, [name]: val }))}
+          onChange={(name: string, val: any) => setFormData((prev) => ({ ...prev, [name]: val }))}
         />
       );
     case "textarea":
@@ -73,7 +73,7 @@ export const renderInputField = ({
         <SelectInput
           field={field}
           value={formData[field.name]}
-          onChange={(name, value) => setFormData((prev) => ({ ...prev, [name]: value }))}
+          onChange={(name: string, value: any) => setFormData((prev) => ({ ...prev, [name]: value }))}
         />
       );
     case "input":
