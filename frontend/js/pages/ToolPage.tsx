@@ -32,9 +32,8 @@ const ToolPage = () => {
 
   switch (tool.category) {
     case "calculadora":
-      return <DynamicToolForm tool={tool} />;
     default:
-      return <p>Categoria não suportada ainda.</p>;
+      return <DynamicToolForm tool={tool} />;
   }
 };
 
