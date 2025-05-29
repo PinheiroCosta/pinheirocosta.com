@@ -6,7 +6,7 @@ class ToolFieldOptionSerializer(serializers.ModelSerializer):
     """ Serializa as opções de um campo (usado para selects). """
     class Meta:
         model = ToolFieldOption
-        fields = ["value", "label"]
+        fields = ["id", "value", "label"]
 
 class ToolFieldSerializer(serializers.ModelSerializer):
     """ Serializa os campos de entrada e saída de uma ferramenta. """
@@ -14,7 +14,7 @@ class ToolFieldSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ToolField
-        fields = ["name", "label", "data_type", "widget_type", "required", "options"]
+        fields = ["id", "name", "label", "data_type", "widget_type", "default_value", "min_value", "max_value", "help_text", "required", "options"]
 
 class ToolSerializer(serializers.ModelSerializer):
     """ Serializa a ferramenta, separando inputs e outputs. """
