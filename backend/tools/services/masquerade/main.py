@@ -25,6 +25,9 @@ class FichaRequest(BaseModel):
     virtudes: Optional[Dict[str, int]] = None
     nome: Optional[str] = None
     cla: Optional[str] = None
+    conceito: Optional[str] = None
+    comportamento: Optional[str] = None
+    natureza: Optional[str] = None
 
 
 @app.post("/fichas/vampiro")
