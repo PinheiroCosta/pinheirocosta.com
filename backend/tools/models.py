@@ -57,6 +57,8 @@ class ToolField(models.Model):
     widget_type = models.CharField(max_length=50, choices=WIDGET_TYPES, blank=True, null=True, default="")
     required = models.BooleanField(default=False)
     help_text = models.CharField(max_length=255, blank=True)
+    min_value = models.IntegerField(null=True, blank=True, default=0)
+    max_value = models.IntegerField(null=True, blank=True)
     default_value = models.CharField(max_length=255, blank=True)
 
     class Meta:
