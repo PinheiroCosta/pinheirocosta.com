@@ -73,3 +73,11 @@ services:
     ports:
       - "5001:5001"
 
+  masquerade:
+    build:
+      context: ./backend/tools/services/masquerade
+      dockerfile: Dockerfile
+    ports:
+      - "5005:5005"
+    volumes:
+      - ./backend/tools/services/masquerade:/app
