@@ -1,11 +1,11 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import BlogPostViewSet
+from .views import BlogPostViewSet, BlogPostDetailView
 
-router = DefaultRouter()
-router.register(r'api/blog', BlogPostViewSet, basename='blogpost')
+
+app_name = "blog"
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path("blog/<slug:slug>/", BlogPostDetailView.as_view(), name="post_detail"),
 ]
 

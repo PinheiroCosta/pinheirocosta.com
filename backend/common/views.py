@@ -1,13 +1,30 @@
-from django.views import generic
-
+from django.views import generic, View
+from django.http import HttpResponse
 from drf_spectacular.utils import OpenApiExample, extend_schema
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from .models import ParametroSistema, AboutMe
+from .models import ParametroSistema, AboutMe, RobotsTxt
 from .serializers import ParametroSistemaSerializer, AboutMeSerializer, MessageSerializer
+
+
+class RobotsTxtView(View):
+    def get(self, request, *args, **kwargs):
+        try:
+            robots = RobotsTxt.objects.latest("last_modified")
+            content = robots.content.strip()
+        except RobotsTxt.DoesNotExist:
+            content = "\n".join([
+                "User-Agent: *",
+                "Disallow: /admin/",
+                "Sitemap: https://www.pinheirocosta.com/sitemap.xml", 
+            ])
+
+        response = HttpResponse(content, content_type="text/plain")
+        response["Cache-Control"] = "public, max-age=3600"
+        return response
 
 
 class IndexView(generic.TemplateView):

@@ -1,5 +1,6 @@
 import random
 import requests
+from django.views.generic.detail import DetailView
 from django.http import JsonResponse
 from django_ratelimit.decorators import ratelimit
 from django.utils.decorators import method_decorator
@@ -17,6 +18,13 @@ from .serializers import ToolSerializer
 TIMEOUT_SECONDS = 5
 MAX_RETRIES = 3
 
+class ToolDetailView(DetailView):
+    model = Tool
+    context_object_name = "tool"
+    slug_field = "slug"
+    slug_url_kwarg = "slug"
+
+    
 class ToolViewSet(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
     queryset = Tool.objects.filter(active=True)

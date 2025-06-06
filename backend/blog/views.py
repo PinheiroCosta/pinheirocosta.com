@@ -1,3 +1,5 @@
+from django.views.generic import DetailView
+from django.http import Http404
 from rest_framework import viewsets
 from rest_framework.permissions import AllowAny
 from rest_framework.pagination import PageNumberPagination
@@ -6,6 +8,18 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound
 from .models import BlogPost, Tag
 from .serializers import BlogPostSerializer
+
+
+class BlogPostDetailView(DetailView):
+    model = BlogPost
+    template_name = "blog/post_detail.html"
+
+    def get_object(self, queryset=None):
+        slug = self.kwargs.get("slug")
+        try:
+            return BlogPost.objects.get(slug=slug, status=BlogPost.PUBLICADO)
+        except BlogPost.DoesNotExist:
+            raise Http404("Post não encontrado")
 
 
 class BlogPostPagination(PageNumberPagination):

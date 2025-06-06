@@ -1,11 +1,9 @@
 from django.urls import path, include
-from rest_framework.routers import DefaultRouter
-from .views import ToolViewSet
+from .views import ToolDetailView
 
-router = DefaultRouter()
-router.register(r'api/tools', ToolViewSet, basename='tools')
+app_name = "tools"
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path('tools/<slug:slug>/', ToolDetailView.as_view(), name="detail"),
 ]
 

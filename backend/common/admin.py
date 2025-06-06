@@ -2,7 +2,13 @@ from django.contrib import admin, messages
 from django.urls import path
 from django.shortcuts import redirect
 from django.utils.html import format_html
-from .models import ParametroSistema, AboutMe
+from .models import ParametroSistema, AboutMe, RobotsTxt
+
+
+@admin.register(RobotsTxt)
+class RobotsTxtAdmin(admin.ModelAdmin):
+    list_display = ["id", "last_modified"]
+    readonly_fields = ["last_modified"]
 
 
 @admin.register(AboutMe)

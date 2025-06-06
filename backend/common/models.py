@@ -8,6 +8,14 @@ from model_utils.fields import AutoCreatedField, AutoLastModifiedField
 from django.dispatch import receiver
 
 
+class RobotsTxt(models.Model):
+    content = models.TextField(default="", help_text="Conteúdo do arquivo robots.txt")
+    last_modified = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return "Arquivo robots.txt"
+
+
 class IndexedTimeStampedModel(models.Model):
     created = AutoCreatedField(_("created"), db_index=True)
     modified = AutoLastModifiedField(_("modified"), db_index=True)

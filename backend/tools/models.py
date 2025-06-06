@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 
 
 class Tool(models.Model):
@@ -23,6 +24,8 @@ class Tool(models.Model):
     def __str__(self):
         return self.name
 
+    def get_absolute_url(self):
+        return reverse("tools:detail", kwargs={"slug": self.slug})
 
 class ToolField(models.Model):
     IO_TYPES = [

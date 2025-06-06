@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 from tinymce.models import HTMLField
 from django.utils.text import slugify
+from django.urls import reverse
 
 
 class Tag(models.Model):
@@ -40,3 +41,5 @@ class BlogPost(models.Model):
     def __str__(self):
         return self.titulo
 
+    def get_absolute_url(self):
+        return reverse("blog:post_detail", kwargs={"slug": self.slug})
