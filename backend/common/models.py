@@ -19,7 +19,7 @@ class ProfessionalContactMessage(models.Model):
 
     name = models.CharField(max_length=100)
     email = models.EmailField()
-    subject = models.CharField(max_length=50)
+    subject = models.CharField(max_length=50, choices=SUBJECT_CHOICES)
     message = models.TextField()
     utm_source = models.CharField(max_length=100, blank=True, null=True)
     utm_medium = models.CharField(max_length=100, blank=True, null=True)

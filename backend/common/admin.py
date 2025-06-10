@@ -9,7 +9,7 @@ from .models import ParametroSistema, AboutMe, RobotsTxt, ProfessionalContactMes
 class ContactMessageAdmin(admin.ModelAdmin):
     list_display = ('name', 'email', 'subject', 'created_at')
     search_fields = ('name', 'email', 'subject', 'message')
-    list_fielter = ('subject', 'created_at',)
+    list_filter = ('subject', 'created_at',)
     
 
 @admin.register(RobotsTxt)
