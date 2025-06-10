@@ -2,8 +2,15 @@ from django.contrib import admin, messages
 from django.urls import path
 from django.shortcuts import redirect
 from django.utils.html import format_html
-from .models import ParametroSistema, AboutMe, RobotsTxt
+from .models import ParametroSistema, AboutMe, RobotsTxt, ProfessionalContactMessage
 
+
+@admin.register(ProfessionalContactMessage)
+class ContactMessageAdmin(admin.ModelAdmin):
+    list_display = ('name', 'email', 'subject', 'created_at')
+    search_fields = ('name', 'email', 'subject', 'message')
+    list_fielter = ('subject', 'created_at',)
+    
 
 @admin.register(RobotsTxt)
 class RobotsTxtAdmin(admin.ModelAdmin):

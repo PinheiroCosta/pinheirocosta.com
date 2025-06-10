@@ -1,16 +1,66 @@
 from django.views import generic, View
 from django.http import HttpResponse
-from drf_spectacular.utils import OpenApiExample, extend_schema
-from rest_framework import status, viewsets
+from django.shortcuts import get_object_or_404
+from drf_spectacular.utils import OpenApiExample, extend_schema, OpenApiResponse
+from rest_framework import status, viewsets, mixins
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from .models import ParametroSistema, AboutMe, RobotsTxt
-from .serializers import ParametroSistemaSerializer, AboutMeSerializer, MessageSerializer
+from .models import (
+    ParametroSistema, 
+    AboutMe, 
+    RobotsTxt, 
+    ProfessionalContactMessage
+)
+from .serializers import (
+    ParametroSistemaSerializer, 
+    AboutMeSerializer, 
+    MessageSerializer, 
+    ProfessionalContactMessageSerializer,
+    ProfessionalContactMessageCreateSerializer
+)
 
+class ProfessionalContactMessageViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
+    """
+    Endpoint para envio de mensagens de contato profissional.
+    Aceita apenas requisições POST com nome, e-mail, mensagem e dados de UTM.
+    """
+
+    permission_classes = [AllowAny]
+    queryset = ProfessionalContactMessage.objects.all()
+    http_method_names = ["post", "get"]
+
+    def get_serializer_class(self):
+        if self.request.method == "POST":
+            return ProfessionalContactMessageCreateSerializer
+        return ProfessionalContactMessageSerializer
+
+    @extend_schema(
+        summary="Listar assuntos disponíveis",
+        description="Retorna as opções de assunto válidas para mensagens de contato profissional.",
+        responses={
+            200: OpenApiResponse(
+                response={ "type": "object", "additionalProperties": {"type": "string"} },
+                description="Dicionário com as opções disponíveis. Chave/valor para o backend, valor = label exibida no frontend.",
+            )
+        },
+        methods={"GET"},
+    )
+    @action(detail=False, methods=["get"], url_path="subjects", permission_classes=[AllowAny])
+    def list_subjects(self, request):
+        """
+        Retorna a lista de opções de assunto disponíveis para mensagens de contato profissional.
+        """
+        choices = dict(ProfessionalContactMessage.SUBJECT_CHOICES)
+        return Response(choices)
 
 class RobotsTxtView(View):
+    """
+    Serve o conteúdo mais recente do robots.txt armazenado no banco.
+    Se não houver conteúdo cadastrado, responde com o padrão.
+    """
+
     def get(self, request, *args, **kwargs):
         try:
             robots = RobotsTxt.objects.latest("last_modified")
@@ -67,12 +117,19 @@ class RestViewSet(viewsets.ViewSet):
 
 
 class ParametroSistemaViewSet(viewsets.ReadOnlyModelViewSet): 
+    """
+    ViewSet somente leitura para acessar os parâmetros de sistema configuráveis.
+    """
     queryset = ParametroSistema.objects.all()
     serializer_class = ParametroSistemaSerializer
 
     @action(detail=False, methods=["get"], url_path="(?P<chave>[^/.]+)")
     def buscar_por_chave(self, request, chave=None):
-        """Busca um parâmetro específico pela chave"""
+        """
+        Busca um parâmetro de sistema pelo valor da chave.
+        Útil para configuração dinâmica no frontend.
+        """
+
         parametro = ParametroSistema.objects.filter(chave=chave).first()
         if parametro:
             return Response({'chave': parametro.chave, 'valor': parametro.valor})
@@ -81,19 +138,20 @@ class ParametroSistemaViewSet(viewsets.ReadOnlyModelViewSet):
 
 class AboutMeViewSet(viewsets.ModelViewSet):
     """
-    ViewSet para gerenciar informaç~oes do dono do site.
+    ViewSet para gerenciar informações do dono do site.
     """
 
     queryset = AboutMe.objects.all()
     serializer_class = AboutMeSerializer
     permission_classes = [AllowAny]
+    pagination_class = None
 
     def get_queryset(self):
         return AboutMe.objects.all()
 
     def retrieve(self, request, pk=None):
         """
-        Retorna os dados do dono do site. Se não existir, retorna erro 404.
+        Retorna os dados do autor. Espera um ID como parâmetro.
         """
         about_me = get_object_or_404(AboutMe, id=pk)
         serializer = AboutMeSerializer(about_me)
@@ -101,7 +159,7 @@ class AboutMeViewSet(viewsets.ModelViewSet):
 
     def update(self, request, pk=None):
         """
-        Atualiza os dados do dono do site. Apenas administradores podem modificar.
+        Atualiza os dados do autor. Apenas usuários administradores têm permissão.
         """
         if not request.user.is_staff:
             return Response({"error": "Permissão negada."}, status=403)

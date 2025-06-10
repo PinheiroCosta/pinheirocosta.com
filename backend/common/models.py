@@ -8,6 +8,32 @@ from model_utils.fields import AutoCreatedField, AutoLastModifiedField
 from django.dispatch import receiver
 
 
+class ProfessionalContactMessage(models.Model):
+    SUBJECT_CHOICES = [
+        ("hire", "Contratação"),
+        ("collab", "Parceria"),
+        ("feedback", "Feedback"),
+        ("question", "Dúvida"),
+        ("other", "Outro"),
+    ]
+
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    subject = models.CharField(max_length=50)
+    message = models.TextField()
+    utm_source = models.CharField(max_length=100, blank=True, null=True)
+    utm_medium = models.CharField(max_length=100, blank=True, null=True)
+    utm_campaign = models.CharField(max_length=100, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Mensagem de Contato Profissional"
+        verbose_name_plural = "Mensagens de Contato Profissional"
+
+    def __str__(self):
+        return f"{self.name} ({self.email}) - {self.created_at:%Y-%m-%d}"
+
+
 class RobotsTxt(models.Model):
     content = models.TextField(default="", help_text="Conteúdo do arquivo robots.txt")
     last_modified = models.DateTimeField(auto_now=True)
