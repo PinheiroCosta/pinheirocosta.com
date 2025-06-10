@@ -1,6 +1,8 @@
 from django.views import generic, View
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+from django.utils.decorators import method_decorator
+from django_ratelimit.decorators import ratelimit
 from drf_spectacular.utils import OpenApiExample, extend_schema, OpenApiResponse
 from rest_framework import status, viewsets, mixins
 from rest_framework.decorators import action
@@ -23,8 +25,10 @@ from .serializers import (
 
 class ProfessionalContactMessageViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
     """
-    Endpoint para envio de mensagens de contato profissional.
-    Aceita apenas requisições POST com nome, e-mail, mensagem e dados de UTM.
+    Endpoint para envio de mensagens através do formulário de contato profissional.
+
+    Permite envio de mensagens públicas que podem ser rastreadas via UTM.
+    As mensagens são validadas, armazenas e notificações por email podem ser disparadas.
     """
 
     permission_classes = [AllowAny]
@@ -35,6 +39,13 @@ class ProfessionalContactMessageViewSet(mixins.CreateModelMixin, viewsets.Generi
         if self.request.method == "POST":
             return ProfessionalContactMessageCreateSerializer
         return ProfessionalContactMessageSerializer
+
+    @method_decorator(ratelimit(key='ip', rate='10/m', method='POST', block=False, group='contact'))
+    def create(self, request, *args, **kwargs):
+        was_limited = getattr(request, 'limited', False)
+        if was_limited:
+            return Response({'detail': 'Too many requests'}, status=429)
+        return super().create(request, *args, **kwargs)
 
     @extend_schema(
         summary="Listar assuntos disponíveis",
