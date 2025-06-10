@@ -46,7 +46,6 @@ export function ContactForm() {
 
   useEffect(() => {
     if (resultStatus !== "idle" && alertRef.current) {
-      alertRef.current.scrollIntoView({ behavior: "smooth" });
       const timer = setTimeout(() => setResultStatus("idle"), 5000);
       return () => clearTimeout(timer);
     }
