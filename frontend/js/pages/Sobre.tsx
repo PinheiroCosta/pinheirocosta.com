@@ -1,30 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Image, Card } from "react-bootstrap";
-import axios from "axios";
-
+import ContactForm from "../components/ContactForm";
+import { AboutmeService } from "../api/services.gen"; 
+import type { AboutmeListResponse, AboutMe } from "../api/types.gen";
 
 const Sobre = () => {
-  const [aboutMeData, setAboutMeData] = useState<any>(null);
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000/api";
+  const [aboutMeData, setAboutMeData] = useState<AboutMe | null>(null);
 
   useEffect(() => {
-    async function fetchAboutMe() {
-      try {
-        const response = await axios.get(`${API_URL}/aboutme/`);
-        setAboutMeData(response.data.results[0]);
-      } catch (error) {
-        console.error("Erro ao buscar informações do dono do site:", error);
-      }
-    }
-
-    fetchAboutMe();
+    AboutmeService.aboutmeList().then((res) => {
+        setAboutMeData(res[0] || null);
+    });
   }, []);
 
   return (
     <Container>
-      <Row className="justify-content-center align-items-center">
-      {aboutMeData && aboutMeData.about_image && (
-        <Col md={3} className="text-center mb-2">
+      <Row className="mt-5 justify-content-center align-items-center">
+        {aboutMeData?.about_image && (
+          <Col md={3} className="text-center mb-2">
             <Image
               src={aboutMeData.about_image}
               roundedCircle
@@ -32,25 +25,24 @@ const Sobre = () => {
               className="shadow about-me-img"
               alt="Foto do dono do site"
             />
-        </Col>
-      )}
+          </Col>
+        )}
         <Col md={6}>
           <Card className="p-4 shadow">
             <Card.Body>
               <Card.Title className="text-center mb-3">
                 <h2>Sobre Mim</h2>
               </Card.Title>
-              <Card.Text 
+              <Card.Text
                 className="text-justify"
                 dangerouslySetInnerHTML={{
-                   __html: aboutMeData ? aboutMeData.about_text : "<p>Carregando...</p>" 
-                }}>
-                
-              </Card.Text>
-              {aboutMeData && aboutMeData.social_links && (
+                  __html: aboutMeData?.about_text || "<p>Carregando...</p>",
+                }}
+              />
+              {aboutMeData?.social_links && (
                 <div className="social-links">
                   {Object.entries(aboutMeData.social_links).map(([platform, link]) => (
-                    <a key={platform} href={link as string | undefined} target="_blank" rel="noopener noreferrer">
+                    <a key={platform} href={link as string} target="_blank" rel="noopener noreferrer">
                       {platform}
                     </a>
                   ))}
@@ -60,6 +52,16 @@ const Sobre = () => {
           </Card>
         </Col>
       </Row>
+        <Row className="mt-5">
+          <Col md={{ span: 6, offset: 3 }}>
+            <div className="mb-5 mt-5 text-justify">
+              <p className="text-muted">
+                Este site é open source — sinta-se livre para explorar e usar partes do código. Estou aberto a colaborações em projetos de código aberto e também disponível para trabalho profissional. Se quiser trocar uma ideia ou propor algo, é só me chamar.
+              </p>
+            </div>
+            <ContactForm />
+          </Col>
+        </Row>
     </Container>
   );
 };
