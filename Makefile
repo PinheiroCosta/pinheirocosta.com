@@ -20,10 +20,10 @@ clean:
 	@find . -name "__pycache__" -delete
 
 test:
-	poetry run backend/manage.py test backend/ $(ARG) --parallel --keepdb
+	docker-compose -f ${DOCKER_COMPOSE_FILE} exec backend poetry run python ./manage.py test $(ARG) --parallel --keepdb -v 2
 
 test_reset:
-	poetry run backend/manage.py test backend/ $(ARG) --parallel
+	docker-compose -f ${DOCKER_COMPOSE_FILE} exec backend poetry run python ./manage.py test $(ARG) --parallel -v 2
 
 backend_format:
 	black backend
