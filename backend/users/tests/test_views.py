@@ -1,6 +1,6 @@
 from django.urls import reverse
 
-from common.utils.tests import TestCaseUtils
+from common.tests.test_utils import TestCaseUtils
 from model_bakery import baker
 from rest_framework.test import APITestCase
 
