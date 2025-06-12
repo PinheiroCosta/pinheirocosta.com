@@ -135,3 +135,8 @@ JS_REVERSE_EXCLUDE_NAMESPACES = ["admin"]
 
 # Sentry
 sentry_sdk.init(dsn=SENTRY_DSN, integrations=[DjangoIntegration()], release=COMMIT_SHA)
+
+# RECAPTCHA CONFIG
+RECAPTCHA_SECRET_KEY = config("RECAPTCHA_SECRET_KEY")
+RECAPTCHA_MIN_SCORE = 0.5
+RECAPTCHA_BYPASS = False

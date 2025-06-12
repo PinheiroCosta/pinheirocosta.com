@@ -152,7 +152,7 @@ STATICFILES_DIRS = (base_dir_join("../frontend/webpack_bundles"),)
 WEBPACK_LOADER = {
     "DEFAULT": {
         "BUNDLE_DIR_NAME": "assets/",
-        "CACHE": False,  # on DEBUG should be False
+        "CACHE": False, 
         "STATS_FILE": base_dir_join("../webpack-stats.json"),
         "POLL_INTERVAL": 0.1,
         "IGNORE": [r".+\.hot-update.js", r".+\.map"],
@@ -237,6 +237,8 @@ CSP_SCRIPT_SRC = [
     # drf-spectacular UI (Swagger and ReDoc)
     "https://cdn.jsdelivr.net/npm/swagger-ui-dist@latest/",
     "https://cdn.jsdelivr.net/npm/redoc@latest/",
+    "https://www.google.com",
+    "https://www.gstatic.com",
     "blob:",
 ] + [f"*{host}" if host.startswith(".") else host for host in ALLOWED_HOSTS]
 CSP_CONNECT_SRC = [
@@ -266,6 +268,9 @@ CSP_IMG_SRC = [
     "https://cdn.jsdelivr.net/npm/swagger-ui-dist@latest/",
     "https://cdn.redoc.ly/redoc/",
 ]
+CSP_FRAME_SRC = [
+    "https://www.google.com",
+]
 
 # Django-defender
 DEFENDER_LOGIN_FAILURE_LIMIT = 3
@@ -285,3 +290,8 @@ TINYMCE_DEFAULT_CONFIG = {
     "image_advtab": True,
     "media_live_embeds": True,
 }
+
+# RECAPTCHA CONFIG
+RECAPTCHA_SECRET_KEY = config("RECAPTCHA_SECRET_KEY")
+RECAPTCHA_MIN_SCORE = 0.8
+RECAPTCHA_BYPASS = DEBUG

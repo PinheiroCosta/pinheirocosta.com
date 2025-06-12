@@ -45,7 +45,12 @@ class ProfessionalContactMessageViewSet(mixins.CreateModelMixin, viewsets.Generi
         was_limited = getattr(request, 'limited', False)
         if was_limited:
             return Response({'detail': 'Too many requests'}, status=429)
-        return super().create(request, *args, **kwargs)
+
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+
+        return Response({"detail": "Mensagem enviada com sucesso"}, status=status.HTTP_201_CREATED)
 
     @extend_schema(
         summary="Listar assuntos disponíveis",
