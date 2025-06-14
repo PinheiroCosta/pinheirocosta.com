@@ -9,6 +9,27 @@ from django.dispatch import receiver
 
 
 class ProfessionalContactMessage(models.Model):
+    """
+    Modelo para armazenar mensagens enviadas atrvés do formulário de contato profissional.
+
+    Inclui:
+    - Nome e email do remetente.
+    - Assunto (escolha fixa entre categorias pré-definidas).
+    - Mensagem livre ( com validação anti-HTML e anti-SQL injection feita no srializer).
+    - Campos UTM opcionais para rastreamento de origem.
+    - Timestamp de criação.
+
+    Segurança:
+    - Os dados chegam ao banco somente após validação do reCAPTCHA e sanitização (feito no serializer).
+    """
+
+    class Meta:
+        verbose_name = "Mensagem de Contato Profissional"
+        verbose_name_plural = "Mensagens de Contato Profissional"
+
+    def __str__(self):
+        return f"{self.name} ({self.email}) - {self.created_at:%Y-%m-%d}"
+
     SUBJECT_CHOICES = [
         ("hire", "Contratação"),
         ("collab", "Parceria"),
@@ -18,20 +39,13 @@ class ProfessionalContactMessage(models.Model):
     ]
 
     name = models.CharField(max_length=100)
-    email = models.EmailField()
+    email = models.EmailField(max_length=254)
     subject = models.CharField(max_length=50, choices=SUBJECT_CHOICES)
-    message = models.TextField()
+    message = models.TextField(max_length=4000)
     utm_source = models.CharField(max_length=100, blank=True, null=True)
     utm_medium = models.CharField(max_length=100, blank=True, null=True)
     utm_campaign = models.CharField(max_length=100, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        verbose_name = "Mensagem de Contato Profissional"
-        verbose_name_plural = "Mensagens de Contato Profissional"
-
-    def __str__(self):
-        return f"{self.name} ({self.email}) - {self.created_at:%Y-%m-%d}"
 
 
 class RobotsTxt(models.Model):

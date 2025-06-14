@@ -9,6 +9,17 @@ from common.validators.sanitize import (
 
 
 class ProfessionalContactMessageCreateSerializer(serializers.ModelSerializer):
+    """
+    Serializer usado apenas na criação de mensagens de contato (POST).
+
+    Inclui:
+    - Validação de reCAPTCHA.
+    - Campos UTM para rastreamento de origem
+    - Validações de segurança contra HTML e SQL Injection
+
+    Obs: O campo `recaptcha_token` não é persistido no banco.
+    """
+
     name = serializers.CharField(max_length=100)
     email = serializers.EmailField()
     subject = serializers.ChoiceField(choices=ProfessionalContactMessage.SUBJECT_CHOICES)
@@ -44,6 +55,13 @@ class ProfessionalContactMessageCreateSerializer(serializers.ModelSerializer):
 
     
 class ProfessionalContactMessageSerializer(serializers.ModelSerializer):
+    """
+    Serializer de leitura para mensagens de contato.
+
+    Usado apenas para visualização no painel admin
+    Não expõe o campo recaptcha_token.
+    """
+
     class Meta:
         model = ProfessionalContactMessage
         fields = ['name', 'email', 'subject', 'message', 'utm_source', 'utm_medium', 'utm_campaign']

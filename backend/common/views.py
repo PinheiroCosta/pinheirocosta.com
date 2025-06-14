@@ -6,7 +6,7 @@ from django_ratelimit.decorators import ratelimit
 from drf_spectacular.utils import OpenApiExample, extend_schema, OpenApiResponse
 from rest_framework import status, viewsets, mixins
 from rest_framework.decorators import action
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAdminUser
 from rest_framework.response import Response
 
 from .models import (
@@ -134,17 +134,21 @@ class RestViewSet(viewsets.ViewSet):
 
 class ParametroSistemaViewSet(viewsets.ReadOnlyModelViewSet): 
     """
-    ViewSet somente leitura para acessar os parâmetros de sistema configuráveis.
+    Acesso dos parâmetros de sistema configuráveis.
     """
-    queryset = ParametroSistema.objects.all()
+    queryset = ParametroSistema.objects.none() # Previne exposição acidental na listagem
     serializer_class = ParametroSistemaSerializer
+    permission_classes = [IsAdminUser]
 
-    @action(detail=False, methods=["get"], url_path="(?P<chave>[^/.]+)")
+    @action(detail=False, methods=["get"], url_path="(?P<chave>[^/.]+)", permission_classes=[AllowAny])
     def buscar_por_chave(self, request, chave=None):
         """
         Busca um parâmetro de sistema pelo valor da chave.
         Útil para configuração dinâmica no frontend.
         """
+
+        if chave != "RECAPTCHA_SITE_KEY":
+            return Response({"error": "Acesso negado."}, status=403)
 
         parametro = ParametroSistema.objects.filter(chave=chave).first()
         if parametro:
@@ -154,7 +158,7 @@ class ParametroSistemaViewSet(viewsets.ReadOnlyModelViewSet):
 
 class AboutMeViewSet(viewsets.ModelViewSet):
     """
-    ViewSet para gerenciar informações do dono do site.
+    Informações do dono do site.
     """
 
     queryset = AboutMe.objects.all()

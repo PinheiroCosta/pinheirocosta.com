@@ -138,5 +138,5 @@ sentry_sdk.init(dsn=SENTRY_DSN, integrations=[DjangoIntegration()], release=COMM
 
 # RECAPTCHA CONFIG
 RECAPTCHA_SECRET_KEY = config("RECAPTCHA_SECRET_KEY")
-RECAPTCHA_MIN_SCORE = 0.5
+RECAPTCHA_MIN_SCORE = 0.8
 RECAPTCHA_BYPASS = False
