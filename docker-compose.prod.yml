@@ -4,6 +4,7 @@ volumes:
   dbdata:
     name: romweb_dbdata
     external: true
+  redisdata:
 
 services:
   db:
@@ -20,7 +21,10 @@ services:
   result:
     image: "redis:alpine"
     ports:
-    - "6379:6379"
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
 
   frontend:
     build:
