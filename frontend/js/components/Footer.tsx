@@ -14,6 +14,7 @@ const Footer = () => {
               target="_blank"
               rel="noopener noreferrer"
               className="text-dark mx-2"
+              aria-label="Github de Rômulo Pinheiro Costa"
             >
               <FaGithub size={24} className="icon-social" />
             </a>
@@ -24,6 +25,7 @@ const Footer = () => {
               target="_blank"
               rel="noopener noreferrer"
               className="text-dark mx-2"
+              aria-label="Instagram de Rômulo Pinheiro Costa"
             >
               <FaInstagram size={24} className="icon-social" />
             </a>
@@ -34,6 +36,7 @@ const Footer = () => {
               target="_blank"
               rel="noopener noreferrer"
               className="text-dark mx-2"
+              aria-label="LinkedIn de Rômulo Pinheiro Costa"
             >
               <FaLinkedin size={24} className="icon-social" />
             </a>
