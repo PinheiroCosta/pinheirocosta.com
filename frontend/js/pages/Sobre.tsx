@@ -1,16 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Image, Card } from "react-bootstrap";
 import ContactForm from "../components/ContactForm";
-import { AboutmeService } from "../api/services.gen"; 
+import { AboutmeService, ParametrosService } from "../api/services.gen"; 
+import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3'
 import type { AboutmeListResponse, AboutMe } from "../api/types.gen";
 
 const Sobre = () => {
   const [aboutMeData, setAboutMeData] = useState<AboutMe | null>(null);
+  const [siteKey, setSiteKey] = useState<string | null>(null);
+  const [captchaError, setCaptchaError] = useState<string | null>(null);
 
   useEffect(() => {
     AboutmeService.aboutmeList().then((res) => {
         setAboutMeData(res[0] || null);
     });
+
+    ParametrosService.parametrosRetrieve({ chave: "RECAPTCHA_SITE_KEY" })
+        .then((res) => setSiteKey(res.valor))
+        .catch(() => setCaptchaError("Falha ao carregar reCAPTCHA."));
   }, []);
 
   return (
@@ -59,7 +66,17 @@ const Sobre = () => {
                 Este site é open source — sinta-se livre para explorar e usar partes do código. Estou aberto a colaborações em projetos de código aberto e também disponível para trabalho profissional. Se quiser trocar uma ideia ou propor algo, é só me chamar.
               </p>
             </div>
-            <ContactForm />
+
+            {captchaError && <p className="text-danger">{captchaError}</p>}
+
+            {siteKey && (
+                <GoogleReCaptchaProvider
+                    reCaptchaKey={siteKey}
+                    scriptProps={{ async: true, defer: true}}
+                >
+                <ContactForm siteKey={siteKey}/>
+                </GoogleReCaptchaProvider>
+            )}
           </Col>
         </Row>
     </Container>

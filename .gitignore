@@ -55,3 +55,6 @@ backend/checkpoint/db/*
 
 # Diretório de midia
 backend/media/
+
+# tmux
+tmux_pinheirocosta.sh

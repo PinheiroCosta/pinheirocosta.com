@@ -8,3 +8,9 @@ declare global {
     Urls: unknown;
   }
 }
+
+declare global {
+  interface Window {
+    grecaptcha: any;
+  }
+}
