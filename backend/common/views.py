@@ -23,6 +23,7 @@ from .serializers import (
     ProfessionalContactMessageCreateSerializer
 )
 
+
 class ProfessionalContactMessageViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
     """
     Endpoint para envio de mensagens através do formulário de contato profissional.
@@ -93,9 +94,26 @@ class RobotsTxtView(View):
         return response
 
 
+
 class IndexView(generic.TemplateView):
     template_name = "common/index.html"
 
+
+class SpaIndexView(generic.TemplateView):
+    """
+    View para servir o index.html da SPA, capturando todas as rotas não-api.
+    """
+
+    template_name = "common/index.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        """
+        View para servir o index.html da SPA, capturando todas as rotas não-API.
+        """
+        path = request.path
+        if path.startswith(("/api/", "/admin/", "/static/", "/media/")):
+            return HttpResponse(status=404)
+        return super().dispatch(request, *args, **kwargs)
 
 class RestViewSet(viewsets.ViewSet):
     serializer_class = MessageSerializer

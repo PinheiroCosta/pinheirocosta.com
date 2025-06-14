@@ -15,6 +15,8 @@ SITE_ID = 1
 
 DEBUG = True
 
+APPEND_SLASH = True
+
 ADMINS = (("Admin", "romulo@pinheirocosta.com"),)
 
 AUTH_USER_MODEL = "users.User"
