@@ -46,7 +46,7 @@ export function useContactFormLogic(siteKey: string) {
       if (!window.grecaptcha || !window.grecaptcha.execute) {
         throw new Error("reCAPTCHA não carregado.");
       }
-      token = await window.grecaptcha.execute(siteKey, { action: "submit" });
+      token = await window.grecaptcha.execute(siteKey, { action: "contact_form" });
     } catch (error) {
         setError("Erro ao executar o reCAPTCHA. Verifique Adblockers ou tente recarregar a página.");
         setIsSending(false);
