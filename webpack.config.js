@@ -1,7 +1,6 @@
 const path = require("path");
 
 const webpack = require("webpack");
-const DotEnv = require("dotenv-webpack");
 const ReactRefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const BundleTracker = require("webpack-bundle-tracker");
@@ -9,9 +8,6 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 module.exports = (env, argv) => {
   const isDev = argv.mode === "development";
-  const API_URL = isDev
-    ? "http://localhost8000/api"
-    : process.env.REACT_APP_API_URL || "";
   const nodeModulesDir = path.resolve(__dirname, "node_modules");
   const localhostOutput = {
     path: path.resolve("./frontend/webpack_bundles/assets/"),
@@ -97,10 +93,6 @@ module.exports = (env, argv) => {
       ],
     },
     plugins: [
-      new DotEnv(),
-      new webpack.DefinePlugin({
-        'process.env.API_URL': JSON.stringify(API_URL),
-      }),
       !isDev &&
       new MiniCssExtractPlugin({ filename: "[name]-[chunkhash].css" }),
       isDev && new ReactRefreshWebpackPlugin(),
