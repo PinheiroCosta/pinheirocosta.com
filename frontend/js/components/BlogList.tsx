@@ -2,16 +2,8 @@ import React from "react";
 import { Container, Row, Col, Card, Spinner } from "react-bootstrap";
 import CustomNavLink from "./CustomNavLink"; 
 import { Link } from "react-router-dom";
+import type { BlogPost } from "../api/types.gen";
 
-interface BlogPost {
-  id: number;
-  titulo: string;
-  conteudo: string;
-  criado_em: string;
-  tags: { nome: string }[];
-  slug: string;
-  nome_autor: string;
-}
 
 interface BlogListProps {
   posts: BlogPost[];

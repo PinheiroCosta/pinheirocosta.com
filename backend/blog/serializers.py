@@ -1,14 +1,21 @@
 from rest_framework import serializers
-from .models import BlogPost, Tag
 from django.contrib.auth.models import User
+from .models import BlogPost, Tag
 
 
 class TagSerializer(serializers.ModelSerializer):
+    """Serializador para o modelo Tag."""
+
     class Meta:
         model = Tag
         fields = ['id', 'nome']
 
+
 class BlogPostSerializer(serializers.ModelSerializer):
+    """
+    Serializador para o modelo BlogPost. Inclui nome formatado do autor (extraído do email) e lista de tags.
+    """
+
     tags = TagSerializer(many=True)  # Serializa as tags associadas
     nome_autor = serializers.SerializerMethodField()
 
@@ -16,10 +23,16 @@ class BlogPostSerializer(serializers.ModelSerializer):
         model = BlogPost
         fields = ['id', 'slug', 'nome_autor', 'titulo', 'conteudo', 'criado_em', 'atualizado_em', 'tags']
 
-
     def get_nome_autor(self, obj):
+        """
+        Retorna o nome do autor baseado na parte local do email.
+        Se o autor não possuir email, retorna 'Autor Desconhecido'.
+        """
+
         autor = obj.autor
         if autor and autor.email:
             nome = autor.email.split('@')[0]        
             return ' '.join(word.capitalize() for word in nome.split('.'))
         return "Autor Desconhecido"
+
+

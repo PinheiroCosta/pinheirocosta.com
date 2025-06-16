@@ -1,49 +1,40 @@
 import React, { useEffect, useState } from "react";
 import BlogList from "../components/BlogList";
 import Pagination from "../components/Pagination";
+import { BlogService } from "../api/services.gen";
+import { BlogPost } from "../api/types.gen";
 
-interface BlogPost {
-  id: number;
-  titulo: string;
-  conteudo: string;
-  criado_em: string;
-  tags: { nome: string }[];
-  slug: string;
-  nome_autor: string;
-}
 
 const Blog = () => {
   const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [count, setCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const [hasNext, setHasNext] = useState(false);
+  const [hasPrevious, setHasPrevious] = useState(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000/api";
+  const pageSize= 6;
 
   useEffect(() => {
-    fetch(`${API_URL}/blog/?page=${currentPage}`)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Erro ao buscar posts");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setPosts(data.results);
-        setTotalPages(Math.ceil(data.count / 6));
-        setLoading(false);
-      })
-      .catch((error) => {
-        setError(error.message);
-        setLoading(false);
-      });
+	  setLoading(true);
+	  setError(null);
+
+	  BlogService.blogList({ page: currentPage })
+		.then((data) => {
+		  setPosts(data.results);
+		  setHasNext(Boolean(data.next));
+		  setHasPrevious(Boolean(data.previous));
+		  setCount(data.count);
+		})
+		.catch(() => setError("Erro ao buscar posts"))
+		.finally(() => setLoading(false));
   }, [currentPage]);
 
   return (
     <>
     <h2 className="my-4 text-center mb-5 mt-2">Publicações Recentes</h2>
     <BlogList posts={posts} loading={loading} error={error} />
-    <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+    <Pagination currentPage={currentPage} pageSize={pageSize} count={count} hasNext={hasNext} hasPrevious={hasPrevious} onPageChange={setCurrentPage} />
     </>
  )
 };

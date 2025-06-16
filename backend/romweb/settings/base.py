@@ -133,10 +133,14 @@ REST_FRAMEWORK = {
 
 # drf-spectacular
 SPECTACULAR_SETTINGS = {
-    "TITLE": "Vinta Boilerplate API",
-    "DESCRIPTION": "A Django project boilerplate with Vinta's best practices",
+    "TITLE": "Romweb API",
+    "DESCRIPTION": "Api pública para o site pessoal pinheirocosta.com.",
     "VERSION": "0.1.0",
     "SERVE_INCLUDE_SCHEMA": False,
+    "COMPONENT_SPLIT_REQUEST": True,
+    "COMPONENT_SPLIT_PATCH": True,
+    "SORT_OPERATIONS": False,
+    "SORT_OPERATION_PARAMETERS": False,
 }
 
 LANGUAGE_CODE = "en-us"
