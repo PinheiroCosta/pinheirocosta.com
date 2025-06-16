@@ -1,34 +1,28 @@
 import React, { useState, useEffect } from "react";
 import { Card } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import { BlogService } from "../api/services.gen";
+import type { BlogPost } from "../api/types.gen";
 
-interface BlogPost {
-  slug: string;
-  titulo: string;
-  conteudo: string;
-}
 
 const LatestArticle: React.FC = () => {
   const [latestPost, setLatestPost] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState(true);
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000/api";
 
   useEffect(() => {
-    async function fetchLatestPost() {
-      try {
-        const response = await fetch(`${API_URL}/blog/?limit=1`);
-        const data = await response.json();
-        if (data.results && data.results.length > 0) {
-          setLatestPost(data.results[0]); 
-        }
-      } catch (error) {
-        console.error("Erro ao buscar o último post:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchLatestPost();
-  }, []);
+        BlogService.blogList({ page: 1 })
+            .then((data) => {
+                if (data.results && data.results.length > 0) {
+                    setLatestPost(data.results[0]); 
+                }
+            })
+            .catch((error) => {
+                console.error("Erro ao buscar o último post:", error);
+            })
+            .finally(() => {
+                setLoading(false);
+            });
+      }, []);
 
   return (
     <Card className="text-start">

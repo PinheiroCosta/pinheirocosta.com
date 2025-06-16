@@ -1,39 +1,32 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Container } from "react-bootstrap";
+import { BlogService } from "../api/services.gen";
+import type { BlogPost } from "../api/types.gen";
 
-interface BlogPost {
-  slug: string;
-  titulo: string;
-  nome_autor: string;
-  conteudo: string;
-  criado_em: string;
-  tags: { nome: string }[];
-}
 
 const BlogPostPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const [post, setPost] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000/api";
 
   useEffect(() => {
-    fetch(`${API_URL}/blog/slug/${slug}/`)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Erro ao buscar o post.");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setPost(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err.message);
-        setLoading(false);
-      });
+    if (!slug) return;
+
+    setLoading(true);
+    setError(null);
+
+    BlogService.blogRetrieve({ slug })
+        .then((data) => {
+            setPost(data);
+        })
+        .catch(() => {
+            setError("Erro ao buscar o post.");
+        })
+        .finally(() => {
+            setLoading(false);
+        });
   }, [slug]);
 
   if (loading) return <p>Carregando...</p>;
