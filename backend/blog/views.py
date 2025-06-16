@@ -25,13 +25,4 @@ class BlogPostViewSet(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['tags__nome']
-
-    @action(detail=False, methods=['get'], url_path='slug/(?P<slug>[^/.]+)')
-    def by_slug(self, request, slug=None):
-        try:
-            post = BlogPost.objects.get(slug=slug, status=BlogPost.PUBLICADO)
-            serializer = BlogPostSerializer(post)
-            return Response(serializer.data)
-        except BlogPost.DoesNotExist:
-            raise NotFound(detail="Post não encontrado com esse slug.")
-
+    lookup_field = 'slug'
