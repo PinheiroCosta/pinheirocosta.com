@@ -14,7 +14,7 @@ const Tools = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [hasNext, setHasNext] = useState(false);
   const [hasPrevious, setHasPrevious] = useState(false);
-  const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
+  const [categoryFilter, setCategoryFilter] = useState<Tool["category"] | null>(null);
   const pageSize= 6;
 
 
@@ -89,15 +89,15 @@ const Tools = () => {
                 </Link>
                 </td>
               <td className="align-middle" >
-                  <Link
+                  <span
                     style={{ textDecoration: "underline", cursor: "pointer" }}
                     onClick={() => {
                       setCategoryFilter(tool.category);
-                      setCurrentPage(1); // Reseta para página 1 ao aplicar filtro
+                      setCurrentPage(1); 
                     }}
                   >
                     {tool.category}
-                  </Link>
+                  </span>
               </td>
               <td>{tool.description}</td>
             </tr>
