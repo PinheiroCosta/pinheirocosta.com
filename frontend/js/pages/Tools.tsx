@@ -58,7 +58,7 @@ const Tools = () => {
     <Container className="mt-5 ">
       <h2 className="my-4 text-center">Lista de Ferramentas</h2>
         {categoryFilter && (
-          <Alert variant="info">
+          <Alert variant="info" className="mb-2">
             Filtrando por categoria: <strong>{categoryFilter}</strong>{" "}
             <button
               className="btn btn-sm btn-outline-secondary ms-2"
@@ -88,9 +88,8 @@ const Tools = () => {
                     {tool.name}
                 </Link>
                 </td>
-              <td>
-                  <button
-                    className="btn btn-link p-0"
+              <td className="align-middle" >
+                  <Link
                     style={{ textDecoration: "underline", cursor: "pointer" }}
                     onClick={() => {
                       setCategoryFilter(tool.category);
@@ -98,7 +97,7 @@ const Tools = () => {
                     }}
                   >
                     {tool.category}
-                  </button>
+                  </Link>
               </td>
               <td>{tool.description}</td>
             </tr>
