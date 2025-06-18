@@ -27,7 +27,8 @@ class ToolViewSet(viewsets.ModelViewSet):
     queryset = Tool.objects.filter(active=True)
     serializer_class = ToolSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['id'] 
+    filterset_fields = ['id', 'category'] 
+    lookup_field = 'slug'
 
     @method_decorator(ratelimit(key='ip', rate='30/m', method='POST', block=True))
     @method_decorator(ratelimit(key='ip', rate='60/m', method='POST', group='global', block=True))

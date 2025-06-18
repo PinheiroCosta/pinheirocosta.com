@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Container, Table, Spinner, Alert } from "react-bootstrap";
 import { ToolsService } from "../api/services.gen"; 
 import { Link } from "react-router-dom";
+import Pagination from "../components/Pagination";
 import type { Tool } from "../api/types.gen";
 
 
@@ -9,12 +10,23 @@ const Tools = () => {
   const [tools, setTools] = useState<Tool[]>([]); // Inicializa com um array vazio
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [count, setCount] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasNext, setHasNext] = useState(false);
+  const [hasPrevious, setHasPrevious] = useState(false);
+  const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
+  const pageSize= 6;
+
 
   useEffect(() => {
     setLoading(true);
-    ToolsService.toolsList()
+    ToolsService.toolsList({ page: currentPage, category: categoryFilter || undefined, })
       .then((data) => {
-        setTools(data.results || []); // Garante que tools sempre seja um array
+        console.log(data.results);
+        setTools(data.results || []); 
+        setHasNext(Boolean(data.next));
+        setHasPrevious(Boolean(data.previous));
+		setCount(data.count);
         setLoading(false);
       })
       .catch((error) => {
@@ -22,7 +34,7 @@ const Tools = () => {
         setError("Erro ao carregar ferramentas");
         setLoading(false);
       });
-  }, []);
+  }, [currentPage, categoryFilter]);
 
   if (loading) {
     return (
@@ -45,11 +57,26 @@ const Tools = () => {
   return (
     <Container className="mt-5 ">
       <h2 className="my-4 text-center">Lista de Ferramentas</h2>
+        {categoryFilter && (
+          <Alert variant="info">
+            Filtrando por categoria: <strong>{categoryFilter}</strong>{" "}
+            <button
+              className="btn btn-sm btn-outline-secondary ms-2"
+              onClick={() => {
+                setCategoryFilter(null);
+                setCurrentPage(1);
+              }}
+            >
+              Limpar filtro
+            </button>
+          </Alert>
+        )}
       <div className="table-wrapper">
       <Table className="my-table">
         <thead>
           <tr>
             <th>Nome</th>
+            <th>Categoria</th>
             <th>Descrição</th>
           </tr>
         </thead>
@@ -61,12 +88,25 @@ const Tools = () => {
                     {tool.name}
                 </Link>
                 </td>
+              <td>
+                  <button
+                    className="btn btn-link p-0"
+                    style={{ textDecoration: "underline", cursor: "pointer" }}
+                    onClick={() => {
+                      setCategoryFilter(tool.category);
+                      setCurrentPage(1); // Reseta para página 1 ao aplicar filtro
+                    }}
+                  >
+                    {tool.category}
+                  </button>
+              </td>
               <td>{tool.description}</td>
             </tr>
           ))}
         </tbody>
       </Table>
     </div>
+    <Pagination currentPage={currentPage} pageSize={pageSize} count={count} hasNext={hasNext} hasPrevious={hasPrevious} onPageChange={setCurrentPage} />
     </Container>
   );
 };

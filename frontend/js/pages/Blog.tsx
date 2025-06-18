@@ -7,12 +7,12 @@ import { BlogPost } from "../api/types.gen";
 
 const Blog = () => {
   const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
   const [count, setCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [hasNext, setHasNext] = useState(false);
   const [hasPrevious, setHasPrevious] = useState(false);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
   const pageSize= 6;
 
   useEffect(() => {
