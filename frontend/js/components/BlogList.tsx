@@ -26,7 +26,7 @@ const BlogList: React.FC<BlogListProps> = ({ posts, loading, error }) => {
       <Row>
         {posts.map((post) => (
           <Col md={6} key={post.id} className="mb-4">
-            <Card>
+            <Card style={{ maxHeight: 270, minHeight: 270 }}>
               <Card.Body>
                 <Card.Title className="text-center fg-primary fw-bold">
                     <Link to={`/blog/${post.slug}`} style={{ textDecoration: "none", color: "inherit" }}>

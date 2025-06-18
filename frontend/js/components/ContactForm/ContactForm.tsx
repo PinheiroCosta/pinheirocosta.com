@@ -1,4 +1,5 @@
 import { Form, Button, Card, Spinner } from "react-bootstrap";
+import { FaPaperPlane } from "react-icons/fa";
 import { SubjectEnum } from "../../api/types.gen";
 import { ErrorMessage, SuccessMessage } from "../../MessageCard";
 import type { useContactFormLogic } from "./useContactFormLogic";
@@ -112,6 +113,7 @@ export default function ContactForm({
             className="d-flex align-items-center"
           >
             {isSending && <Spinner animation="border" size="sm" className="me-2" />}
+            <FaPaperPlane style={{ marginRight: 8 }} />
             {isSending ? "Enviando..." : "Enviar"}
           </Button>
         </Form>

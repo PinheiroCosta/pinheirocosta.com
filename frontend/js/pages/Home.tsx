@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Container, Row, Col, Card} from "react-bootstrap";
+import { Container, Row, Col } from "react-bootstrap";
 import Motd from "../components/Motd";
 import LatestArticle from "../components/LatestArticle";
 import RandomToolCard from "../components/RandomToolCard";
@@ -24,24 +24,14 @@ const Home = () => {
   }, []);
 
   return (
-    <Container className="p-4">
+    <Container className="p-4" style={{ maxWidth: 960 }}>
     <Motd />
-      <Row className="justify-content-center">
-        <Col md={4} className="d-flex mb-2">
-          <Card className="text-start ">
-          <Card.Header className="text-center mb-2 pb-3 pt-3 fs-5">Novidades</Card.Header>
-            <Card.Body>
-              <Card.Text className="text-truncate-card">
-                Em breve, vou adicionar aqui um feed com as últimas publicações que fiz nas redes.
-              </Card.Text>
-            </Card.Body>
-          </Card>
-        </Col>
+      <Row className="justify-content-center mb-4">
         {/* Última publicação */}
-        <Col md={4} className="d-flex mb-2">
+        <Col md={6} className="d-flex mb-3">
             <LatestArticle />
         </Col>
-        <Col md={4} className="d-flex mb-2">
+        <Col md={6} className="d-flex mb-3">
             <RandomToolCard />
         </Col>
       </Row>

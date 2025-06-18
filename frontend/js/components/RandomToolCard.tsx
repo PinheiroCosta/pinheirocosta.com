@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { FaExternalLinkAlt } from "react-icons/fa";
 import { Card } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { ToolsService } from "../api/services.gen";
@@ -42,7 +43,7 @@ const RandomToolCard: React.FC = () => {
             <Card.Text className="text-justify">{tool.description}</Card.Text>
             <div className="text-center fs-5">
               <Link className="nav-link active py-2" to={`/tools/${tool.slug}`}>
-                Acessar Ferramenta
+                Acessar Ferramenta <FaExternalLinkAlt className="ms-2" />
               </Link>
             </div>
           </>

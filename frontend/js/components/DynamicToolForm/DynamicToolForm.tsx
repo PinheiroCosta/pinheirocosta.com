@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { FaPlay, FaRedo } from "react-icons/fa";
 import { Container, Col, Card, Form, Button, Alert } from "react-bootstrap";
 import { ToolsRetrieveResponse, ProxyToolData, ProxyToolResponse } from "../../api/types.gen";
 import { ToolsService } from "../../api/services.gen";
@@ -66,14 +67,14 @@ const DynamicToolForm: React.FC<DynamicToolFormProps> = ({ tool }) => {
               )}
 
               <Button type="submit" className="w-100 fs-4" disabled={loading}>
-                {loading ? "Executando..." : "Executar"}
+                {loading ? "Executando..." : <> <FaPlay className="me-2" /> Executar </>}
               </Button>
               <Button
                 className="w-100 fs-4 mt-2"
                 disabled={loading}
                 onClick={handleResetForm}
               >
-                {loading ? "Executando..." : "Limpar Formulário"}
+                {loading ? "Executando..." : <> <FaRedo className="me-2" /> Limpar Formulário </>}
               </Button>
             </Form>
 
