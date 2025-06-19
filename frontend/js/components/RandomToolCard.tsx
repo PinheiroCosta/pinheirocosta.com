@@ -25,30 +25,35 @@ const RandomToolCard: React.FC = () => {
   }, []);
 
   return (
-    <Card className="text-start">
-    <Card.Header className="text-center mb-2 pb-3 pt-3 fs-5">Ferramenta em Destaque</Card.Header>
-      <Card.Body>
-
+    <Card className="text-start h-100 w-100" style={{ minHeight: "300px" }}>
+      <Card.Header className="text-center mb-2 pb-3 pt-3 fs-5">Ferramenta em Destaque</Card.Header>
+      <Card.Body className="d-flex flex-column">
         {loading ? (
-          <p>Carregando ferramenta...</p>
+          <div style={{ flexGrow: 1 }} className="d-flex align-items-center justify-content-center text-muted">
+            Carregando ferramenta...
+          </div>
         ) : error ? (
-          <p>Não foi possível carregar as ferramentas no momento. Tente novamente mais tarde.</p>
+          <div style={{ flexGrow: 1 }} className="d-flex align-items-center justify-content-center text-danger">
+            Não foi possível carregar as ferramentas no momento.
+          </div>
         ) : tool ? (
           <>
-            <h5>
+            <h2 className="fs-5">
               <Link className="nav-link text-center" to={`/tools/${tool.slug}`}>
                 {tool.name[0].toUpperCase() + tool.name.slice(1)}
               </Link>
-            </h5>
+            </h2>
             <Card.Text className="text-justify">{tool.description}</Card.Text>
-            <div className="text-center fs-5">
+            <div className="text-center fs-5 mt-auto">
               <Link className="nav-link active py-2" to={`/tools/${tool.slug}`}>
                 Acessar Ferramenta <FaExternalLinkAlt className="ms-2" />
               </Link>
             </div>
           </>
         ) : (
-          <p>Nenhuma ferramenta disponível no momento.</p>
+          <div style={{ flexGrow: 1 }} className="d-flex align-items-center justify-content-center text-muted">
+            Nenhuma ferramenta disponível no momento.
+          </div>
         )}
       </Card.Body>
     </Card>

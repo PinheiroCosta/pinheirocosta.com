@@ -4,45 +4,51 @@ import { Link } from "react-router-dom";
 import { BlogService } from "../api/services.gen";
 import type { BlogPost } from "../api/types.gen";
 
-
 const LatestArticle: React.FC = () => {
   const [latestPost, setLatestPost] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-        BlogService.blogList({ page: 1 })
-            .then((data) => {
-                if (data.results && data.results.length > 0) {
-                    setLatestPost(data.results[0]); 
-                }
-            })
-            .catch((error) => {
-                console.error("Erro ao buscar o último post:", error);
-            })
-            .finally(() => {
-                setLoading(false);
-            });
-      }, []);
+    BlogService.blogList({ page: 1 })
+      .then((data) => {
+        if (data.results && data.results.length > 0) {
+          setLatestPost(data.results[0]);
+        }
+      })
+      .catch((error) => {
+        console.error("Erro ao buscar o último post:", error);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
 
   return (
-    <Card className="text-start">
+    <Card className="text-start h-100 w-100" style={{ minHeight: "300px" }}>
       <Card.Header className="text-center mb-2 pb-3 pt-3 fs-5">Última Publicação</Card.Header>
-      <Card.Body>
+      <Card.Body className="d-flex flex-column">
         {loading ? (
-          <p>Carregando última publicação do blog...</p>
+          <div style={{ flexGrow: 1 }} className="d-flex align-items-center justify-content-center text-muted">
+            Carregando...
+          </div>
         ) : latestPost ? (
           <>
-            <h5>
-              <Link className="nav-link text-center" to={`/blog/${latestPost.slug}`}>{latestPost.titulo}</Link>
-            </h5>
+            <h2 className="fs-5">
+              <Link className="nav-link text-center" to={`/blog/${latestPost.slug}`}>
+                {latestPost.titulo}
+              </Link>
+            </h2>
             <Card.Text
+              className="mt-2"
               dangerouslySetInnerHTML={{
                 __html: latestPost.conteudo.substring(0, 330) + "...",
               }}
             />
           </>
         ) : (
-          <p>Nenhum artigo encontrado.</p>
+          <div style={{ flexGrow: 1 }} className="d-flex align-items-center justify-content-center text-muted">
+            Nenhum artigo encontrado.
+          </div>
         )}
       </Card.Body>
     </Card>

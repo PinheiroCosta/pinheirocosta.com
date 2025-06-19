@@ -43,7 +43,6 @@ export function useToolSubmit(tool: ToolsRetrieveResponse) {
             newFormData[input.name] = current;
           }
         }
-        // Opcional: Podemos retornar newFormData se quiser que o form seja re-preenchido externamente
       }
 
       setResult(data);

@@ -7,7 +7,7 @@ import type { Tool } from "../api/types.gen";
 
 
 const Tools = () => {
-  const [tools, setTools] = useState<Tool[]>([]); // Inicializa com um array vazio
+  const [tools, setTools] = useState<Tool[]>([]); 
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [count, setCount] = useState(0);
