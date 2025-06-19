@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { FaPlay, FaRedo } from "react-icons/fa";
-import { Container, Col, Card, Form, Button, Alert } from "react-bootstrap";
+import { Container, Col, Card, Form, Button } from "react-bootstrap";
 import { ToolsRetrieveResponse, ProxyToolData, ProxyToolResponse } from "../../api/types.gen";
 import { ToolsService } from "../../api/services.gen";
 import { useToolSubmit } from "../../hooks/useToolSubmit";
 import { renderInputField } from "../DynamicInputs/InputDispatcher";
 import OutputRenderer from "../DynamicOutputs/OutputRenderer";
+import { ErrorMessage } from "../../MessageCard";
 
 
 interface DynamicToolFormProps {
@@ -42,6 +43,7 @@ const DynamicToolForm: React.FC<DynamicToolFormProps> = ({ tool }) => {
           </Card.Header>
           <Card.Body>
             <OutputRenderer outputs={tool.outputs} result={result} />
+            {error && <ErrorMessage title="Erro" message={error}></ErrorMessage>}
 
             <Form onSubmit={handleSubmit}>
               {isManyInputs ? (
@@ -78,7 +80,6 @@ const DynamicToolForm: React.FC<DynamicToolFormProps> = ({ tool }) => {
               </Button>
             </Form>
 
-            {error && <Alert variant="danger" className="mt-3">{error}</Alert>}
           </Card.Body>
         </Card>
       </Col>

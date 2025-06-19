@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Container, Table, Spinner, Alert } from "react-bootstrap";
+import { Container, Table } from "react-bootstrap";
+import { ErrorMessage, InfoMessage } from "../MessageCard";
 import { ToolsService } from "../api/services.gen"; 
 import { Link } from "react-router-dom";
 import Pagination from "../components/Pagination";
@@ -22,7 +23,6 @@ const Tools = () => {
     setLoading(true);
     ToolsService.toolsList({ page: currentPage, category: categoryFilter || undefined, })
       .then((data) => {
-        console.log(data.results);
         setTools(data.results || []); 
         setHasNext(Boolean(data.next));
         setHasPrevious(Boolean(data.previous));
@@ -39,27 +39,24 @@ const Tools = () => {
   if (loading) {
     return (
       <Container className="text-center mt-5">
-        <Spinner animation="border" role="status">
           <span className="visually-hidden">Carregando...</span>
-        </Spinner>
       </Container>
     );
   }
 
   if (error) {
-    return <Alert variant="danger">{error}</Alert>;
+    return <ErrorMessage title="Error" message={error} ></ErrorMessage>;
   }
 
   if (tools.length === 0) {
-    return <Alert variant="warning">Nenhuma ferramenta encontrada.</Alert>;
+    return <ErrorMessage title="Error" message="Nenhuma Ferramenta foi encontrada." ></ErrorMessage>;
   }
 
   return (
     <Container className="mt-5 ">
       <h2 className="my-4 text-center">Lista de Ferramentas</h2>
         {categoryFilter && (
-          <Alert variant="info" className="mb-2">
-            Filtrando por categoria: <strong>{categoryFilter}</strong>{" "}
+          <InfoMessage title="" message={`Filtrando por categoria: ${categoryFilter}`} >
             <button
               className="btn btn-sm btn-outline-secondary ms-2"
               onClick={() => {
@@ -69,7 +66,7 @@ const Tools = () => {
             >
               Limpar filtro
             </button>
-          </Alert>
+          </InfoMessage>
         )}
       <div className="table-wrapper">
       <Table className="my-table">
