@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { ToolsService } from "../api/services.gen";
 import { ProxyToolData, ProxyToolResponse, ToolsRetrieveResponse } from "../api/types.gen";
+import { parseApiError } from "../utils/apiError";
+
 
 export function useToolSubmit(tool: ToolsRetrieveResponse) {
   const [loading, setLoading] = useState(false);
@@ -47,8 +49,9 @@ export function useToolSubmit(tool: ToolsRetrieveResponse) {
 
       setResult(data);
       return data;
-    } catch {
-      setError("Erro ao executar ferramenta");
+    } catch (error) {
+      console.log(error);
+      setError(parseApiError(error));
     } finally {
       setLoading(false);
     }
