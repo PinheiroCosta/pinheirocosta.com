@@ -47,7 +47,7 @@ class ToolViewSet(viewsets.ModelViewSet):
                 response = requests.post(
                     tool.api_url,
                     json=request.data,
-                    headers=request.headers,
+                    headers={"Content-Type": "application/json"},
                     timeout=TIMEOUT_SECONDS
                 )
                 return JsonResponse(response.json(), status=response.status_code)
