@@ -85,3 +85,11 @@ services:
       - "5005:5005"
     volumes:
       - ./backend/tools/services/masquerade:/app
+
+  stringutils:
+    build:
+      context: ./backend/tools/services/stringutils
+      dockerfile: Dockerfile
+    ports:
+      - "5010:5010"
+
