@@ -78,12 +78,3 @@ services:
       - ./backend/tools/services/masquerade:/app
     command: uvicorn main:app --host 0.0.0.0 --port 5005 --reload
 
-  stringutils:
-    build:
-      context: ./backend/tools/services/stringutils
-      dockerfile: Dockerfile
-    ports:
-      - "5010:5010"
-    volumes:
-      - ./backend/tools/services/stringutils:/app
-    command: uvicorn app.main:app --host 0.0.0.0 --port 5010 --reload
