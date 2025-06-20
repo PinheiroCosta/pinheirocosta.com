@@ -70,13 +70,6 @@ services:
       - result
 
   # tools
-  charcount:
-    build:
-      context: ./backend/tools/services/charcount
-      dockerfile: Dockerfile
-    ports:
-      - "5001:5001"
-
   masquerade:
     build:
       context: ./backend/tools/services/masquerade
@@ -85,11 +78,4 @@ services:
       - "5005:5005"
     volumes:
       - ./backend/tools/services/masquerade:/app
-
-  stringutils:
-    build:
-      context: ./backend/tools/services/stringutils
-      dockerfile: Dockerfile
-    ports:
-      - "5010:5010"
 
