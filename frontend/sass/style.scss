@@ -81,6 +81,29 @@ a {
   color: white;
 }
 
+.btn-primary {
+  background-color: $verde;
+  color: white;
+}
+
+.btn.disabled,
+.btn:active,
+.btn:disabled {
+  background-color: $verde; /* ou cor verde que você usa */
+  color: white;
+  opacity: 0.7; /* opcional, para indicar disabled sem mudar cor */
+  cursor: not-allowed;
+  box-shadow: none;
+  /* evitar qualquer mudança para cor "padrão" do navegador */
+}
+.btn-primary:active,
+.btn-primary:disabled,
+.btn-primary.disabled {
+  background-color: $verde !important; /* ou o verde que você usa */
+  border-color: $verde !important;
+  opacity: 0.7; /* Opcional: para manter o visual de disabled */
+  color: white; /* Garantir contraste */
+}
 // Inputs
 .btn:hover {
   background-color: $verde;
