@@ -1,5 +1,9 @@
 version: '3.5'
 
+networks:
+  romweb_dev_network:
+    external: true
+
 volumes:
   dbdata:
     name: romweb_dbdata
@@ -13,14 +17,20 @@ services:
       - "5432:5432"
     volumes:
       - dbdata:/var/lib/postgresql/data:delegated
+    networks:
+      - romweb_dev_network
 
   broker:
     image: "rabbitmq:alpine"
+    networks:
+      - romweb_dev_network
 
   result:
     image: "redis:alpine"
     ports:
     - "6379:6379"
+    networks:
+      - romweb_dev_network
 
   frontend:
     build:
@@ -31,6 +41,8 @@ services:
       - /app/node_modules
     ports:
       - "3000:3000"
+    networks:
+      - romweb_dev_network
 
   backend:
     build:
@@ -47,6 +59,8 @@ services:
       - broker
       - result
       - frontend
+    networks:
+      - romweb_dev_network
 
   celery:
     build:
@@ -60,12 +74,16 @@ services:
       - db
       - broker
       - result
+    networks:
+      - romweb_dev_network
 
   mailhog: # service for faking a SMTP server
     image: mailhog/mailhog
     ports:
       - '1025:1025' # smtp server
       - '8025:8025' # web ui
+    networks:
+      - romweb_dev_network
 
 # tools
   masquerade:
@@ -76,5 +94,7 @@ services:
       - "5005:5005"
     volumes:
       - ./backend/tools/services/masquerade:/app
+    networks:
+      - romweb_dev_network
     command: uvicorn main:app --host 0.0.0.0 --port 5005 --reload
 
