@@ -65,7 +65,7 @@ const Sobre = () => {
                       rel="noopener noreferrer"
                       className="me-2"
                     >
-                      {platform}
+                      <strong>{platform}</strong>
                     </a>
                   ))}
                 </div>

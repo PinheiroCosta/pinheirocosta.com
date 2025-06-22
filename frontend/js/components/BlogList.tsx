@@ -50,10 +50,10 @@ const BlogList: React.FC<BlogListProps> = ({ posts, loading, error }) => {
               </Card.Body>
                 <Card.Footer className="text-muted d-flex justify-content-between">
                   <span>
-                    Publicado em: {new Date(post.criado_em).toLocaleDateString()}
+                    <strong>Publicado em: {new Date(post.criado_em).toLocaleDateString()}</strong>
                   </span>
                   <span>
-                    <Link className="text-decoration-none" to="/sobre">Por: {post.nome_autor}</Link>
+                    <Link className="text-decoration-none" to="/sobre">Por: <strong>{post.nome_autor}</strong></Link>
                   </span>
                 </Card.Footer>
             </Card>
