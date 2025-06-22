@@ -58,7 +58,7 @@ const Footer = () => {
         <Row className="footer-text">
           <Col className="text-center">
             <small className="text-muted">
-              &copy; {new Date().getFullYear()} PinheiroCosta. 
+              © {new Date().getFullYear()} PinheiroCosta. 
               Todos os direitos reservados.
             </small>
           </Col>
