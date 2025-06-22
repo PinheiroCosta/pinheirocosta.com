@@ -58,14 +58,6 @@ class ToolViewSet(viewsets.ModelViewSet):
                 if attempt == MAX_RETRIES - 1:
                     return JsonResponse({"error": "Service unavailable"}, status=503)
         
-    @action(detail=False, methods=['get'], url_path='slug/(?P<slug>[^/.]+)')
-    def by_slug(self, request, slug=None):
-        try:
-            tool = Tool.objects.get(slug=slug, active=True)
-            serializer = ToolSerializer(tool)
-            return Response(serializer.data)
-        except Tool.DoesNotExist:
-            return Response({'detail': 'Ferramenta não encontrada'}, status=status.HTTP_NOT_FOUND)
 
     @action(detail=False, methods=["get"], url_path="random")
     def random_tool(self, request):
@@ -76,4 +68,3 @@ class ToolViewSet(viewsets.ModelViewSet):
         tool = self.queryset.all()[random_index]
         serializer = self.get_serializer(tool)
         return Response(serializer.data)
-        

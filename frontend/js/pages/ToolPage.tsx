@@ -15,12 +15,8 @@ const ToolPage = () => {
 
   useEffect(() => {
     if (!tool && slug) {
-      ToolsService.toolsList()
-        .then((tools) => {
-          const found = tools.results.find((t) => t.slug === slug);
-          if (!found) throw new Error("Ferramenta não encontrada");
-          setTool(found);
-        })
+      ToolsService.toolsRetrieve({ slug })
+        .then((result) => setTool(result))
         .catch((err) => {
           console.error("Erro ao buscar ferramenta por slug:", err);
           navigate("/404");
