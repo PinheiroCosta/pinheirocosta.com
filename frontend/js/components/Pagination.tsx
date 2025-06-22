@@ -16,7 +16,7 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, hasNext, hasPrevio
             <button 
                 onClick={() => onPageChange(currentPage -1)}
                 disabled={!hasPrevious}
-                className="px-3 py-1 bg-gray-300 rounded disabled:opacity-50"
+                className="btn btn-primary px-3 py-1 rounded disabled:opacity-50"
             >
             {"⤺"}
             </button>
@@ -28,7 +28,7 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, hasNext, hasPrevio
             <button
                 onClick={() => onPageChange(currentPage + 1)}
                 disabled={!hasNext}
-                className="px-3 py-1 bg-gray-300 rounded disabled:opacity-50"
+                className="btn btn-primary px-3 py-1 rounded disabled:opacity-50"
             >
                 {"⤻"}
             </button>
