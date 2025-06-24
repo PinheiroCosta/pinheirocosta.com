@@ -2,13 +2,22 @@ import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Image, Card } from "react-bootstrap";
 import ContactForm from "../components/ContactForm";
 import { AboutmeService, ParametrosService } from "../api/services.gen";
+import BuyMeACoffee from "../components/BuyMeACoffeeButton";
 import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
+import { FaGithub, FaInstagram, FaLinkedin, FaGlobe } from "react-icons/fa";
 import type { AboutmeListResponse, AboutMe } from "../api/types.gen";
 
 const Sobre = () => {
   const [aboutMeData, setAboutMeData] = useState<AboutMe | null>(null);
   const [siteKey, setSiteKey] = useState<string | null>(null);
   const [captchaError, setCaptchaError] = useState<string | null>(null);
+
+  const socialIconMap: Record<string, JSX.Element> = {
+    Github: <FaGithub size={34} />,
+    Instagram: <FaInstagram size={34} />,
+    Linkedin: <FaLinkedin size={34} />,
+    Website: <FaGlobe size={34} />,
+  };
 
   useEffect(() => {
     AboutmeService.aboutmeList().then((res) => {
@@ -54,7 +63,7 @@ const Sobre = () => {
                   __html: aboutMeData?.about_text || "<p class='text-muted'>Carregando informações...</p>",
                 }}
               />
-
+              <BuyMeACoffee className="text-end" />
               {aboutMeData?.social_links && (
                 <div className="social-links mt-3" >
                   {Object.entries(aboutMeData.social_links).map(([platform, link]) => (
@@ -64,8 +73,9 @@ const Sobre = () => {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="me-2"
+                      aria-label={`Link para ${platform}`}
                     >
-                      <strong>{platform}</strong>
+                    {socialIconMap[platform] || <FaGlobe size={24} />}
                     </a>
                   ))}
                 </div>

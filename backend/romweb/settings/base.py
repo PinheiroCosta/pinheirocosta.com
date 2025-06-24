@@ -272,6 +272,7 @@ CSP_IMG_SRC = [
     "data:",
     "https://cdn.jsdelivr.net/npm/swagger-ui-dist@latest/",
     "https://cdn.redoc.ly/redoc/",
+    "https://cdn.buymeacoffee.com",
 ]
 CSP_FRAME_SRC = [
     "https://www.google.com",
