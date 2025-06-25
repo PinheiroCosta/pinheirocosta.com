@@ -16,11 +16,11 @@ interface DynamicToolFormProps {
 const getInitialFormData = (tool: ToolsRetrieveResponse): { [key: string]: any } => {
   const initialData: { [key: string]: any } = {};
   tool.inputs.forEach((field) => {
-    switch (field.type) {
-      case "number":
+    switch (field.data_type) {
+      case "int":
         initialData[field.name] = 0;
         break;
-      case "boolean":
+      case "bool":
         initialData[field.name] = false;
         break;
       default:
