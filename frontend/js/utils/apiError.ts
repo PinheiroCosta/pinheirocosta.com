@@ -63,12 +63,11 @@ function isNetworkError(error: any): boolean {
  * @param detail Array de objetos com informações do erro.
  * @returns Mensagem formatada para exibição.
  */
-function formatDetailArray(detail: ApiErrorDetail[]): string {
+function formatDetailArray(detail: ApiErrorDetail[], showLoc = false): string {
   if (!Array.isArray(detail)) return "";
-
   return detail
     .map((d) =>
-      Array.isArray(d.loc) ? `${d.loc.join(".")}: ${d.msg}` : d.msg
+      showLoc && Array.isArray(d.loc) ? `${d.loc.join(".")}: ${d.msg}` : d.msg
     )
     .join("; ");
 }
@@ -100,7 +99,7 @@ export function parseApiError(error: any): string {
         : formatDetailArray(detail) || BAD_REQUEST_MESSAGE,
     422: (detail) =>
       Array.isArray(detail)
-        ? formatDetailArray(detail)
+        ? formatDetailArray(detail, false)
         : VALIDATION_ERROR_MESSAGE,
     404: () => NOT_FOUND_MESSAGE,
     500: () => SERVER_ERROR_MESSAGE,

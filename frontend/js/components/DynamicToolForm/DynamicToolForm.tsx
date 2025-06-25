@@ -13,8 +13,25 @@ interface DynamicToolFormProps {
   tool: ToolsRetrieveResponse;
 }
 
+const getInitialFormData = (tool: ToolsRetrieveResponse): { [key: string]: any } => {
+  const initialData: { [key: string]: any } = {};
+  tool.inputs.forEach((field) => {
+    switch (field.type) {
+      case "number":
+        initialData[field.name] = 0;
+        break;
+      case "boolean":
+        initialData[field.name] = false;
+        break;
+      default:
+        initialData[field.name] = "";
+    }
+  });
+  return initialData;
+};
+
 const DynamicToolForm: React.FC<DynamicToolFormProps> = ({ tool }) => {
-  const [formData, setFormData] = useState<{ [key: string]: any }>({});
+  const [formData, setFormData] = useState<{ [key: string]: any }>(() => getInitialFormData(tool));
   const { submit, loading, result, error, reset } = useToolSubmit(tool);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -24,9 +41,10 @@ const DynamicToolForm: React.FC<DynamicToolFormProps> = ({ tool }) => {
   };
 
   const handleResetForm = () => {
-    setFormData({});
+    setFormData(getInitialFormData(tool));
     reset();
-  }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await submit(formData);
