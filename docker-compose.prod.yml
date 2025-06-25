@@ -69,6 +69,19 @@ services:
       - broker
       - result
 
+  celery-beat:
+    build:
+      dockerfile: backend/Dockerfile.prod
+      context: .
+    command: celery --app=romweb_tasks beat --loglevel=info
+    volumes:
+      - ./:/home/user/app/
+    env_file: backend/.env.prod
+    depends_on:
+      - db
+      - broker
+      - result
+
   # tools
   masquerade:
     build:

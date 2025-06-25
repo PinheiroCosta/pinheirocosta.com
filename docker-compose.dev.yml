@@ -77,6 +77,21 @@ services:
     networks:
       - romweb_dev_network
 
+  celery-beat:
+    build:
+      dockerfile: backend/Dockerfile.dev
+      context: .
+    command: celery --app=romweb beat --loglevel=info
+    volumes:
+      - ./:/home/user/app/
+    env_file: backend/.env.dev
+    depends_on:
+      - db
+      - broker
+      - result
+    networks:
+      - romweb_dev_network
+
   mailhog: # service for faking a SMTP server
     image: mailhog/mailhog
     ports:
