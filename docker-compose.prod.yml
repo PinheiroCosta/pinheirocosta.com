@@ -73,7 +73,7 @@ services:
     build:
       dockerfile: backend/Dockerfile.prod
       context: .
-    command: celery --app=romweb_tasks beat --loglevel=info
+    command: celery --app=romweb beat --loglevel=info
     volumes:
       - ./:/home/user/app/
     env_file: backend/.env.prod
