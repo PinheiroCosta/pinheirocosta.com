@@ -21,7 +21,7 @@ ADMINS = (("Admin", "romulo@pinheirocosta.com"),)
 
 AUTH_USER_MODEL = "users.User"
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ["*"]
 
 DATABASES = {
     "default": config("DATABASE_URL", cast=db_url),
@@ -157,7 +157,7 @@ STATICFILES_DIRS = (base_dir_join("../frontend/webpack_bundles"),)
 WEBPACK_LOADER = {
     "DEFAULT": {
         "BUNDLE_DIR_NAME": "assets/",
-        "CACHE": False, 
+        "CACHE": False,
         "STATS_FILE": base_dir_join("../webpack-stats.json"),
         "POLL_INTERVAL": 0.1,
         "IGNORE": [r".+\.hot-update.js", r".+\.map"],
@@ -290,9 +290,9 @@ TINYMCE_DEFAULT_CONFIG = {
     "width": "100%",
     "menubar": True,
     "plugins": "advlist autolink lists link image charmap preview anchor codesample "
-               "searchreplace visualblocks code fullscreen insertdatetime media table code help wordcount",
+    "searchreplace visualblocks code fullscreen insertdatetime media table code help wordcount",
     "toolbar": "undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | "
-               "bullist numlist outdent indent | link image media | code codesample",
+    "bullist numlist outdent indent | link image media | code codesample",
     "image_advtab": True,
     "media_live_embeds": True,
 }

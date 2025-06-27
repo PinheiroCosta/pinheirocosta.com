@@ -6,16 +6,29 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('common', '0003_remove_aboutme_temp_image_alter_aboutme_about_image'),
+        ("common", "0003_remove_aboutme_temp_image_alter_aboutme_about_image"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='RobotsTxt',
+            name="RobotsTxt",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('content', models.TextField(default='', help_text='Conteúdo do arquivo robots.txt')),
-                ('last_modified', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "content",
+                    models.TextField(
+                        default="", help_text="Conteúdo do arquivo robots.txt"
+                    ),
+                ),
+                ("last_modified", models.DateTimeField(auto_now=True)),
             ],
         ),
     ]

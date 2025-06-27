@@ -7,10 +7,13 @@ from .models import ParametroSistema, AboutMe, RobotsTxt, ProfessionalContactMes
 
 @admin.register(ProfessionalContactMessage)
 class ContactMessageAdmin(admin.ModelAdmin):
-    list_display = ('name', 'email', 'subject', 'created_at')
-    search_fields = ('name', 'email', 'subject', 'message')
-    list_filter = ('subject', 'created_at',)
-    
+    list_display = ("name", "email", "subject", "created_at")
+    search_fields = ("name", "email", "subject", "message")
+    list_filter = (
+        "subject",
+        "created_at",
+    )
+
 
 @admin.register(RobotsTxt)
 class RobotsTxtAdmin(admin.ModelAdmin):
@@ -32,15 +35,18 @@ class AboutMeAdmin(admin.ModelAdmin):
             self.message_user(
                 request,
                 "Só é permitido um único registro de 'Sobre Mim'.",
-                level=messages.ERROR
+                level=messages.ERROR,
             )
             return
         super().save_model(request, obj, form, change)
-        
+
     def preview(self, obj):
         """Previsualização da imagem no Django Admin."""
-        if obj.about_image and hasattr(obj.about_image, 'url'):
-            return format_html('<img src="{}" width="200" style="object-fit:contain;"/>', obj.about_image.url)
+        if obj.about_image and hasattr(obj.about_image, "url"):
+            return format_html(
+                '<img src="{}" width="200" style="object-fit:contain;"/>',
+                obj.about_image.url,
+            )
         return "(Sem imagem)"
 
 

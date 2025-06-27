@@ -16,7 +16,9 @@ class Tool(models.Model):
     name = models.CharField(max_length=255, unique=True)
     slug = models.SlugField(unique=True, db_index=True)
     description = models.TextField(blank=True, null=True)
-    category = models.CharField(max_length=50, choices=TOOL_CATEGORIES, default="utilitario")
+    category = models.CharField(
+        max_length=50, choices=TOOL_CATEGORIES, default="utilitario"
+    )
     api_url = models.CharField(max_length=255)  # URL do microserviço da ferramenta
     active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -26,6 +28,7 @@ class Tool(models.Model):
 
     def get_absolute_url(self):
         return reverse("tools:detail", kwargs={"slug": self.slug})
+
 
 class ToolField(models.Model):
     IO_TYPES = [
@@ -51,13 +54,15 @@ class ToolField(models.Model):
         ("date", "Formato de data dd/mm/aaaa"),
         ("", "Padrão automático"),
     ]
-    
+
     tool = models.ForeignKey(Tool, on_delete=models.CASCADE, related_name="fields")
-    name = models.CharField(max_length=255)     # Nome interno do campo (ex: 'cpf')
-    label = models.CharField(max_length=255)    # Nome amigável (ex: "CPF do usuário")
+    name = models.CharField(max_length=255)  # Nome interno do campo (ex: 'cpf')
+    label = models.CharField(max_length=255)  # Nome amigável (ex: "CPF do usuário")
     io_type = models.CharField(max_length=20, choices=IO_TYPES)
     data_type = models.CharField(max_length=20, choices=DATA_TYPES)
-    widget_type = models.CharField(max_length=50, choices=WIDGET_TYPES, blank=True, null=True, default="")
+    widget_type = models.CharField(
+        max_length=50, choices=WIDGET_TYPES, blank=True, null=True, default=""
+    )
     required = models.BooleanField(default=False)
     help_text = models.CharField(max_length=255, blank=True)
     min_value = models.IntegerField(null=True, blank=True, default=0)
@@ -68,17 +73,21 @@ class ToolField(models.Model):
         ordering = ["tool", "io_type", "id"]
 
     def __str__(self):
-        return f"[{self.io_type.upper()}] {self.tool.slug}::{self.name} ({self.data_type})"
+        return (
+            f"[{self.io_type.upper()}] {self.tool.slug}::{self.name} ({self.data_type})"
+        )
 
 
 class ToolFieldOption(models.Model):
-    field = models.ForeignKey(ToolField, on_delete=models.CASCADE, related_name="options")
+    field = models.ForeignKey(
+        ToolField, on_delete=models.CASCADE, related_name="options"
+    )
     value = models.CharField(max_length=255)
     label = models.CharField(max_length=255)
     order = models.PositiveIntegerField(default=0)
 
     class Meta:
-        ordering = ['order']
+        ordering = ["order"]
 
     def __str__(self):
         return f"{self.field.tool.slug}::{self.field.name} -> {self.label}"

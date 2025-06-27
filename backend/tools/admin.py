@@ -27,8 +27,11 @@ class ToolFieldAdmin(admin.ModelAdmin):
 
 @admin.register(Tool)
 class ToolAdmin(admin.ModelAdmin):
-    list_display = ('name', "category", "active", "slug")
-    list_filter = ('category', 'active',)
+    list_display = ("name", "category", "active", "slug")
+    list_filter = (
+        "category",
+        "active",
+    )
     search_field = ("name", "description", "slug")
     prepopulated_fields = {"slug": ("name",)}
     inlines = [ToolFieldInline]

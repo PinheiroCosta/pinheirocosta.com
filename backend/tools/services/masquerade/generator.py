@@ -2,37 +2,51 @@ from random import choices, randint, sample
 from typing import Optional, Dict
 from models import FichaVampiro
 from constants import (
-    ATRIBUTOS_PONTOS_INICIAIS, HABILIDADES_PONTOS_INICIAIS, DISCIPLINAS_PONTOS_INICIAIS, ANTECEDENTES_PONTOS_INICIAIS,
-    VIRTUDES_PONTOS_INICIAIS, ATRIBUTOS_POSSIVEIS, HABILIDADES_POSSIVEIS, DISCIPLINAS_POSSIVEIS, CLAS_POSSIVEIS,  
-    ANTECEDENTES_POSSIVEIS, VIRTUDES_POSSIVEIS, CONCEITOS_POSSIVEIS, ARQUETIPOS_POSSIVEIS 
+    ATRIBUTOS_PONTOS_INICIAIS,
+    HABILIDADES_PONTOS_INICIAIS,
+    DISCIPLINAS_PONTOS_INICIAIS,
+    ANTECEDENTES_PONTOS_INICIAIS,
+    VIRTUDES_PONTOS_INICIAIS,
+    ATRIBUTOS_POSSIVEIS,
+    HABILIDADES_POSSIVEIS,
+    DISCIPLINAS_POSSIVEIS,
+    CLAS_POSSIVEIS,
+    ANTECEDENTES_POSSIVEIS,
+    VIRTUDES_POSSIVEIS,
+    CONCEITOS_POSSIVEIS,
+    ARQUETIPOS_POSSIVEIS,
 )
 
 
 def gerar_distribuicao_com_base(
-    possiveis: list[str], 
-    total: int, 
+    possiveis: list[str],
+    total: int,
     fornecido: Optional[Dict[str, int]] = None,
     minimo_por_item: int = 0,
-    remove_zeros: bool = True
+    remove_zeros: bool = True,
 ) -> dict[str, int]:
 
     fornecido = fornecido or {}
-    
+
     # começa com o mínimo garantido
     distribuicao = {}
     for chave in possiveis:
-        distribuicao[chave] = max(fornecido.get(chave, minimo_por_item), minimo_por_item)
+        distribuicao[chave] = max(
+            fornecido.get(chave, minimo_por_item), minimo_por_item
+        )
 
     pontos_usados = sum(distribuicao.values())
     restante = total - pontos_usados
-    
+
     if restante > 0:
         for _ in range(restante):
             escolha = choices(possiveis, k=1)[0]
             distribuicao[escolha] += 1
-    
+
     if remove_zeros:
-        distribuicao_sem_zerados = {chave: valor for chave, valor in distribuicao.items() if valor}
+        distribuicao_sem_zerados = {
+            chave: valor for chave, valor in distribuicao.items() if valor
+        }
         return distribuicao_sem_zerados
 
     return distribuicao
@@ -53,7 +67,10 @@ def gerar_ficha_completa(data: dict) -> FichaVampiro:
     comportamento_input = data.get("comportamento")
 
     atributos = gerar_distribuicao_com_base(
-        ATRIBUTOS_POSSIVEIS, ATRIBUTOS_PONTOS_INICIAIS, atributos_input, minimo_por_item=1
+        ATRIBUTOS_POSSIVEIS,
+        ATRIBUTOS_PONTOS_INICIAIS,
+        atributos_input,
+        minimo_por_item=1,
     )
     habilidades = gerar_distribuicao_com_base(
         HABILIDADES_POSSIVEIS, HABILIDADES_PONTOS_INICIAIS, habilidades_input
@@ -76,22 +93,22 @@ def gerar_ficha_completa(data: dict) -> FichaVampiro:
         conceito_descricao = CONCEITOS_POSSIVEIS[conceito_input]
     else:
         conceito_nome = choices(list(CONCEITOS_POSSIVEIS.keys()), k=1)[0]
-        conceito = conceito_nome 
+        conceito = conceito_nome
         conceito_descricao = CONCEITOS_POSSIVEIS[conceito_nome]
 
     if natureza_input in ARQUETIPOS_POSSIVEIS:
         natureza = natureza_input
         natureza_descricao = ARQUETIPOS_POSSIVEIS[natureza_input]
     else:
-        natureza_nome = choices(list(ARQUETIPOS_POSSIVEIS.keys()), k=1)[0] 
+        natureza_nome = choices(list(ARQUETIPOS_POSSIVEIS.keys()), k=1)[0]
         natureza = natureza_nome
         natureza_descricao = ARQUETIPOS_POSSIVEIS[natureza_nome]
-        
+
     if comportamento_input in ARQUETIPOS_POSSIVEIS:
         comportamento = comportamento_input
         comportamento_descricao = ARQUETIPOS_POSSIVEIS[comportamento_input]
     else:
-        comportamento_nome = choices(list(ARQUETIPOS_POSSIVEIS.keys()), k=1)[0] 
+        comportamento_nome = choices(list(ARQUETIPOS_POSSIVEIS.keys()), k=1)[0]
         comportamento = comportamento_nome
         comportamento_descricao = ARQUETIPOS_POSSIVEIS[comportamento_nome]
 
@@ -111,7 +128,7 @@ def gerar_ficha_completa(data: dict) -> FichaVampiro:
         natureza=natureza,
         natureza_descricao=natureza_descricao,
         comportamento=comportamento,
-        comportamento_descricao=comportamento_descricao
+        comportamento_descricao=comportamento_descricao,
     )
 
-    return ficha 
+    return ficha

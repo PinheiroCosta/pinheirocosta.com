@@ -16,10 +16,9 @@ class MOTDConfig(models.Model):
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
-        help_text="Se definido, esta mensagem será usada como MOTD fixa."
+        help_text="Se definido, esta mensagem será usada como MOTD fixa.",
     )
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"Config (override: {self.message_override})"
-

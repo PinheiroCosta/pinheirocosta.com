@@ -5,7 +5,7 @@ from .models import MOTD, MOTDConfig
 class MOTDSerializer(serializers.ModelSerializer):
     class Meta:
         model = MOTD
-        fields = '__all__'
+        fields = "__all__"
 
 
 class MOTDConfigSerializer(serializers.ModelSerializer):
@@ -13,9 +13,7 @@ class MOTDConfigSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MOTDConfig
-        fields = ['id', 'message_override', 'message_override_text']
+        fields = ["id", "message_override", "message_override_text"]
 
-    
     def get_message_override_text(self, obj):
         return obj.message_override.text if obj.message_override else None
-

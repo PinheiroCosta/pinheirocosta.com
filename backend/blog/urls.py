@@ -8,4 +8,3 @@ app_name = "blog"
 urlpatterns = [
     path("<slug:slug>/", BlogPostDetailView.as_view(), name="post_detail"),
 ]
-

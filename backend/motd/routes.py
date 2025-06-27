@@ -11,6 +11,5 @@ routes = [
         "regex": r"motd-config",
         "viewset": MOTDConfigViewSet,
         "basename": "motdconfig",
-    }
+    },
 ]
-

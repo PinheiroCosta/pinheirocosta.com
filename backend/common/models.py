@@ -67,27 +67,35 @@ class IndexedTimeStampedModel(models.Model):
 class ParametroSistema(models.Model):
     chave = models.CharField(max_length=255, unique=True, db_index=True)
     valor = models.TextField()
-    ambiente = models.CharField(max_length=50)  
+    ambiente = models.CharField(max_length=50)
     descricao = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
-        return f'{self.chave}  ({self.ambiente})'
+        return f"{self.chave}  ({self.ambiente})"
 
 
 class AboutMe(models.Model):
     about_image = models.ImageField(
         upload_to="about_me/",
-        null=True, 
+        null=True,
         blank=True,
-        validators=[FileExtensionValidator(allowed_extensions=['jpeg', 'jpg', 'png', 'gif'])]
+        validators=[
+            FileExtensionValidator(allowed_extensions=["jpeg", "jpg", "png", "gif"])
+        ],
     )
-    about_text = HTMLField()  
+    about_text = HTMLField()
     social_links = models.JSONField(default=dict, blank=True)
-    meta_description = models.CharField(max_length=160, blank=True, null=True)  # Meta descrição para SEO
-    meta_keywords = models.CharField(max_length=255, blank=True, null=True)  # Meta palavras-chave para SEO
-    last_modified = models.DateTimeField(auto_now=True) 
+    meta_description = models.CharField(
+        max_length=160, blank=True, null=True
+    )  # Meta descrição para SEO
+    meta_keywords = models.CharField(
+        max_length=255, blank=True, null=True
+    )  # Meta palavras-chave para SEO
+    last_modified = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    slug = models.SlugField(unique=True, blank=True, null=True)  # Slug para URL amigável
+    slug = models.SlugField(
+        unique=True, blank=True, null=True
+    )  # Slug para URL amigável
 
     def save(self, *args, **kwargs):
         try:

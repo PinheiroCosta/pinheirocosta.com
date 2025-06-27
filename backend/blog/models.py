@@ -11,10 +11,11 @@ class Tag(models.Model):
     def __str__(self):
         return self.nome
 
+
 class BlogPost(models.Model):
-    RASCUNHO = 'rascunho'
-    PUBLICADO = 'publicado'
-    ARQUIVADO = 'arquivado'
+    RASCUNHO = "rascunho"
+    PUBLICADO = "publicado"
+    ARQUIVADO = "arquivado"
     ARTICLE_STATUS = [
         ("rascunho", "Rascunho"),
         ("publicado", "Publicado"),
@@ -27,7 +28,9 @@ class BlogPost(models.Model):
     criado_em = models.DateTimeField(auto_now_add=True)
     atualizado_em = models.DateTimeField(auto_now=True)
     tags = models.ManyToManyField(Tag, related_name="posts")
-    autor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="posts")
+    autor = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="posts"
+    )
     status = models.CharField(max_length=10, choices=ARTICLE_STATUS, default="rascunho")
 
     class Meta:

@@ -1,5 +1,6 @@
 from common.tests.test_utils import TestCaseUtils
 
+
 class TestProfessionalContactSubjects(TestCaseUtils):
     def setUp(self):
         super().setUp()
@@ -9,4 +10,3 @@ class TestProfessionalContactSubjects(TestCaseUtils):
         response = self.auth_client.get(self.view_url)
         self.assertResponse200(response)
         self.assertIn("hire", response.json())
-

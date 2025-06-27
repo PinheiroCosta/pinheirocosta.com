@@ -4,6 +4,7 @@ from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
+
 def verify_recaptcha(token: str, action: str = "contact_form") -> bool:
     if getattr(settings, "RECAPTCHA_BYPASS", settings.DEBUG):
         return True  # Só ignora se RECAPTCHA_BYPASS estiver ativado
@@ -30,7 +31,9 @@ def verify_recaptcha(token: str, action: str = "contact_form") -> bool:
         return False
 
     if received_action != action:
-        logger.warning(f"[reCAPTCHA] Ação esperada '{action}' mas recebeu '{received_action}'")
+        logger.warning(
+            f"[reCAPTCHA] Ação esperada '{action}' mas recebeu '{received_action}'"
+        )
         return False
 
     min_score = getattr(settings, "RECAPTCHA_MIN_SCORE", 0.5)
@@ -39,4 +42,3 @@ def verify_recaptcha(token: str, action: str = "contact_form") -> bool:
         return False
 
     return True
-

@@ -3,6 +3,7 @@ from django.core.cache import cache
 from common.models import ParametroSistema
 import requests
 
+
 @shared_task
 def ping_stringutils_healthcheck():
     try:
