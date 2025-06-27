@@ -2,8 +2,8 @@ from rest_framework import serializers
 from .utils.recaptcha import verify_recaptcha
 from .models import ParametroSistema, AboutMe, ProfessionalContactMessage
 from common.validators.sanitize import (
-    validate_no_html, 
-    sanitize_html, 
+    validate_no_html,
+    sanitize_html,
     validate_no_sql_injection,
 )
 
@@ -22,7 +22,9 @@ class ProfessionalContactMessageCreateSerializer(serializers.ModelSerializer):
 
     name = serializers.CharField(max_length=100)
     email = serializers.EmailField()
-    subject = serializers.ChoiceField(choices=ProfessionalContactMessage.SUBJECT_CHOICES)
+    subject = serializers.ChoiceField(
+        choices=ProfessionalContactMessage.SUBJECT_CHOICES
+    )
     message = serializers.CharField()
     utm_source = serializers.CharField(required=False, allow_blank=True)
     utm_medium = serializers.CharField(required=False, allow_blank=True)
@@ -31,7 +33,16 @@ class ProfessionalContactMessageCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProfessionalContactMessage
-        fields = ['name', 'email', 'subject', 'message', 'utm_source', 'utm_medium', 'utm_campaign', 'recaptcha_token']
+        fields = [
+            "name",
+            "email",
+            "subject",
+            "message",
+            "utm_source",
+            "utm_medium",
+            "utm_campaign",
+            "recaptcha_token",
+        ]
 
     def validate_name(self, value):
         value = validate_no_html("name", value)
@@ -53,7 +64,7 @@ class ProfessionalContactMessageCreateSerializer(serializers.ModelSerializer):
         validated_data["message"] = sanitize_html(validated_data["message"])
         return super().create(validated_data)
 
-    
+
 class ProfessionalContactMessageSerializer(serializers.ModelSerializer):
     """
     Serializer de leitura para mensagens de contato.
@@ -64,8 +75,16 @@ class ProfessionalContactMessageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProfessionalContactMessage
-        fields = ['name', 'email', 'subject', 'message', 'utm_source', 'utm_medium', 'utm_campaign']
-        read_only_fields = ['id', 'created_at']
+        fields = [
+            "name",
+            "email",
+            "subject",
+            "message",
+            "utm_source",
+            "utm_medium",
+            "utm_campaign",
+        ]
+        read_only_fields = ["id", "created_at"]
 
 
 class MessageSerializer(serializers.Serializer):
@@ -75,15 +94,12 @@ class MessageSerializer(serializers.Serializer):
 class ParametroSistemaSerializer(serializers.ModelSerializer):
     class Meta:
         model = ParametroSistema
-        fields = ['chave', 'valor']
+        fields = ["chave", "valor"]
+
 
 class AboutMeSerializer(serializers.ModelSerializer):
-    social_links = serializers.DictField(
-        child=serializers.CharField(), required=False
-    )
+    social_links = serializers.DictField(child=serializers.CharField(), required=False)
 
     class Meta:
         model = AboutMe
-        fields = ['about_image', 'about_text', 'social_links']
-
-
+        fields = ["about_image", "about_text", "social_links"]

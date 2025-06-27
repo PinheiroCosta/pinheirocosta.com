@@ -23,7 +23,7 @@ class TestProfessionalContactMessage(TestCaseUtils):
             "name": "João da Silva",
             "email": "joao@email.com",
             "subject": "hire",
-            "message": "Gostaria de contratar seus serviços."
+            "message": "Gostaria de contratar seus serviços.",
         }
         response = self.client.post(self.url, data=payload, format="json")
         self.assertResponse201(response)
@@ -32,7 +32,7 @@ class TestProfessionalContactMessage(TestCaseUtils):
         payload = {
             "email": "joao@email.com",
             "subject": "hire",
-            "message": "Faltando o nome."
+            "message": "Faltando o nome.",
         }
         response = self.client.post(self.url, data=payload, format="json")
         self.assertResponse400(response)
@@ -43,7 +43,7 @@ class TestProfessionalContactMessage(TestCaseUtils):
             "name": "João",
             "email": "email-invalido",
             "subject": "hire",
-            "message": "Mensagem qualquer"
+            "message": "Mensagem qualquer",
         }
         response = self.client.post(self.url, data=payload, format="json")
         self.assertResponse400(response)
@@ -54,7 +54,7 @@ class TestProfessionalContactMessage(TestCaseUtils):
             "name": "João",
             "email": "joao@email.com",
             "subject": "invalid-subject",
-            "message": "Mensagem qualquer"
+            "message": "Mensagem qualquer",
         }
         response = self.client.post(self.url, data=payload, format="json")
         self.assertResponse400(response)
@@ -65,17 +65,17 @@ class TestProfessionalContactMessage(TestCaseUtils):
             "name": "Anônimo",
             "email": "anon@email.com",
             "subject": "other",
-            "message": "Mensagem pública"
+            "message": "Mensagem pública",
         }
         response = self.client.post(self.url, data=payload, format="json")
         self.assertResponse201(response)
 
     def test_name_too_long_returns_400(self):
         payload = {
-            "name": "A" * 300,  
+            "name": "A" * 300,
             "email": "joao@email.com",
             "subject": "hire",
-            "message": "Mensagem qualquer"
+            "message": "Mensagem qualquer",
         }
         response = self.client.post(self.url, data=payload, format="json")
         self.assertResponse400(response)
@@ -98,7 +98,7 @@ class TestProfessionalContactMessageSecurity(TestCaseUtils):
             "name": "Hacker",
             "email": "hacker@example.com",
             "subject": "hire",
-            "message": "<script>alert('XSS')</script>"
+            "message": "<script>alert('XSS')</script>",
         }
         response = self.client.post(self.url, data=payload, format="json")
         self.assertResponse400(response)  # ou ajustar conforme sua regra de negócio
@@ -108,7 +108,7 @@ class TestProfessionalContactMessageSecurity(TestCaseUtils):
             "name": "<img src=x onerror=alert(1)>",
             "email": "user@example.com",
             "subject": "hire",
-            "message": "Teste HTML tags no nome"
+            "message": "Teste HTML tags no nome",
         }
         response = self.client.post(self.url, data=payload, format="json")
         self.assertResponse400(response)
@@ -118,7 +118,7 @@ class TestProfessionalContactMessageSecurity(TestCaseUtils):
             "name": "SQLi",
             "email": "sqli@example.com",
             "subject": "hire",
-            "message": "admin'; DROP TABLE users; --"
+            "message": "admin'; DROP TABLE users; --",
         }
         response = self.client.post(self.url, data=payload, format="json")
         self.assertResponse400(response)
@@ -128,7 +128,7 @@ class TestProfessionalContactMessageSecurity(TestCaseUtils):
             "name": "' OR 1=1 --",
             "email": "sqli2@example.com",
             "subject": "hire",
-            "message": "Tentando SQL Injection no nome"
+            "message": "Tentando SQL Injection no nome",
         }
         response = self.client.post(self.url, data=payload, format="json")
         self.assertResponse400(response)
@@ -138,7 +138,7 @@ class TestProfessionalContactMessageSecurity(TestCaseUtils):
             "name": "Teste Rate Limit",
             "email": "ratelimit@example.com",
             "subject": "hire",
-            "message": "Testando limite de envio"
+            "message": "Testando limite de envio",
         }
 
         for _ in range(10):
@@ -148,4 +148,3 @@ class TestProfessionalContactMessageSecurity(TestCaseUtils):
         # Quarta tentativa deve ser bloqueada
         response = self.client.post(self.url, data=payload, format="json")
         self.assertEqual(response.status_code, 429)
-

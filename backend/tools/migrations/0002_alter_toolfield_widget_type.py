@@ -6,13 +6,27 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('tools', '0001_initial'),
+        ("tools", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='toolfield',
-            name='widget_type',
-            field=models.CharField(blank=True, choices=[('text', 'Área de texto'), ('input', 'Campo de entrada'), ('checkbox', 'Caixa de seleção'), ('select', 'Dropdown'), ('radio', 'Botões de opção'), ('date', 'Formato de data dd/mm/aaaa'), ('', 'Padrão automático')], default='', max_length=50, null=True),
+            model_name="toolfield",
+            name="widget_type",
+            field=models.CharField(
+                blank=True,
+                choices=[
+                    ("text", "Área de texto"),
+                    ("input", "Campo de entrada"),
+                    ("checkbox", "Caixa de seleção"),
+                    ("select", "Dropdown"),
+                    ("radio", "Botões de opção"),
+                    ("date", "Formato de data dd/mm/aaaa"),
+                    ("", "Padrão automático"),
+                ],
+                default="",
+                max_length=50,
+                null=True,
+            ),
         ),
     ]

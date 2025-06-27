@@ -20,9 +20,9 @@ class BlogPostViewSet(viewsets.ModelViewSet):
     API para listagem, filtro e recuperação de posts do blog.
     """
 
-    queryset = BlogPost.objects.filter(status=BlogPost.PUBLICADO).order_by('-criado_em')
+    queryset = BlogPost.objects.filter(status=BlogPost.PUBLICADO).order_by("-criado_em")
     serializer_class = BlogPostSerializer
     permission_classes = [AllowAny]
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['tags__nome']
-    lookup_field = 'slug'
+    filterset_fields = ["tags__nome"]
+    lookup_field = "slug"

@@ -11,4 +11,3 @@ class BlogPostSitemap(Sitemap):
 
     def lastmod(self, obj):
         return obj.atualizado_em
-

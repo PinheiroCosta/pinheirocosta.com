@@ -8,7 +8,7 @@ class TagSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tag
-        fields = ['id', 'nome']
+        fields = ["id", "nome"]
 
 
 class BlogPostSerializer(serializers.ModelSerializer):
@@ -21,7 +21,16 @@ class BlogPostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BlogPost
-        fields = ['id', 'slug', 'nome_autor', 'titulo', 'conteudo', 'criado_em', 'atualizado_em', 'tags']
+        fields = [
+            "id",
+            "slug",
+            "nome_autor",
+            "titulo",
+            "conteudo",
+            "criado_em",
+            "atualizado_em",
+            "tags",
+        ]
 
     def get_nome_autor(self, obj):
         """
@@ -31,8 +40,6 @@ class BlogPostSerializer(serializers.ModelSerializer):
 
         autor = obj.autor
         if autor and autor.email:
-            nome = autor.email.split('@')[0]        
-            return ' '.join(word.capitalize() for word in nome.split('.'))
+            nome = autor.email.split("@")[0]
+            return " ".join(word.capitalize() for word in nome.split("."))
         return "Autor Desconhecido"
-
-

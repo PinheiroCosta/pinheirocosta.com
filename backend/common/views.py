@@ -9,22 +9,19 @@ from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAdminUser
 from rest_framework.response import Response
 
-from .models import (
-    ParametroSistema, 
-    AboutMe, 
-    RobotsTxt, 
-    ProfessionalContactMessage
-)
+from .models import ParametroSistema, AboutMe, RobotsTxt, ProfessionalContactMessage
 from .serializers import (
-    ParametroSistemaSerializer, 
-    AboutMeSerializer, 
-    MessageSerializer, 
+    ParametroSistemaSerializer,
+    AboutMeSerializer,
+    MessageSerializer,
     ProfessionalContactMessageSerializer,
-    ProfessionalContactMessageCreateSerializer
+    ProfessionalContactMessageCreateSerializer,
 )
 
 
-class ProfessionalContactMessageViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
+class ProfessionalContactMessageViewSet(
+    mixins.CreateModelMixin, viewsets.GenericViewSet
+):
     """
     Endpoint para envio de mensagens através do formulário de contato profissional.
 
@@ -41,36 +38,46 @@ class ProfessionalContactMessageViewSet(mixins.CreateModelMixin, viewsets.Generi
             return ProfessionalContactMessageCreateSerializer
         return ProfessionalContactMessageSerializer
 
-    @method_decorator(ratelimit(key='ip', rate='10/m', method='POST', block=False, group='contact'))
+    @method_decorator(
+        ratelimit(key="ip", rate="10/m", method="POST", block=False, group="contact")
+    )
     def create(self, request, *args, **kwargs):
-        was_limited = getattr(request, 'limited', False)
+        was_limited = getattr(request, "limited", False)
         if was_limited:
-            return Response({'detail': 'Too many requests'}, status=429)
+            return Response({"detail": "Too many requests"}, status=429)
 
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
 
-        return Response({"detail": "Mensagem enviada com sucesso"}, status=status.HTTP_201_CREATED)
+        return Response(
+            {"detail": "Mensagem enviada com sucesso"}, status=status.HTTP_201_CREATED
+        )
 
     @extend_schema(
         summary="Listar assuntos disponíveis",
         description="Retorna as opções de assunto válidas para mensagens de contato profissional.",
         responses={
             200: OpenApiResponse(
-                response={ "type": "object", "additionalProperties": {"type": "string"} },
+                response={"type": "object", "additionalProperties": {"type": "string"}},
                 description="Dicionário com as opções disponíveis. Chave/valor para o backend, valor = label exibida no frontend.",
             )
         },
         methods={"GET"},
     )
-    @action(detail=False, methods=["get"], url_path="subjects", permission_classes=[AllowAny])
+    @action(
+        detail=False,
+        methods=["get"],
+        url_path="subjects",
+        permission_classes=[AllowAny],
+    )
     def list_subjects(self, request):
         """
         Retorna a lista de opções de assunto disponíveis para mensagens de contato profissional.
         """
         choices = dict(ProfessionalContactMessage.SUBJECT_CHOICES)
         return Response(choices)
+
 
 class RobotsTxtView(View):
     """
@@ -83,16 +90,17 @@ class RobotsTxtView(View):
             robots = RobotsTxt.objects.latest("last_modified")
             content = robots.content.strip()
         except RobotsTxt.DoesNotExist:
-            content = "\n".join([
-                "User-Agent: *",
-                "Disallow: /admin/",
-                "Sitemap: https://www.pinheirocosta.com/sitemap.xml", 
-            ])
+            content = "\n".join(
+                [
+                    "User-Agent: *",
+                    "Disallow: /admin/",
+                    "Sitemap: https://www.pinheirocosta.com/sitemap.xml",
+                ]
+            )
 
         response = HttpResponse(content, content_type="text/plain")
         response["Cache-Control"] = "public, max-age=3600"
         return response
-
 
 
 class IndexView(generic.TemplateView):
@@ -114,6 +122,7 @@ class SpaIndexView(generic.TemplateView):
         if path.startswith(("/api/", "/admin/", "/static/", "/media/")):
             return HttpResponse(status=404)
         return super().dispatch(request, *args, **kwargs)
+
 
 class RestViewSet(viewsets.ViewSet):
     serializer_class = MessageSerializer
@@ -150,15 +159,23 @@ class RestViewSet(viewsets.ViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class ParametroSistemaViewSet(viewsets.ReadOnlyModelViewSet): 
+class ParametroSistemaViewSet(viewsets.ReadOnlyModelViewSet):
     """
     Acesso dos parâmetros de sistema configuráveis.
     """
-    queryset = ParametroSistema.objects.none() # Previne exposição acidental na listagem
+
+    queryset = (
+        ParametroSistema.objects.none()
+    )  # Previne exposição acidental na listagem
     serializer_class = ParametroSistemaSerializer
     permission_classes = [IsAdminUser]
 
-    @action(detail=False, methods=["get"], url_path="(?P<chave>[^/.]+)", permission_classes=[AllowAny])
+    @action(
+        detail=False,
+        methods=["get"],
+        url_path="(?P<chave>[^/.]+)",
+        permission_classes=[AllowAny],
+    )
     def buscar_por_chave(self, request, chave=None):
         """
         Busca um parâmetro de sistema pelo valor da chave.
@@ -170,8 +187,8 @@ class ParametroSistemaViewSet(viewsets.ReadOnlyModelViewSet):
 
         parametro = ParametroSistema.objects.filter(chave=chave).first()
         if parametro:
-            return Response({'chave': parametro.chave, 'valor': parametro.valor})
-        return Response({'error': 'Parâmetro não encontrado'}, status=404)
+            return Response({"chave": parametro.chave, "valor": parametro.valor})
+        return Response({"error": "Parâmetro não encontrado"}, status=404)
 
 
 class AboutMeViewSet(viewsets.ModelViewSet):

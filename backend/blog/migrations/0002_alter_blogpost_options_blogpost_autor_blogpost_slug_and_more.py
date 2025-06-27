@@ -8,29 +8,42 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('blog', '0001_initial'),
+        ("blog", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='blogpost',
-            options={'ordering': ['-criado_em']},
+            name="blogpost",
+            options={"ordering": ["-criado_em"]},
         ),
         migrations.AddField(
-            model_name='blogpost',
-            name='autor',
-            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, related_name='posts', to=settings.AUTH_USER_MODEL),
+            model_name="blogpost",
+            name="autor",
+            field=models.ForeignKey(
+                default=1,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="posts",
+                to=settings.AUTH_USER_MODEL,
+            ),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='blogpost',
-            name='slug',
+            model_name="blogpost",
+            name="slug",
             field=models.SlugField(blank=True, max_length=220, null=True, unique=True),
         ),
         migrations.AddField(
-            model_name='blogpost',
-            name='status',
-            field=models.CharField(choices=[('rascunho', 'Rascunho'), ('publicado', 'Publicado'), ('arquivado', 'Arquivado')], default='rascunho', max_length=10),
+            model_name="blogpost",
+            name="status",
+            field=models.CharField(
+                choices=[
+                    ("rascunho", "Rascunho"),
+                    ("publicado", "Publicado"),
+                    ("arquivado", "Arquivado"),
+                ],
+                default="rascunho",
+                max_length=10,
+            ),
         ),
     ]

@@ -11,10 +11,8 @@ from generator import gerar_ficha_completa
 from validator import validar_ficha
 
 
-app = FastAPI(
-    title="Gerador de Fichas - Vampiro: A Máscara",
-    version="0.1.0"
-)
+app = FastAPI(title="Gerador de Fichas - Vampiro: A Máscara", version="0.1.0")
+
 
 class FichaRequest(BaseModel):
     geracao: Optional[int] = Field(default=None, ge=1, le=13)
@@ -32,11 +30,11 @@ class FichaRequest(BaseModel):
 
 @app.post("/fichas/vampiro")
 async def criar_ficha(payload: FichaRequest):
-    geracao = payload.geracao if payload.geracao is not None else  randint(5, 13)
+    geracao = payload.geracao if payload.geracao is not None else randint(5, 13)
     data_dict = payload.model_dump(exclude_unset=True)
     data_dict["geracao"] = geracao
 
-    ficha= gerar_ficha_completa(data_dict)
+    ficha = gerar_ficha_completa(data_dict)
     validar_ficha(ficha)
 
     resposta = {
@@ -50,4 +48,3 @@ async def criar_ficha(payload: FichaRequest):
 @app.get("/")
 def status():
     return {"status": "ok", "msg": "Use POST /fichas/vampiro para gerar fichas."}
-

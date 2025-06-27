@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('tools', '0002_alter_toolfield_widget_type'),
+        ("tools", "0002_alter_toolfield_widget_type"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='toolfield',
-            name='max_value',
+            model_name="toolfield",
+            name="max_value",
             field=models.IntegerField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='toolfield',
-            name='min_value',
+            model_name="toolfield",
+            name="min_value",
             field=models.IntegerField(blank=True, default=0, null=True),
         ),
     ]

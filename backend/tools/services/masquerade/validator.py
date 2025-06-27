@@ -24,11 +24,10 @@ def validar_ficha(ficha: FichaVampiro):
 
     if erros:
         raise HTTPException(
-            status_code=422, 
+            status_code=422,
             detail={
                 "erro": "validacao_regra_negocio",
                 "mensagem": "A ficha enviada possui erros de distribuição de pontos.",
-                "problemas": erros
-            }
+                "problemas": erros,
+            },
         )
-

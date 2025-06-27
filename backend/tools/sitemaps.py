@@ -11,4 +11,3 @@ class ToolSitemap(Sitemap):
 
     def lastmod(self, obj):
         return obj.created_at
-

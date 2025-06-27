@@ -7,4 +7,3 @@ routes = [
         "basename": "tools",
     }
 ]
-

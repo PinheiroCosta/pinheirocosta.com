@@ -37,18 +37,34 @@ sitemaps = {
 }
 
 urlpatterns = [
-    path("sitemap.xml", cache_page(60 * 60)(lambda request: sitemap(request, sitemaps=sitemaps)), name="django.contrib.sitemaps.views.sitemap"),
-    path("robots.txt", cache_page(60 * 60 * 48)(RobotsTxtView.as_view()), name="robots_txt"),
+    path(
+        "sitemap.xml",
+        cache_page(60 * 60)(lambda request: sitemap(request, sitemaps=sitemaps)),
+        name="django.contrib.sitemaps.views.sitemap",
+    ),
+    path(
+        "robots.txt",
+        cache_page(60 * 60 * 48)(RobotsTxtView.as_view()),
+        name="robots_txt",
+    ),
     path("admin/", admin.site.urls, name="admin"),
     path("admin/defender/", include("defender.urls")),
     path("jsreverse/", django_js_reverse.views.urls_js, name="js_reverse"),
     path("api/", include(router.urls), name="api"),
-    path('tinymce/', include('tinymce.urls')),
+    path("tinymce/", include("tinymce.urls")),
     path("blog/", include("blog.urls")),
     path("tools/", include("tools.urls")),
     path("", include("common.urls"), name="common"),
     # drf-spectacular
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
-    path("api/schema/swagger-ui/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
-    path("api/schema/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
+    path(
+        "api/schema/swagger-ui/",
+        SpectacularSwaggerView.as_view(url_name="schema"),
+        name="swagger-ui",
+    ),
+    path(
+        "api/schema/redoc/",
+        SpectacularRedocView.as_view(url_name="schema"),
+        name="redoc",
+    ),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

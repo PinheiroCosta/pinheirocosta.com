@@ -8,23 +8,49 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('common', '0001_initial'),
+        ("common", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='AboutMe',
+            name="AboutMe",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('about_image', models.TextField(blank=True, null=True)),
-                ('about_text', tinymce.models.HTMLField()),
-                ('social_links', models.JSONField(blank=True, default=dict)),
-                ('meta_description', models.CharField(blank=True, max_length=160, null=True)),
-                ('meta_keywords', models.CharField(blank=True, max_length=255, null=True)),
-                ('last_modified', models.DateTimeField(auto_now=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('slug', models.SlugField(blank=True, null=True, unique=True)),
-                ('temp_image', models.ImageField(blank=True, null=True, upload_to='temp_uploads/', validators=[django.core.validators.FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'gif'])])),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("about_image", models.TextField(blank=True, null=True)),
+                ("about_text", tinymce.models.HTMLField()),
+                ("social_links", models.JSONField(blank=True, default=dict)),
+                (
+                    "meta_description",
+                    models.CharField(blank=True, max_length=160, null=True),
+                ),
+                (
+                    "meta_keywords",
+                    models.CharField(blank=True, max_length=255, null=True),
+                ),
+                ("last_modified", models.DateTimeField(auto_now=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("slug", models.SlugField(blank=True, null=True, unique=True)),
+                (
+                    "temp_image",
+                    models.ImageField(
+                        blank=True,
+                        null=True,
+                        upload_to="temp_uploads/",
+                        validators=[
+                            django.core.validators.FileExtensionValidator(
+                                allowed_extensions=["jpg", "jpeg", "png", "gif"]
+                            )
+                        ],
+                    ),
+                ),
             ],
         ),
     ]

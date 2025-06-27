@@ -4,6 +4,5 @@ from .views import ToolDetailView
 app_name = "tools"
 
 urlpatterns = [
-    path('<slug:slug>/', ToolDetailView.as_view(), name="detail"),
+    path("<slug:slug>/", ToolDetailView.as_view(), name="detail"),
 ]
-

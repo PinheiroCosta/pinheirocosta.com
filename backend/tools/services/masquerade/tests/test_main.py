@@ -9,15 +9,11 @@ from main import app
 async def test_criar_ficha_valida():
     payload = {
         "geracao": 10,
-        "atributos": {
-            "força": 5,
-            "destreza": 5,
-            "vigor": 5
-        },
+        "atributos": {"força": 5, "destreza": 5, "vigor": 5},
         "habilidades": {},
         "disciplinas": {},
         "nome": "Teste",
-        "cla": "Toreador"
+        "cla": "Toreador",
     }
 
     transport = ASGITransport(app=app)
@@ -28,6 +24,7 @@ async def test_criar_ficha_valida():
     body = response.json()
     assert "problemas" in body["detail"]
     assert any("excedem o limite" in p for p in body["detail"]["problemas"])
+
 
 @pytest.mark.asyncio
 async def test_criar_ficha_aleatoria():
@@ -43,6 +40,7 @@ async def test_criar_ficha_aleatoria():
     assert sum(body["ficha"]["habilidades"].values()) == 27
     assert sum(body["ficha"]["disciplinas"].values()) == 3
 
+
 @pytest.mark.asyncio
 async def test_geracao_fora_limite():
     """Testes de Validação de Dados"""
@@ -52,7 +50,7 @@ async def test_geracao_fora_limite():
         "habilidades": {},
         "disciplinas": {},
         "nome": "Teste",
-        "cla": "Toreador"
+        "cla": "Toreador",
     }
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as client:
@@ -80,6 +78,7 @@ async def test_desempenho_criar_ficha_aleatoria():
 @pytest.mark.asyncio
 async def test_concorrencia_criar_ficha_aleatoria():
     """Testes de Concurrency"""
+
     async def fazer_requisicao():
         transport = ASGITransport(app=app)
         async with AsyncClient(transport=transport, base_url="http://test") as ac:

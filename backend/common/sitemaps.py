@@ -29,4 +29,3 @@ class StaticPrivacySitemap(Sitemap):
 
     def lastmod(self, item):
         return timezone.now()
-

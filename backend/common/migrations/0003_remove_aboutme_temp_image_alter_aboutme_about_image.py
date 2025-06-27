@@ -7,17 +7,26 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('common', '0002_aboutme'),
+        ("common", "0002_aboutme"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='aboutme',
-            name='temp_image',
+            model_name="aboutme",
+            name="temp_image",
         ),
         migrations.AlterField(
-            model_name='aboutme',
-            name='about_image',
-            field=models.ImageField(blank=True, null=True, upload_to='about_me/', validators=[django.core.validators.FileExtensionValidator(allowed_extensions=['jpeg', 'jpg', 'png', 'gif'])]),
+            model_name="aboutme",
+            name="about_image",
+            field=models.ImageField(
+                blank=True,
+                null=True,
+                upload_to="about_me/",
+                validators=[
+                    django.core.validators.FileExtensionValidator(
+                        allowed_extensions=["jpeg", "jpg", "png", "gif"]
+                    )
+                ],
+            ),
         ),
     ]

@@ -3,13 +3,15 @@ from common.validators.sanitize import sanitize_text
 
 
 class SanitizeTextValidatorTests(TestCase):
-    
+
     def test_strips_html_tags(self):
         value = "<b>Olá</b>, <script>alert('xss')</script> mundo!"
-        expected = "Olá, alert('xss') mundo!"  # tags removidas, mas conteúdo interno mantido
+        expected = (
+            "Olá, alert('xss') mundo!"  # tags removidas, mas conteúdo interno mantido
+        )
         result = sanitize_text(value)
         self.assertEqual(result, expected)
-    
+
     def test_allows_safe_tags(self):
         value = "<b>Texto</b> com <i>ênfase</i>"
         expected = "<b>Texto</b> com <i>ênfase</i>"
@@ -26,4 +28,3 @@ class SanitizeTextValidatorTests(TestCase):
         value = "Mensagem simples, sem tags."
         result = sanitize_text(value)
         self.assertEqual(result, value)
-
