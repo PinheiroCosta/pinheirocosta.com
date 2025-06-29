@@ -29,8 +29,8 @@ backend_format:
 	docker-compose -f ${DOCKER_COMPOSE_FILE} run backend black .
 
 git_update_submodules:
-	@echo -e "\033[32m[INFO] Atualizando Submodules\033[0m"
-	git submodule update --remote
+	@echo -e "\033[32m[INFO] Atualizando Submodules recursivamente\033[0m"
+	git submodule update --remote --merge --recursive
 
 docker_create_db_volume:
 	@echo -e "\033[32mCriando volume Docker para o banco de dados\033[0m"
