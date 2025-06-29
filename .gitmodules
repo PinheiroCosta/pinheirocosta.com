@@ -1,0 +1,3 @@
+[submodule "backend/private_apps/comanda_go_backend"]
+	path = backend/private_apps/comanda_go_backend
+	url = git@github.com:PinheiroCosta/comanda-go-backend.git

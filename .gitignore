@@ -58,3 +58,6 @@ backend/media/
 
 # tmux
 tmux_pinheirocosta.sh
+
+# ComandaGo
+backend/private_apps/
