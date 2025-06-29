@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "tools",
     "django_filters",
     "motd",
+    "private_apps.comanda_go_backend.comanda_go",
 ]
 
 MIDDLEWARE = [
