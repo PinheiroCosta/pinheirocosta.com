@@ -1,3 +1,5 @@
+.PHONY: clean backend_format docker_create_db_volume docker_up_build docker_build_backend docker_build_frontend docker_update_schema docker_down docker_dev_up docker_logs docker_backend_shell docker_makemigrations docker_migrate docker_frontend_update_api docker_test docker_test_reset docker_db_save docker_db_restore docker_wipe docker_cleanup_frontend docker_setup docker_update_dependencies docker_prod_up deploy_rolling_update
+
 SHELL := /bin/bash # Use bash syntax
 
 # Carrega variáveis do .env principal se existir
@@ -24,7 +26,11 @@ clean:
 
 backend_format:
 	@echo -e "\033[32m[INFO] Formatando código Python com Black\033[0m"
-	black backend
+	docker-compose -f ${DOCKER_COMPOSE_FILE} run backend black .
+
+git_update_submodules:
+	@echo -e "\033[32m[INFO] Atualizando Submodules\033[0m"
+	git submodule update --remote
 
 docker_create_db_volume:
 	@echo -e "\033[32mCriando volume Docker para o banco de dados\033[0m"
@@ -146,4 +152,3 @@ deploy_rolling_update:
 	$(MAKE) docker_db_restore  
 	@echo -e "\033[32m[INFO] Rolling Update concluído!\033[0m"
 
-.PHONY: clean backend_format docker_create_db_volume docker_up_build docker_build_backend docker_build_frontend docker_update_schema docker_down docker_dev_up docker_logs docker_backend_shell docker_makemigrations docker_migrate docker_frontend_update_api docker_test docker_test_reset docker_db_save docker_db_restore docker_wipe docker_cleanup_frontend docker_setup docker_update_dependencies docker_prod_up deploy_rolling_update
