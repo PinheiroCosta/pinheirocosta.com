@@ -1,8 +1,7 @@
 import os
-
 from decouple import config
 from dj_database_url import parse as db_url
-
+from .installed_apps import INSTALLED_APPS, OPTIONAL_APPS
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -27,31 +26,7 @@ DATABASES = {
     "default": config("DATABASE_URL", cast=db_url),
 }
 
-INSTALLED_APPS = [
-    "django.contrib.admin",
-    "django.contrib.auth",
-    "django.contrib.contenttypes",
-    "django.contrib.sessions",
-    "django.contrib.messages",
-    "django.contrib.staticfiles",
-    "django.contrib.sitemaps",
-    "django_js_reverse",
-    "webpack_loader",
-    "import_export",
-    "rest_framework",
-    "drf_spectacular",
-    "defender",
-    "django_guid",
-    "common",
-    "users",
-    "blog",
-    "tinymce",
-    "corsheaders",
-    "tools",
-    "django_filters",
-    "motd",
-    "private_apps.comanda_go_backend.comanda_go",
-]
+
 
 MIDDLEWARE = [
     "django.middleware.gzip.GZipMiddleware",
