@@ -31,18 +31,18 @@ DATABASES = {
 MIDDLEWARE = [
     "django.middleware.gzip.GZipMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django_permissions_policy.PermissionsPolicyMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
+    "common.middleware.cache_control.DefaultCacheControlMiddleware",
+    "csp.middleware.CSPMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
-    "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "csp.middleware.CSPMiddleware",
     "defender.middleware.FailedLoginMiddleware",
     "django_guid.middleware.guid_middleware",
-    "corsheaders.middleware.CorsMiddleware",
 ]
 
 CORS_ALLOWED_ORIGINS = [
@@ -253,6 +253,7 @@ CSP_IMG_SRC = [
 CSP_FRAME_SRC = [
     "https://www.google.com",
 ]
+CSP_FRAME_ANCESTORS = ["'none'"]
 
 # Django-defender
 DEFENDER_LOGIN_FAILURE_LIMIT = 3
