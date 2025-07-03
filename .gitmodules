@@ -4,3 +4,6 @@
 [submodule "private_apps/preview"]
 	path = private_apps/preview
 	url = git@github.com:PinheiroCosta/preview-django-app.git
+[submodule "backend/private_apps/preview"]
+	path = backend/private_apps/preview
+	url = git@github.com:PinheiroCosta/preview-django-app.git
