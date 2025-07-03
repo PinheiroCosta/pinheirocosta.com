@@ -1,3 +1,6 @@
 [submodule "backend/private_apps/comanda_go_backend"]
 	path = backend/private_apps/comanda_go_backend
 	url = git@github.com:PinheiroCosta/comanda-go-backend.git
+[submodule "private_apps/preview"]
+	path = private_apps/preview
+	url = git@github.com:PinheiroCosta/preview-django-app.git
