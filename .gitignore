@@ -61,4 +61,4 @@ tmux_pinheirocosta.sh
 
 # ComandaGo
 /backend/private_apps/*
-!/backend/private_apps/comanda_go_backend/
+!/backend/private_apps/*/
