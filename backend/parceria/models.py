@@ -41,3 +41,13 @@ class PedidoServico(models.Model):
 
     def __str__(self):
         return f"{self.servico.nome} - {self.parceria.nome_projeto}"
+
+class SugestaoServico(models.Model):
+    parceria = models.ForeignKey(Parceria, on_delete=models.CASCADE)
+    titulo = models.CharField(max_length=100)
+    descricao = models.TextField()
+    data = models.DateTimeField(default=timezone.now)
+    status = models.CharField(max_length=20, choices=[('nova', 'Nova'), ('avaliada', 'Avaliada')])
+
+    def __str__(self):
+        return f"{self.titulo} ({self.parceria})"
