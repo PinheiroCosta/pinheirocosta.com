@@ -278,3 +278,58 @@ TINYMCE_DEFAULT_CONFIG = {
 RECAPTCHA_SECRET_KEY = config("RECAPTCHA_SECRET_KEY")
 RECAPTCHA_MIN_SCORE = 0.8
 RECAPTCHA_BYPASS = DEBUG
+
+# JAZZMIN
+JAZZMIN_SETTINGS = {
+    "site_title": "Pinheirocosta.com",
+    "site_brand": "Administração",
+    "site_icon": None,
+    "copyright": "- PinheiroCosta.com",
+    "icons": {
+         "auth": "fas fa-users-cog",
+         "users.User": "fas fa-user",
+         "auth.Group": "fas fa-users",
+         "blog.Tag": "fas fa-tags",
+         "blog.BlogPost": "fas fa-book",
+         "defender.AccessAttempt": "fas fa-shield",
+         "common.RobotsTxt": "fas fa-sitemap",
+         "common.ProfessionalContactMessage": "fas fa-envelope",
+         "common.AboutMe": "fas fa-address-card",
+         "common.ParametroSistema": "fas fa-key",
+         "motd.MOTD": "fas fa-quote-left",
+         "motd.MOTDConfig": "fas fa-gears",
+         "tools.Tool": "fas fa-gear",
+         "tools.ToolField": "fas fa-gears",
+    },
+}
+JAZZMIN_UI_TWEAKS = {
+    "navbar_small_text": False,
+    "footer_small_text": False,
+    "body_small_text": False,
+    "brand_small_text": True,
+    "brand_colour": "navbar-teal",
+    "accent": "accent-teal",
+    "navbar": "navbar-teal navbar-dark",
+    "no_navbar_border": False,
+    "navbar_fixed": False,
+    "layout_boxed": False,
+    "footer_fixed": False,
+    "sidebar_fixed": False,
+    "sidebar": "sidebar-dark-teal",
+    "sidebar_nav_small_text": True,
+    "sidebar_disable_expand": False,
+    "sidebar_nav_child_indent": False,
+    "sidebar_nav_compact_style": False,
+    "sidebar_nav_legacy_style": False,
+    "sidebar_nav_flat_style": False,
+    "theme": "sandstone",
+    "dark_mode_theme": None,
+    "button_classes": {
+        "primary": "btn-outline-primary",
+        "secondary": "btn-outline-secondary",
+        "info": "btn-info",
+        "warning": "btn-warning",
+        "danger": "btn-danger",
+        "success": "btn-success"
+    }
+}
