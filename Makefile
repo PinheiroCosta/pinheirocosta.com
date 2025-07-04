@@ -35,6 +35,10 @@ git_update_submodules:
 docker_create_db_volume:
 	@echo -e "\033[32mCriando volume Docker para o banco de dados\033[0m"
 	docker volume create romweb_dbdata
+
+docker_create_dev_network:
+	@echo -e "\033[32mCriando Rede Docker para comunicação entre serviços.\033[0m"
+	docker network create romweb_dev_network
 	
 docker_up_build:
 	docker-compose -f ${DOCKER_COMPOSE_FILE} up -d --build
