@@ -62,3 +62,11 @@ tmux_pinheirocosta.sh
 # ComandaGo
 /backend/private_apps/*
 !/backend/private_apps/*/
+
+# arquivos gerados pelo celery
+backend/celerybeat-schedule
+
+# arquivos gerados pelo openapi
+frontend/js/api/services.gen.ts
+frontend/js/api/types.gen.ts
+
