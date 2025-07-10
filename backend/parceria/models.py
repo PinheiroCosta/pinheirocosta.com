@@ -20,7 +20,15 @@ class Servico(models.Model):
 
 
 class Parceria(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    TIPO_CHOICES = [
+        ('cliente', 'Cliente'),
+        ('marca', 'Marca'),
+        ('conteudo', 'Criador de conteúdo'),
+    ]
+
+    nome = models.CharField(max_length=100)
+    tipo = models.CharField(max_length=20, choices=TIPO_CHOICES)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     nome_projeto = models.CharField(max_length=100)
     dominio = models.CharField(max_length=100, blank=True, null=True)
     data_criacao = models.DateTimeField(default=timezone.now)
@@ -29,12 +37,30 @@ class Parceria(models.Model):
         return f"{self.user.get_full_name()} ({self.nome_projeto})"
 
 
+class ContratoServico(models.Model):
+    parceria = models.ForeignKey(Parceria, on_delete=models.CASCADE, related_name='contratos')
+    servico = models.ForeignKey(Servico, on_delete=models.PROTECT)
+    data_inicio = models.DateField(default=timezone.now)
+    data_fim = models.DateField(blank=True, null=True)
+    cancelado = models.BooleanField(default=False)
+    observacoes = models.TextField(blank=True)
+    
+    class Meta:
+        unique_together = ('parceria', 'servico', 'data_inicio')
+        verbose_name = "Contrato de Serviço"
+        verbose_name_plural = "Contratos de Serviço"
+
+    def __str__(self):
+        return f"{self.parceria} - {self.servico} ({self.data_inicio})"
+
+
 class PedidoServico(models.Model):
     parceria = models.ForeignKey(Parceria, on_delete=models.CASCADE, related_name='pedidos')
     servico = models.ForeignKey(Servico, on_delete=models.PROTECT)
     data_pedido = models.DateField(default=timezone.now)
     desconto = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
     vencimento = models.DateField(blank=True, null=True)
+    contrato = models.ForeignKey(ContratoServico, on_delete=models.SET_NULL, null=True, blank=True)
     status = models.CharField(
         max_length=20,
         choices=[
@@ -110,3 +136,20 @@ class Pagamento(models.Model):
 
     def __str__(self):
         return f"{self.pedido} - {self.metodo} - {self.status}"
+
+
+class PagamentoHistorico(models.Model):
+    STATUS_CHOICES = [
+        ('pendente', 'Pendente'),
+        ('confirmado', 'Confirmado'),
+        ('falhou', 'Falhou'),
+        ('estornado', 'Estornado'),
+    ]
+
+    pagamento = models.ForeignKey(Pagamento, on_delete=models.CASCADE, related_name="historico")
+    status = models.CharField(max_length=20, choices=Pagamento.STATUS_CHOICES)
+    detalhes = models.JSONField(blank=True, null=True)
+    data = models.DateTimeField(auto_now_add=True)
+
+
+
