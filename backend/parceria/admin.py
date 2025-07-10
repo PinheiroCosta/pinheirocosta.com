@@ -1,29 +1,43 @@
 from django.contrib import admin
-from .models import Parceria, Servico, PedidoServico, SugestaoServico
+from .models import Parceria, Servico, PedidoServico, TicketSuporte
 from .forms import ParceriaForm
+
+
+class PedidoServicoInline(admin.TabularInline):
+    model = PedidoServico
+    extra = 0
+    fields = ('servico', 'status', 'data_pedido', 'vencimento', 'desconto')
+    can_delete = False
+    readonly_fields = ('data_pedido',)
+
+    def has_change_permission(self, request, obj=None):
+        return request.user.is_superuser
+
+    def has_delete_permission(self, request, obj=None):
+        return request.user.is_superuser
+
+    def has_add_permission(self, request, obj=None):
+        return request.user.is_superuser
+
+
+class TicketSuporteInline(admin.TabularInline):
+    model = TicketSuporte
+    extra = 0
+    fields = ('titulo', 'descricao', 'resposta', 'status', 'data_criacao',)
+    can_delete = False
+
+    def has_change_permission(self, request, obj=None):
+        return request.user.is_superuser
+
+    def has_delete_permission(self, request, obj=None):
+        return request.user.is_superuser
 
 
 @admin.register(Parceria)
 class ParceriaAdmin(admin.ModelAdmin):
     form = ParceriaForm
-    list_display = ('user', 'nome_projeto', 'dominio', 'data_criacao', 'status_servicos')
-
-    def get_queryset(self, request):
-        qs = super().get_queryset(request)
-        if request.user.is_superuser:
-            return qs
-        return qs.filter(parceria__user=request.user)
-
-    def has_change_permission(self, request, obj=None):
-        if request.user.is_superuser or obj is None:
-            return True
-        return obj.parceria.user == request.user
-
-    def status_servicos(self, obj):
-        ativos = obj.pedidos.filter(status='em_andamento').count()
-        pendentes = obj.pedidos.filter(status='pendente').count()
-        return f"{ativos} ativos / {pendentes} pendentes"
-    status_servicos.short_description = "Serviços"
+    list_display = ('nome_projeto', 'dominio', 'data_criacao')
+    inlines = [PedidoServicoInline, TicketSuporteInline]
 
 
 @admin.register(Servico)
@@ -34,46 +48,13 @@ class ServicoAdmin(admin.ModelAdmin):
 
 @admin.register(PedidoServico)
 class PedidoServicoAdmin(admin.ModelAdmin):
-    list_display = ('parceria', 'servico', 'status', 'data_pedido', 'vencimento', 'desconto')
+    list_display = ('servico', 'status', 'data_pedido', 'vencimento', 'desconto')
     list_filter = ('status', 'servico')
     date_hierarchy = 'data_pedido'
 
-    def get_queryset(self, request):
-        qs = super().get_queryset(request)
-        if request.user.is_superuser:
-            return qs
-        return qs.filter(parceria__user=request.user)
 
-    def has_change_permission(self, request, obj=None):
-        if request.user.is_superuser or obj is None:
-            return True
-        return obj.parceria.user == request.user
-
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == "parceria" and not request.user.is_superuser:
-            kwargs["queryset"] = Parceria.objects.filter(user=request.user)
-        return super().formfield_for_foreignkey(db_field, request, **kwargs)
-    
-    def save_model(self, request, obj, form, change):
-        if not change and not request.user.is_superuser:
-            obj.parceria = Parceria.objects.get(user=request.user)
-        super().save_model(request, obj, form, change)
-
-
-@admin.register(SugestaoServico)
-class SugestaoServicoAdmin(admin.ModelAdmin):
-    list_display = ('parceria', 'titulo', 'descricao', 'data', 'status')
-    list_filter = ('status', 'data')
-    date_hierarchy = 'data'
-
-    def get_queryset(self, request):
-        qs = super().get_queryset(request)
-        if request.user.is_superuser:
-            return qs
-        return qs.filter(parceria__user=request.user)
-
-    def has_change_permission(self, request, obj=None):
-        if request.user.is_superuser or obj is None:
-            return True
-        return obj.parceria.user == request.user
-
+@admin.register(TicketSuporte)
+class TicketSuporteAdmin(admin.ModelAdmin):
+    list_display = ('tipo', 'titulo', 'descricao', 'status', 'data_criacao', 'prazo_entrega', 'resposta')
+    list_filter = ('status', 'data_criacao')
+    date_hierarchy = 'data_criacao'

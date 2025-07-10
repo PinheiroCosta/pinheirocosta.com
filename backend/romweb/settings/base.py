@@ -283,6 +283,7 @@ RECAPTCHA_BYPASS = DEBUG
 JAZZMIN_SETTINGS = {
     "site_title": "Pinheirocosta.com",
     "site_brand": "Administração",
+    "welcome_sign": None,
     "site_icon": None,
     "copyright": "- PinheiroCosta.com",
     "icons": {
@@ -300,6 +301,10 @@ JAZZMIN_SETTINGS = {
          "motd.MOTDConfig": "fas fa-gears",
          "tools.Tool": "fas fa-gear",
          "tools.ToolField": "fas fa-gears",
+         "parceria.Parceria": "fas fa-handshake",
+         "parceria.PedidoServico": "fas fa-cart-shopping",
+         "parceria.Servico": "fas fa-shop",
+         "parceria.TicketSuporte": "fas fa-comment-medical",
     },
 }
 JAZZMIN_UI_TWEAKS = {
