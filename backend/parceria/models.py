@@ -4,9 +4,16 @@ from django.utils import timezone
 
 
 class Servico(models.Model):
+    PERIODICIDADE_CHOICES = [
+        ('avulso', 'Avulso'),
+        ('mensal', 'Mensal'),
+        ('anual', 'Anual'),
+    ]
+
     nome = models.CharField(max_length=100)
     descricao = models.TextField(blank=True)
     preco = models.DecimalField(max_digits=8, decimal_places=2)
+    periodicidade = models.CharField(max_length=10, choices=PERIODICIDADE_CHOICES, default='avulso')
 
     def __str__(self):
         return self.nome
@@ -26,7 +33,8 @@ class PedidoServico(models.Model):
     parceria = models.ForeignKey(Parceria, on_delete=models.CASCADE, related_name='pedidos')
     servico = models.ForeignKey(Servico, on_delete=models.PROTECT)
     data_pedido = models.DateField(default=timezone.now)
-    desconto = models.DecimalField(max_digits=2, decimal_places=0)
+    desconto = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
+    vencimento = models.DateField(blank=True, null=True)
     status = models.CharField(
         max_length=20,
         choices=[
@@ -37,17 +45,68 @@ class PedidoServico(models.Model):
         ],
         default='pendente',
     )
-    vencimento = models.DateField(blank=True, null=True)
+
+    class Meta:
+        verbose_name_plural = "Pedidos"
+
 
     def __str__(self):
         return f"{self.servico.nome} - {self.parceria.nome_projeto}"
 
-class SugestaoServico(models.Model):
+
+class TicketSuporte(models.Model):
+    TIPO_CHOICES = [
+        ('sugestao', 'Sugestão de funcionalidade'),
+        ('ajuda', 'Ajuda ou dúvida'),
+        ('problema', 'Relato de problema'),
+        ('outro', 'Outro'),
+    ]
+
+    STATUS_CHOICES = [
+        ('novo', 'Novo'),
+        ('em_analise', 'Em análise'),
+        ('em_execucao', 'Em execução'),
+        ('concluido', 'Concluído'),
+        ('rejeitado', 'Rejeitado'),
+    ]
+
     parceria = models.ForeignKey(Parceria, on_delete=models.CASCADE)
-    titulo = models.CharField(max_length=100)
+    tipo = models.CharField(max_length=20, choices=TIPO_CHOICES)
+    titulo = models.CharField(max_length=120)
     descricao = models.TextField()
-    data = models.DateTimeField(default=timezone.now)
-    status = models.CharField(max_length=20, choices=[('nova', 'Nova'), ('avaliada', 'Avaliada')])
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='novo')
+    data_criacao = models.DateTimeField(default=timezone.now)
+    prazo_entrega = models.DateField(blank=True, null=True)
+    resposta = models.TextField(blank=True)
+
+    class Meta:
+        verbose_name_plural = "Tickets"
+
 
     def __str__(self):
-        return f"{self.titulo} ({self.parceria})"
+        return f"[{self.get_status_display()}] {self.titulo}"
+
+
+class Pagamento(models.Model):
+    METODO_CHOICES = [
+        ('pix', 'Pix'),
+        ('boleto', 'Boleto bancário'),
+        ('crédito', 'Cartão de crédito'),
+        ('débito', 'Cartão de débito'),
+    ]
+    STATUS_CHOICES = [
+        ('pendente', 'Pendente'),
+        ('confirmado', 'Confirmado'),
+        ('falhou', 'Falhou'),
+        ('estornado', 'Estornado'),
+    ]
+
+    pedido = models.OneToOneField(PedidoServico, on_delete=models.CASCADE, related_name="pagamento")
+    valor = models.DecimalField(max_digits=8, decimal_places=2)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pendente')
+    metodo = models.CharField(max_length=30, choices=METODO_CHOICES)
+    criado_em = models.DateTimeField(auto_now_add=True)
+    atualizado_em = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.pedido} - {self.metodo} - {self.status}"
