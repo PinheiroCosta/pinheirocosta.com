@@ -286,6 +286,7 @@ JAZZMIN_SETTINGS = {
     "welcome_sign": None,
     "site_icon": None,
     "copyright": "- PinheiroCosta.com",
+    "show_ui_builder":  True,
     "icons": {
          "auth": "fas fa-users-cog",
          "users.User": "fas fa-user",
@@ -305,10 +306,11 @@ JAZZMIN_SETTINGS = {
          "parceria.PedidoServico": "fas fa-cart-shopping",
          "parceria.Servico": "fas fa-shop",
          "parceria.TicketSuporte": "fas fa-comment-medical",
+         "parceria.ContratoServico": "fas fa-file-signature",
     },
 }
 JAZZMIN_UI_TWEAKS = {
-    "navbar_small_text": False,
+    "navbar_small_text": True,
     "footer_small_text": False,
     "body_small_text": False,
     "brand_small_text": True,
@@ -321,7 +323,7 @@ JAZZMIN_UI_TWEAKS = {
     "footer_fixed": False,
     "sidebar_fixed": False,
     "sidebar": "sidebar-dark-teal",
-    "sidebar_nav_small_text": True,
+    "sidebar_nav_small_text": False,
     "sidebar_disable_expand": False,
     "sidebar_nav_child_indent": False,
     "sidebar_nav_compact_style": False,
