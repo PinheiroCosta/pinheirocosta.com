@@ -150,6 +150,3 @@ class PagamentoHistorico(models.Model):
     status = models.CharField(max_length=20, choices=Pagamento.STATUS_CHOICES)
     detalhes = models.JSONField(blank=True, null=True)
     data = models.DateTimeField(auto_now_add=True)
-
-
-
