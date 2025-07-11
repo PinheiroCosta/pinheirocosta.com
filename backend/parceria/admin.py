@@ -67,6 +67,9 @@ class PedidoServicoAdmin(admin.ModelAdmin):
     list_filter = ('status', 'servico', 'contrato')
     date_hierarchy = 'data_pedido'
 
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('servico', 'parceria', 'contrato')
+
 
 @admin.register(TicketSuporte)
 class TicketSuporteAdmin(admin.ModelAdmin):
@@ -81,3 +84,6 @@ class ContratoServicoAdmin(admin.ModelAdmin):
     list_filter = ('servico', 'cancelado')
     search_fields = ('parceria__nome_projeto', 'servico__nome')
     date_hierarchy = 'data_inicio'
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('servico', 'parceria', 'contrato')

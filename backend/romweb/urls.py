@@ -20,7 +20,7 @@ from drf_spectacular.views import (
 
 
 router = DefaultRouter()
-routes = common_routes + users_routes 
+routes = common_routes + users_routes
 sitemaps = {
     "aboutme": AboutMeSitemap,
     "privacy": StaticPrivacySitemap,
@@ -29,12 +29,11 @@ sitemaps = {
 urlpatterns = [
 ]
 
-# Load opcional apps
 OPTIONAL_URLS = {
     "blog": "blog.urls_registry",
     "tools": "tools.urls_registry",
     "motd": "motd.urls_registry",
-    # outros apps opcionais...
+    "parceria": "parceria.urls_registry",
 }
 
 for app, module_path in OPTIONAL_URLS.items():
