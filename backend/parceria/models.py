@@ -40,8 +40,8 @@ class Parceria(models.Model):
 class ContratoServico(models.Model):
     parceria = models.ForeignKey(Parceria, on_delete=models.CASCADE, related_name='contratos')
     servico = models.ForeignKey(Servico, on_delete=models.PROTECT)
-    data_inicio = models.DateField(default=timezone.now)
-    data_fim = models.DateField(blank=True, null=True)
+    data_inicio = models.DateTimeField(default=timezone.now)
+    data_fim = models.DateTimeField(blank=True, null=True)
     cancelado = models.BooleanField(default=False)
     observacoes = models.TextField(blank=True)
     
@@ -57,9 +57,9 @@ class ContratoServico(models.Model):
 class PedidoServico(models.Model):
     parceria = models.ForeignKey(Parceria, on_delete=models.CASCADE, related_name='pedidos')
     servico = models.ForeignKey(Servico, on_delete=models.PROTECT)
-    data_pedido = models.DateField(default=timezone.now)
+    data_pedido = models.DateTimeField(default=timezone.now)
     desconto = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
-    vencimento = models.DateField(blank=True, null=True)
+    vencimento = models.DateTimeField(blank=True, null=True)
     contrato = models.ForeignKey(ContratoServico, on_delete=models.SET_NULL, null=True, blank=True)
     status = models.CharField(
         max_length=20,
@@ -102,7 +102,7 @@ class TicketSuporte(models.Model):
     descricao = models.TextField()
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='novo')
     data_criacao = models.DateTimeField(default=timezone.now)
-    prazo_entrega = models.DateField(blank=True, null=True)
+    prazo_entrega = models.DateTimeField(blank=True, null=True)
     resposta = models.TextField(blank=True)
 
     class Meta:

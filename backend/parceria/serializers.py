@@ -25,7 +25,14 @@ class ContratoServicoSerializer(serializers.ModelSerializer):
 class PagamentoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Pagamento
-        fields = ['id', 'pedido', 'status', 'valor', 'metodo', 'criado_em']
+        fields = ['id', 'pedido', 'status', 'valor', 'metodo', 'criado_em', 'atualizado_em']
+
+
+class PagamentoHistoricoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PagamentoHistorico
+        fields = ['pagamento', 'status', 'detalhes', 'data']
+        read_only_fields = fields
 
 
 class TicketSuporteSerializer(serializers.ModelSerializer):
