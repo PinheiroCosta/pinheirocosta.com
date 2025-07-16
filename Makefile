@@ -86,11 +86,11 @@ docker_frontend_update_api:
 
 docker_test:
 	@echo -e "\033[32m[INFO] Executando testes com keepdb\033[0m"
-	docker-compose -f ${DOCKER_COMPOSE_FILE} run backend python manage.py test $(ARG) --parallel --keepdb
+	docker-compose -f ${DOCKER_COMPOSE_FILE} run backend python manage.py test -v 2 $(ARG) --parallel --keepdb
 
 docker_test_reset:
 	@echo -e "\033[32m[INFO] Executando testes com recriação de base\033[0m"
-	docker-compose -f ${DOCKER_COMPOSE_FILE} run backend python manage.py test $(ARG) --parallel
+	docker-compose -f ${DOCKER_COMPOSE_FILE} run backend python manage.py test -v 2 $(ARG) --parallel
 
 # ==== Backup / Restore ====
 
