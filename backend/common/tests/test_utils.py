@@ -6,14 +6,25 @@ from rest_framework.test import APIClient
 
 
 class TestCaseUtils(TestCase):
+    """
+    Classe base utilitária para testes com usuários autenticados.
+    Fornece cliente autenticado, reverso de URLs e asserções comuns de status HTTP.
+    """
     def setUp(self):
         self._user_password = "123456"
+
         self.user = baker.prepare("users.User", email="user@email.com")
         self.user.set_password(self._user_password)
         self.user.save()
-
         self.auth_client = APIClient()
         self.auth_client.login(email=self.user.email, password=self._user_password)
+
+        self.user_b = baker.prepare("users.User", email="user_b@email.com")
+        self.user_b.set_password(self._user_password)
+        self.user_b.save()
+        self.auth_client_b = APIClient()
+        self.auth_client_b.login(email=self.user.email, password=self._user_password)
+
 
     def reverse(self, name, *args, **kwargs):
         """Reverse a url, convenience to avoid having to import reverse in tests"""
@@ -57,12 +68,20 @@ class TestCaseUtils(TestCase):
 
 
 class TestGetRequiresAuthenticatedUser:
+    """
+    Testa se o acesso GET requer autenticação.
+    Deve ser herdado por outras classes de teste que definem `view_url`.
+    """
     def test_get_requires_authenticated_user(self):
         response = self.client.get(self.view_url)
         self.assertResponse403(response)
 
 
 class TestAuthGetRequestSuccess:
+    """
+    Testa se o acesso autenticado à `view_url` retorna 200 OK.
+    Deve ser herdado por outras classes de teste.
+    """
     def test_auth_get_success(self):
         response = self.auth_client.get(self.view_url)
         self.assertResponse200(response)
