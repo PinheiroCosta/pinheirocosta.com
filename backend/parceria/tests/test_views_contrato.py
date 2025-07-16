@@ -1,0 +1,89 @@
+from parceria.models import Parceria, ContratoServico, Servico
+from common.tests.test_utils import TestCaseUtils
+from django.utils import timezone
+from django.urls import reverse
+
+
+class TestContratoServicoView(TestCaseUtils):
+
+    def setUp(self):
+        super().setUp()
+        self.parceria1 = Parceria.objects.create(
+            nome="Cliente 1",
+            tipo="cliente",
+            user=self.user,
+            nome_projeto="projeto1",
+            dominio="p1.com"
+        )
+        self.parceria2 = Parceria.objects.create(
+            nome="Cliente 2",
+            tipo="cliente",
+            user=self.user_b,
+            nome_projeto="projeto2",
+            dominio="p2.com"
+        )
+        self.servico = Servico.objects.create(
+            nome="Serviço Teste",
+            descricao="desc",
+            preco=100,
+            periodicidade="mensal"
+        )
+        self.contrato1 = ContratoServico.objects.create(
+            parceria=self.parceria1,
+            servico=self.servico
+        )
+        self.contrato2 = ContratoServico.objects.create(
+            parceria=self.parceria2,
+            servico=self.servico
+        )
+        self.list_url = reverse("parceria-contratos-list")
+        self.detail_url_1 = reverse("parceria-contratos-detail", args=[self.contrato1.id])
+        self.detail_url_2 = reverse("parceria-contratos-detail", args=[self.contrato2.id])
+
+    def test_list_retorna_somente_contratos_do_usuario(self):
+        """GET /contratos/ deve retornar apenas contratos da parceria do usuário logado."""
+        response = self.auth_client.get(self.list_url)
+        self.assertResponse200(response)
+
+        ids = [c["id"] for c in response.data["results"]]
+        self.assertIn(self.contrato1.id, ids)
+        self.assertNotIn(self.contrato2.id, ids)
+
+    def test_detail_de_outro_usuario_retorna_403(self):
+        """GET /contratos/{id} de outra parceria deve retornar 403."""
+        response = self.auth_client.get(self.detail_url_2)
+        self.assertResponse403(response)
+
+    def test_update_de_outro_usuario_retorna_403(self):
+        """PATCH /contratos/{id} de outra parceria deve retornar 403."""
+        payload = {"observacoes": "tentativa de alteração"}
+        response = self.auth_client.patch(self.detail_url_2, payload, format="json")
+        self.assertResponse403(response)
+
+    def test_delete_de_outro_usuario_retorna_403(self):
+        """DELETE /contratos/{id} de outra parceria deve retornar 403."""
+        response = self.auth_client.delete(self.detail_url_2)
+        self.assertResponse403(response)
+
+    def test_criacao_associa_parceria_do_usuario_ignorando_payload(self):
+        """POST /contratos/ deve associar automaticamente a parceria do usuário autenticado."""
+        payload = {
+            "servico": self.servico.id,
+            "parceria": self.parceria2.id,  # Tentativa de criar para outra parceria
+            "data_inicio": timezone.now().isoformat(),
+            "observacoes": "Teste criação",
+        }
+        response = self.auth_client.post(self.list_url, payload, format="json")
+        self.assertResponse201(response)
+
+        contrato_id = response.data["id"]
+        contrato = ContratoServico.objects.get(id=contrato_id)
+        self.assertEqual(contrato.parceria.id, self.parceria1.id)
+
+    def test_usuario_nao_autenticado_nao_pode_acessar(self):
+        """Usuário não autenticado deve receber 403 em endpoints protegidos."""
+        client = self.client  # Cliente padrão não autenticado
+        urls = [self.list_url, self.detail_url_1]
+        for url in urls:
+            response = client.get(url)
+            self.assertIn(response.status_code, (403, 401))
