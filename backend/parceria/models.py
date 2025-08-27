@@ -28,13 +28,34 @@ class Parceria(models.Model):
 
     nome = models.CharField(max_length=100)
     tipo = models.CharField(max_length=20, choices=TIPO_CHOICES)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    proprietario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="parcerias_proprietario")
     nome_projeto = models.CharField(max_length=100)
     dominio = models.CharField(max_length=100, blank=True, null=True)
     data_criacao = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return f"{self.user.get_full_name()} ({self.nome_projeto})"
+        return f"{self.nome_projeto} ({self.proprietario.get_full_name()})"
+
+
+class ParceriaMembro(models.Model):
+    ROLE_CHOICES = [
+        ("proprietario", "Proprietario"),
+        ("colaborador", "Colaborador"),
+    ]
+
+    parceria = models.ForeignKey(Parceria, on_delete=models.CASCADE, related_name="membros")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="parcerias_membro")
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default="colaborador")
+    is_active = models.BooleanField(default=True)
+    data_entrada = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        unique_together = ("parceria", "user")
+        verbose_name = "Membro de Parceria"
+        verbose_name_plural = "Membros de Parceria"
+
+    def __str__(self):
+        return f"{self.user.get_username()} em {self.parceria.nome_projeto} ({self.role})"
 
 
 class ContratoServico(models.Model):
@@ -44,7 +65,7 @@ class ContratoServico(models.Model):
     data_fim = models.DateTimeField(blank=True, null=True)
     cancelado = models.BooleanField(default=False)
     observacoes = models.TextField(blank=True)
-    
+
     class Meta:
         unique_together = ('parceria', 'servico', 'data_inicio')
         verbose_name = "Contrato de Serviço"
@@ -74,7 +95,6 @@ class PedidoServico(models.Model):
 
     class Meta:
         verbose_name_plural = "Pedidos"
-
 
     def __str__(self):
         return f"{self.servico.nome} - {self.parceria.nome_projeto}"
@@ -107,7 +127,6 @@ class TicketSuporte(models.Model):
 
     class Meta:
         verbose_name_plural = "Tickets"
-
 
     def __str__(self):
         return f"[{self.get_status_display()}] {self.titulo}"

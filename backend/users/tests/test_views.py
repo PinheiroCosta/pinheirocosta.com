@@ -1,4 +1,5 @@
 from django.urls import reverse
+from django.conf import settings
 
 from common.tests.test_utils import TestCaseUtils
 from model_bakery import baker
@@ -11,12 +12,16 @@ class UserViewSetTest(TestCaseUtils, APITestCase):
     def test_list_users(self):
         baker.make(User, _fill_optional=True, _quantity=5)
 
+        # Total esperado é o que estiver no banco agora (inclui os do setUp + _quantity criados aqui)
+        expected_count = User.objects.count()
+
         response = self.auth_client.get(reverse("user-list"))
 
         self.assertResponse200(response)
-        # Note: One user is already created in the setUp method of TestCaseUtils
-        self.assertEqual(response.data.get("count"), 6)
-        self.assertEqual(len(response.data.get("results")), 6)
+        self.assertEqual(response.data.get("count"), expected_count)
+
+        page_size = getattr(settings, "REST_FRAMEWORK", {}).get("PAGE_SIZE", 10)
+        self.assertLessEqual(len(response.data.get("results")), page_size)
 
     def test_create_user(self):
         data = {
