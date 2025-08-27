@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.exceptions import PermissionDenied
 from .models import Parceria, Servico, ContratoServico, PedidoServico, Pagamento, PagamentoHistorico, TicketSuporte
 
 
@@ -14,12 +15,31 @@ class PedidoServicoSerializer(serializers.ModelSerializer):
         fields = ['id', 'servico', 'contrato', 'status', 'data_pedido', 'desconto', 'vencimento']
         read_only_fields = ['data_pedido', 'status']
 
+    def create(self, validated_data):
+        contrato = validated_data["contrato"]
+        user = self.context["request"].user
+        try:
+            parceria = Parceria.objects.get(proprietario=user)
+        except Parceria.DoesNotExist:
+            raise PermissionDenied("Usuário não está vinculado a uma parceria.")
+        if contrato.parceria != parceria:
+            raise PermissionDenied("Contrato não pertence à sua parceria.")
+        return super().create(validated_data)
+
 
 class ContratoServicoSerializer(serializers.ModelSerializer):
     class Meta:
         model = ContratoServico
-        fields = ['id', 'servico', 'data_inicio', 'data_fim', 'cancelado', 'observacoes']
-        read_only_fields = ['data_inicio', 'data_fim', 'cancelado']
+        fields = ['id', 'servico', 'parceria', 'data_inicio', 'data_fim', 'cancelado', 'observacoes']
+        read_only_fields = ['parceria', 'data_inicio', 'data_fim', 'cancelado']
+
+    def create(self, validated_data):
+        user = self.context["request"].user
+        try:
+            parceria = Parceria.objects.get(membros__user=user, membros__is_active=True)
+        except Parceria.DoesNotExist:
+            raise PermissionDenied("Usuário não está vinculado a uma parceria.")
+        return super().create({**validated_data, "parceria": parceria})
 
 
 class PagamentoSerializer(serializers.ModelSerializer):
@@ -31,7 +51,7 @@ class PagamentoSerializer(serializers.ModelSerializer):
 class PagamentoHistoricoSerializer(serializers.ModelSerializer):
     class Meta:
         model = PagamentoHistorico
-        fields = ['pagamento', 'status', 'detalhes', 'data']
+        fields = ['id', 'pagamento', 'status', 'detalhes', 'data']
         read_only_fields = fields
 
 
@@ -39,3 +59,4 @@ class TicketSuporteSerializer(serializers.ModelSerializer):
     class Meta:
         model = TicketSuporte
         fields = ['id', 'titulo', 'descricao', 'tipo', 'status', 'data_criacao']
+        read_only_fields = ['status', 'data_criacao']

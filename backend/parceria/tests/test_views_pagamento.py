@@ -21,46 +21,36 @@ class TestPagamentoView(TestCaseUtils):
     def setUp(self):
         super().setUp()
 
+        # Parcerias
         self.parceria1 = Parceria.objects.create(
             nome="Parceria A",
             tipo="cliente",
-            user=self.user,
+            proprietario=self.user,
             nome_projeto="proj_a",
         )
         self.parceria2 = Parceria.objects.create(
             nome="Parceria B",
             tipo="cliente",
-            user=self.user_b,
+            proprietario=self.user_b,
             nome_projeto="proj_b",
         )
+
+        # Serviço
         self.servico = Servico.objects.create(
             nome="Site Profissional",
             preco=200,
             periodicidade="mensal",
         )
-        self.pedido1 = PedidoServico.objects.create(
-            parceria=self.parceria1,
-            servico=self.servico,
-            status="pendente",
-        )
-        self.pedido2 = PedidoServico.objects.create(
-            parceria=self.parceria2,
-            servico=self.servico,
-            status="pendente",
-        )
-        self.pagamento1 = Pagamento.objects.create(
-            pedido=self.pedido1,
-            valor=200,
-            status="pendente",
-            metodo="pix",
-        )
-        self.pagamento2 = Pagamento.objects.create(
-            pedido=self.pedido2,
-            valor=200,
-            status="pendente",
-            metodo="boleto",
-        )
 
+        # Pedidos
+        self.pedido1 = PedidoServico.objects.create(parceria=self.parceria1, servico=self.servico, status="pendente")
+        self.pedido2 = PedidoServico.objects.create(parceria=self.parceria2, servico=self.servico, status="pendente")
+
+        # Pagamentos
+        self.pagamento1 = Pagamento.objects.create(pedido=self.pedido1, valor=200, status="pendente", metodo="pix")
+        self.pagamento2 = Pagamento.objects.create(pedido=self.pedido2, valor=200, status="pendente", metodo="boleto")
+
+        # URLs
         self.list_url = reverse("parceria-pagamentos-list")
         self.detail_url_1 = reverse("parceria-pagamentos-detail", args=[self.pagamento1.id])
         self.detail_url_2 = reverse("parceria-pagamentos-detail", args=[self.pagamento2.id])
@@ -73,16 +63,16 @@ class TestPagamentoView(TestCaseUtils):
         self.assertIn(self.pagamento1.id, ids)
         self.assertNotIn(self.pagamento2.id, ids)
 
-    def test_detail_pagamento_de_outra_parceria_retorna_403(self):
-        """GET /pagamentos/{id}/ de outra parceria deve retornar 403."""
+    def test_detail_pagamento_de_outra_parceria_retorna_404(self):
+        """GET /pagamentos/{id}/ de outra parceria deve retornar 404."""
         response = self.auth_client.get(self.detail_url_2)
-        self.assertResponse403(response)
+        self.assertResponse404(response)
 
-    def test_update_pagamento_de_outra_parceria_retorna_403(self):
-        """PATCH /pagamentos/{id}/ de outra parceria deve retornar 403."""
+    def test_update_pagamento_de_outra_parceria_retorna_404(self):
+        """PATCH /pagamentos/{id}/ de outra parceria deve retornar 404."""
         payload = {"status": "confirmado"}
         response = self.auth_client.patch(self.detail_url_2, payload, format="json")
-        self.assertResponse403(response)
+        self.assertResponse404(response)
 
     def test_delete_pagamento_de_outra_parceria_retorna_403(self):
         """DELETE /pagamentos/{id}/ de outra parceria deve retornar 403."""

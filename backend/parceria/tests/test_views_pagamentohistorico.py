@@ -6,8 +6,10 @@ from parceria.models import (
     Parceria,
     Servico,
     PedidoServico,
+    ContratoServico,
     Pagamento,
     PagamentoHistorico,
+    ParceriaMembro,
 )
 from common.tests.test_utils import TestCaseUtils
 
@@ -22,30 +24,45 @@ class TestPagamentoHistoricoView(TestCaseUtils):
         super().setUp()
 
         self.parceria1 = Parceria.objects.create(
-            nome="A",
+            nome="Cliente 1",
             tipo="cliente",
-            user=self.user,
-            nome_projeto="proj_a",
+            nome_projeto="projeto1",
+            dominio="p1.com",
+            proprietario=self.user
         )
+        ParceriaMembro.objects.create(parceria=self.parceria1, user=self.user, is_active=True)
+
         self.parceria2 = Parceria.objects.create(
-            nome="B",
+            nome="Cliente 2",
             tipo="cliente",
-            user=self.user_b,
-            nome_projeto="proj_b",
+            nome_projeto="projeto2",
+            dominio="p2.com",
+            proprietario=self.user_b
         )
+        ParceriaMembro.objects.create(parceria=self.parceria2, user=self.user_b, is_active=True)
+
+        # Serviço e contratos
         self.servico = Servico.objects.create(
             nome="Zola Site",
             preco=100,
             periodicidade="mensal",
         )
+        self.contrato1 = ContratoServico.objects.create(parceria=self.parceria1, servico=self.servico)
+        self.contrato2 = ContratoServico.objects.create(parceria=self.parceria2, servico=self.servico)
+
+        # Pedidos
         self.pedido1 = PedidoServico.objects.create(
             parceria=self.parceria1,
             servico=self.servico,
+            contrato=self.contrato1,
         )
         self.pedido2 = PedidoServico.objects.create(
             parceria=self.parceria2,
             servico=self.servico,
+            contrato=self.contrato2,
         )
+
+        # Pagamentos
         self.pagamento1 = Pagamento.objects.create(
             pedido=self.pedido1,
             valor=100,
@@ -58,6 +75,8 @@ class TestPagamentoHistoricoView(TestCaseUtils):
             status="pendente",
             metodo="boleto",
         )
+
+        # Histórico de pagamentos
         self.historico1 = PagamentoHistorico.objects.create(
             pagamento=self.pagamento1,
             status="pendente",
@@ -69,6 +88,7 @@ class TestPagamentoHistoricoView(TestCaseUtils):
             detalhes={"msg": "Pago"},
         )
 
+        # URLs
         self.list_url = reverse("parceria-pagamentohistorico-list")
         self.detail_url_1 = reverse("parceria-pagamentohistorico-detail", args=[self.historico1.id])
         self.detail_url_2 = reverse("parceria-pagamentohistorico-detail", args=[self.historico2.id])
@@ -81,10 +101,10 @@ class TestPagamentoHistoricoView(TestCaseUtils):
         self.assertIn(self.historico1.id, ids)
         self.assertNotIn(self.historico2.id, ids)
 
-    def test_detail_de_outro_usuario_retorna_403(self):
-        """GET /pagamentohistorico/{id}/ de outra parceria deve retornar 403."""
+    def test_detail_de_outro_usuario_retorna_404(self):
+        """GET /pagamentohistorico/{id}/ de outra parceria deve retornar 404."""
         response = self.auth_client.get(self.detail_url_2)
-        self.assertResponse403(response)
+        self.assertResponse404(response)
 
     def test_criacao_nao_autorizada_retorna_403(self):
         """POST /pagamentohistorico/ não deve permitir criação via API."""

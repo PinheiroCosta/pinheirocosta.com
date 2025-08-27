@@ -32,7 +32,7 @@ class TestServicoView(TestCaseUtils):
         """
         response = self.auth_client.get(self.view_url)
         self.assertResponse200(response)
-        self.assertGreaterEqual(len(response.data), 1)
+        self.assertGreaterEqual(len(response.data['results']), 1)
 
     def test_lista_servicos_nao_autenticado(self):
         """Usuário não autenticado deve receber 403 ao listar serviços"""

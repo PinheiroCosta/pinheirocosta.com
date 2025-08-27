@@ -6,14 +6,19 @@ from parceria.models import TicketSuporte, Parceria
 
 
 class TestTicketSuporteViewSet(TestCaseUtils):
+    """
+    Testes de integração para endpoints de TicketSuporte.
+    """
+
     def setUp(self):
         super().setUp()
         self.parceria = Parceria.objects.create(
             nome="Projeto Teste",
             tipo="cliente",
-            user=self.user,
+            proprietario=self.user,
             nome_projeto="Site Teste"
         )
+        self.parceria.membros.create(user=self.user, is_active=True)
         self.list_url = reverse("parceria-tickets-list")
 
     def test_list_tickets_autenticado(self):
@@ -29,7 +34,6 @@ class TestTicketSuporteViewSet(TestCaseUtils):
 
     def test_create_ticket(self):
         payload = {
-            "parceria": self.parceria.id,
             "tipo": "sugestao",
             "titulo": "Nova funcionalidade",
             "descricao": "Seria bom ter filtro de pedidos por status.",
@@ -73,5 +77,6 @@ class TestTicketSuporteViewSet(TestCaseUtils):
         )
         url = reverse("parceria-tickets-detail", args=[ticket.id])
         response = self.auth_client.delete(url)
-        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertTrue(TicketSuporte.objects.filter(id=ticket.id).exists())
+
