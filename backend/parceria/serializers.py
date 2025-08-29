@@ -6,14 +6,14 @@ from .models import Parceria, Servico, ContratoServico, PedidoServico, Pagamento
 class ServicoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Servico
-        fields = ['id', 'nome', 'descricao', 'periodicidade', 'preco']
+        fields = ['id', 'nome', 'descricao', 'periodicidade_servico', 'preco']
 
 
 class PedidoServicoSerializer(serializers.ModelSerializer):
     class Meta:
         model = PedidoServico
-        fields = ['id', 'servico', 'contrato', 'status', 'data_pedido', 'desconto', 'vencimento']
-        read_only_fields = ['data_pedido', 'status']
+        fields = ['id', 'servico', 'contrato', 'status_pedido_servico', 'data_pedido', 'desconto', 'vencimento']
+        read_only_fields = ['data_pedido', 'status_pedido_servico']
 
     def create(self, validated_data):
         contrato = validated_data["contrato"]
@@ -45,18 +45,18 @@ class ContratoServicoSerializer(serializers.ModelSerializer):
 class PagamentoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Pagamento
-        fields = ['id', 'pedido', 'status', 'valor', 'metodo', 'criado_em', 'atualizado_em']
+        fields = ['id', 'pedido', 'status_pagamento', 'valor', 'metodo_pagamento', 'criado_em', 'atualizado_em']
 
 
 class PagamentoHistoricoSerializer(serializers.ModelSerializer):
     class Meta:
         model = PagamentoHistorico
-        fields = ['id', 'pagamento', 'status', 'detalhes', 'data']
+        fields = ['id', 'pagamento', 'status_historico_pagamento', 'detalhes', 'data']
         read_only_fields = fields
 
 
 class TicketSuporteSerializer(serializers.ModelSerializer):
     class Meta:
         model = TicketSuporte
-        fields = ['id', 'titulo', 'descricao', 'tipo', 'status', 'data_criacao']
+        fields = ['id', 'titulo', 'descricao', 'tipo_ticket_suporte', 'status_ticket_suporte', 'data_criacao']
         read_only_fields = ['status', 'data_criacao']

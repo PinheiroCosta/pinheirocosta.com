@@ -6,7 +6,7 @@ from .forms import ParceriaForm, PedidoServicoForm
 class PedidoServicoInline(admin.TabularInline):
     model = PedidoServico
     extra = 0
-    fields = ('servico', 'status', 'data_pedido', 'vencimento', 'desconto')
+    fields = ('servico', 'status_pedido_servico', 'data_pedido', 'vencimento', 'desconto')
     can_delete = False
     readonly_fields = ('data_pedido',)
 
@@ -23,7 +23,7 @@ class PedidoServicoInline(admin.TabularInline):
 class TicketSuporteInline(admin.TabularInline):
     model = TicketSuporte
     extra = 0
-    fields = ('titulo', 'descricao', 'resposta', 'status', 'data_criacao',)
+    fields = ('titulo', 'descricao', 'resposta', 'status_ticket_suporte', 'data_criacao',)
     can_delete = False
 
     def has_change_permission(self, request, obj=None):
@@ -63,8 +63,8 @@ class ServicoAdmin(admin.ModelAdmin):
 @admin.register(PedidoServico)
 class PedidoServicoAdmin(admin.ModelAdmin):
     form = PedidoServicoForm
-    list_display = ('servico', 'status', 'contrato', 'data_pedido', 'vencimento', 'desconto')
-    list_filter = ('status', 'servico', 'contrato')
+    list_display = ('servico', 'status_pedido_servico', 'contrato', 'data_pedido', 'vencimento', 'desconto')
+    list_filter = ('status_pedido_servico', 'servico', 'contrato')
     date_hierarchy = 'data_pedido'
 
     def get_queryset(self, request):
@@ -73,8 +73,8 @@ class PedidoServicoAdmin(admin.ModelAdmin):
 
 @admin.register(TicketSuporte)
 class TicketSuporteAdmin(admin.ModelAdmin):
-    list_display = ('tipo', 'titulo', 'descricao', 'status', 'data_criacao', 'prazo_entrega', 'resposta')
-    list_filter = ('status', 'data_criacao')
+    list_display = ('tipo_ticket_suporte', 'titulo', 'descricao', 'status_ticket_suporte', 'data_criacao', 'prazo_entrega', 'resposta')
+    list_filter = ('status_ticket_suporte', 'data_criacao')
     date_hierarchy = 'data_criacao'
 
 

@@ -12,7 +12,7 @@ class Servico(models.Model):
     nome = models.CharField(max_length=100)
     descricao = models.TextField(blank=True)
     preco = models.DecimalField(max_digits=8, decimal_places=2)
-    periodicidade = models.CharField(max_length=10, choices=ServicoPeriodicidade.choices, default=ServicoPeriodicidade.AVULSO)
+    periodicidade_servico = models.CharField(max_length=10, choices=ServicoPeriodicidade.choices, default=ServicoPeriodicidade.AVULSO)
 
     def __str__(self):
         return self.nome
@@ -25,7 +25,7 @@ class Parceria(models.Model):
         CONTEUDO = 'conteudo', 'Criador de conteúdo'
 
     nome = models.CharField(max_length=100)
-    tipo = models.CharField(max_length=20, choices=ParceriaTipo.choices)
+    tipo_parceria = models.CharField(max_length=20, choices=ParceriaTipo.choices)
     proprietario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="parcerias_proprietario")
     nome_projeto = models.CharField(max_length=100)
     dominio = models.CharField(max_length=100, blank=True, null=True)
@@ -42,7 +42,7 @@ class ParceriaMembro(models.Model):
 
     parceria = models.ForeignKey(Parceria, on_delete=models.CASCADE, related_name="membros")
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="parcerias_membro")
-    role = models.CharField(max_length=20, choices=ParceriaMembroRole.choices, default=ParceriaMembroRole.COLABORADOR)
+    role_parceria_membro = models.CharField(max_length=20, choices=ParceriaMembroRole.choices, default=ParceriaMembroRole.COLABORADOR)
     is_active = models.BooleanField(default=True)
     data_entrada = models.DateTimeField(default=timezone.now)
 
@@ -85,7 +85,7 @@ class PedidoServico(models.Model):
     desconto = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
     vencimento = models.DateTimeField(blank=True, null=True)
     contrato = models.ForeignKey(ContratoServico, on_delete=models.SET_NULL, null=True, blank=True)
-    status = models.CharField(
+    status_pedido_servico = models.CharField(
         max_length=20,
         choices=PedidoServicoStatus.choices,
         default=PedidoServicoStatus.PENDENTE,
@@ -113,10 +113,10 @@ class TicketSuporte(models.Model):
         REJEITADO = 'rejeitado', 'Rejeitado'
 
     parceria = models.ForeignKey(Parceria, on_delete=models.CASCADE)
-    tipo = models.CharField(max_length=20, choices=TicketSuporteTipo.choices)
+    tipo_ticket_suporte = models.CharField(max_length=20, choices=TicketSuporteTipo.choices)
     titulo = models.CharField(max_length=120)
     descricao = models.TextField()
-    status = models.CharField(max_length=20, choices=TicketSuporteStatus.choices, default=TicketSuporteStatus.NOVO)
+    status_ticket_suporte = models.CharField(max_length=20, choices=TicketSuporteStatus.choices, default=TicketSuporteStatus.NOVO)
     data_criacao = models.DateTimeField(default=timezone.now)
     prazo_entrega = models.DateTimeField(blank=True, null=True)
     resposta = models.TextField(blank=True)
@@ -143,8 +143,8 @@ class Pagamento(models.Model):
 
     pedido = models.OneToOneField(PedidoServico, on_delete=models.CASCADE, related_name="pagamento")
     valor = models.DecimalField(max_digits=8, decimal_places=2)
-    status = models.CharField(max_length=20, choices=PagamentoStatus.choices, default=PagamentoStatus.PENDENTE)
-    metodo = models.CharField(max_length=30, choices=PagamentoMetodo.choices)
+    status_pagamento = models.CharField(max_length=20, choices=PagamentoStatus.choices, default=PagamentoStatus.PENDENTE)
+    metodo_pagamento = models.CharField(max_length=30, choices=PagamentoMetodo.choices)
     criado_em = models.DateTimeField(auto_now_add=True)
     atualizado_em = models.DateTimeField(auto_now=True)
 
@@ -153,13 +153,7 @@ class Pagamento(models.Model):
 
 
 class PagamentoHistorico(models.Model):
-    class PagamentoHistoricoStatus(models.TextChoices):
-        PENDENTE = 'pendente', 'Pendente'
-        CONFIRMADO = 'confirmado', 'Confirmado'
-        FALHOU = 'falhou', 'Falhou'
-        ESTORNADO = 'estornado', 'Estornado'
-
     pagamento = models.ForeignKey(Pagamento, on_delete=models.CASCADE, related_name="historico")
-    status = models.CharField(max_length=20, choices=PagamentoHistoricoStatus.choices)
+    status_historico_pagamento = models.CharField(max_length=20, choices=Pagamento.PagamentoStatus.choices)
     detalhes = models.JSONField(blank=True, null=True)
     data = models.DateTimeField(auto_now_add=True)
