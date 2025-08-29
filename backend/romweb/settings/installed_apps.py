@@ -36,13 +36,11 @@ OPTIONAL_APPS = {
     "blog": True,
     "tools": True,
     "motd": True,
-    "private_apps.comanda_go_backend.comanda_go": False,
     "parceria": True,
 }
 
 APP_DEPENDENCIES = {
     'tools': ['common'],
-    'private_apps.comanda_go_backend.comanda_go': ['users'],
     "parceria": ['users'],
 }
 
