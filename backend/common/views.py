@@ -170,6 +170,7 @@ class ParametroSistemaViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = ParametroSistemaSerializer
     permission_classes = [IsAdminUser]
 
+    @extend_schema(operation_id="parametros_retrieve_por_chave")
     @action(
         detail=False,
         methods=["get"],
@@ -190,6 +191,9 @@ class ParametroSistemaViewSet(viewsets.ReadOnlyModelViewSet):
             return Response({"chave": parametro.chave, "valor": parametro.valor})
         return Response({"error": "Parâmetro não encontrado"}, status=404)
 
+    @extend_schema(operation_id="parametros_retrieve_por_id")
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
 
 class AboutMeViewSet(viewsets.ModelViewSet):
     """
