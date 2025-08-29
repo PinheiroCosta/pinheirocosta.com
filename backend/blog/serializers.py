@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
+from drf_spectacular.utils import extend_schema_field
 from .models import BlogPost, Tag
 
 
@@ -32,7 +33,8 @@ class BlogPostSerializer(serializers.ModelSerializer):
             "tags",
         ]
 
-    def get_nome_autor(self, obj):
+    @extend_schema_field(serializers.CharField())
+    def get_nome_autor(self, obj) -> str:
         """
         Retorna o nome do autor baseado na parte local do email.
         Se o autor não possuir email, retorna 'Autor Desconhecido'.

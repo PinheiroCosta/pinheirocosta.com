@@ -110,6 +110,8 @@ class PagamentoHistoricoViewSet(viewsets.ReadOnlyModelViewSet):
     Histórico de alterações de status de pagamentos.
     Apenas leitura. Filtrado pela parceria do usuário via pagamento.pedido.
     """
+    lookup_field = "pk"             # Definição de lookup é importante para gerar o schema correto
+    lookup_value_regex = r"\d+"     # assim o schema gera indices de tipos inteiros ao invés de string
     serializer_class = PagamentoHistoricoSerializer
     permission_classes = [permissions.IsAuthenticated]
 

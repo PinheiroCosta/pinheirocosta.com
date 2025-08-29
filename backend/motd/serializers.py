@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from drf_spectacular.utils import extend_schema_field
 from .models import MOTD, MOTDConfig
 
 
@@ -15,5 +16,6 @@ class MOTDConfigSerializer(serializers.ModelSerializer):
         model = MOTDConfig
         fields = ["id", "message_override", "message_override_text"]
 
-    def get_message_override_text(self, obj):
+    @extend_schema_field(serializers.CharField())
+    def get_message_override_text(self, obj) -> str:
         return obj.message_override.text if obj.message_override else None

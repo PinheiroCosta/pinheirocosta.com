@@ -74,11 +74,11 @@ docker_backend_shell:
 
 docker_makemigrations:
 	@echo -e "\033[32m[INFO] Criando novas migrações Django\033[0m"
-	docker-compose -f ${DOCKER_COMPOSE_FILE} run --rm backend python manage.py makemigrations
+	docker-compose -f ${DOCKER_COMPOSE_FILE} run --rm backend python manage.py makemigrations $(ARG)
 
 docker_migrate:
 	@echo -e "\033[32m[INFO] Aplicando migrações Django\033[0m"
-	docker-compose -f ${DOCKER_COMPOSE_FILE} run --rm backend python manage.py migrate
+	docker-compose -f ${DOCKER_COMPOSE_FILE} run --rm backend python manage.py migrate $(ARG)
 
 docker_frontend_update_api:
 	@echo -e "\033[32m[INFO] Atualizando clientes TypeScript com OpenAPI\033[0m"
