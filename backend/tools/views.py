@@ -25,7 +25,7 @@ class ToolDetailView(TemplateView):
 
 class ToolViewSet(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
-    queryset = Tool.objects.filter(active=True)
+    queryset = Tool.objects.filter(active=True).order_by('name')
     serializer_class = ToolSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ["id", "category"]

@@ -58,6 +58,8 @@ urlpatterns = [
     path("admin/defender/", include("defender.urls")),
     path("api/", include(router.urls), name="api"),
     path("jsreverse/", django_js_reverse.views.urls_js, name="js_reverse"),
+    path("blog/", include("blog.urls")),
+    path("tools/", include("tools.urls")),
     path("robots.txt", cache_page(60 * 60 * 48)(RobotsTxtView.as_view())),
     path(
         "sitemap.xml",
