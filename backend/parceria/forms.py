@@ -25,9 +25,6 @@ class PedidoServicoForm(forms.ModelForm):
         contrato = cleaned_data.get('contrato')
         parceria = cleaned_data.get('parceria')
 
-        if servico and servico.periodicidade != 'avulso' and not contrato:
-            raise forms.ValidationError("Contrato é obrigatório para serviços mensais ou anuais.")
-
         if contrato and contrato.parceria != parceria:
             raise forms.ValidationError("Contrato não pertence à mesma parceria.")
 

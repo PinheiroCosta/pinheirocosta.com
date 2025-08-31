@@ -24,7 +24,7 @@ const Sobre = () => {
       setAboutMeData(res[0] || null);
     });
 
-    ParametrosService.parametrosRetrieve({ chave: "RECAPTCHA_SITE_KEY" })
+    ParametrosService.parametrosRetrievePorChave({ chave: "RECAPTCHA_SITE_KEY" })
       .then((res) => setSiteKey(res.valor))
       .catch(() => setCaptchaError("Falha ao carregar reCAPTCHA."));
   }, []);
