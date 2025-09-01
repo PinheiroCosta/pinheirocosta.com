@@ -14,7 +14,7 @@ class TestTicketSuporteViewSet(TestCaseUtils):
         super().setUp()
         self.parceria = Parceria.objects.create(
             nome="Projeto Teste",
-            tipo="cliente",
+            tipo_parceria="cliente",
             proprietario=self.user,
             nome_projeto="Site Teste"
         )
@@ -24,7 +24,7 @@ class TestTicketSuporteViewSet(TestCaseUtils):
     def test_list_tickets_autenticado(self):
         ticket = TicketSuporte.objects.create(
             parceria=self.parceria,
-            tipo="ajuda",
+            tipo_ticket_suporte="ajuda",
             titulo="Erro no painel",
             descricao="Não consigo acessar a página de pedidos.",
         )
@@ -34,7 +34,7 @@ class TestTicketSuporteViewSet(TestCaseUtils):
 
     def test_create_ticket(self):
         payload = {
-            "tipo": "sugestao",
+            "tipo_ticket_suporte": "sugestao",
             "titulo": "Nova funcionalidade",
             "descricao": "Seria bom ter filtro de pedidos por status.",
         }
@@ -45,7 +45,7 @@ class TestTicketSuporteViewSet(TestCaseUtils):
     def test_retrieve_ticket(self):
         ticket = TicketSuporte.objects.create(
             parceria=self.parceria,
-            tipo="problema",
+            tipo_ticket_suporte="problema",
             titulo="Bug crítico",
             descricao="Erro 500 ao salvar pedido.",
         )
@@ -57,7 +57,7 @@ class TestTicketSuporteViewSet(TestCaseUtils):
     def test_update_ticket(self):
         ticket = TicketSuporte.objects.create(
             parceria=self.parceria,
-            tipo="ajuda",
+            tipo_ticket_suporte="ajuda",
             titulo="Dúvida sobre plano",
             descricao="Não entendi o que está incluso no plano.",
         )
@@ -71,7 +71,7 @@ class TestTicketSuporteViewSet(TestCaseUtils):
     def test_delete_ticket_nao_permitido(self):
         ticket = TicketSuporte.objects.create(
             parceria=self.parceria,
-            tipo="outro",
+            tipo_ticket_suporte="outro",
             titulo="Remover conta",
             descricao="Quero apagar minha conta.",
         )

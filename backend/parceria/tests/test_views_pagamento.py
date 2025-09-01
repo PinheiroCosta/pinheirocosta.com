@@ -24,13 +24,13 @@ class TestPagamentoView(TestCaseUtils):
         # Parcerias
         self.parceria1 = Parceria.objects.create(
             nome="Parceria A",
-            tipo="cliente",
+            tipo_parceria="cliente",
             proprietario=self.user,
             nome_projeto="proj_a",
         )
         self.parceria2 = Parceria.objects.create(
             nome="Parceria B",
-            tipo="cliente",
+            tipo_parceria="cliente",
             proprietario=self.user_b,
             nome_projeto="proj_b",
         )
@@ -39,16 +39,16 @@ class TestPagamentoView(TestCaseUtils):
         self.servico = Servico.objects.create(
             nome="Site Profissional",
             preco=200,
-            periodicidade="mensal",
+            periodicidade_servico="mensal",
         )
 
         # Pedidos
-        self.pedido1 = PedidoServico.objects.create(parceria=self.parceria1, servico=self.servico, status="pendente")
-        self.pedido2 = PedidoServico.objects.create(parceria=self.parceria2, servico=self.servico, status="pendente")
+        self.pedido1 = PedidoServico.objects.create(parceria=self.parceria1, servico=self.servico, status_pedido_servico="pendente")
+        self.pedido2 = PedidoServico.objects.create(parceria=self.parceria2, servico=self.servico, status_pedido_servico="pendente")
 
         # Pagamentos
-        self.pagamento1 = Pagamento.objects.create(pedido=self.pedido1, valor=200, status="pendente", metodo="pix")
-        self.pagamento2 = Pagamento.objects.create(pedido=self.pedido2, valor=200, status="pendente", metodo="boleto")
+        self.pagamento1 = Pagamento.objects.create(pedido=self.pedido1, valor=200, status_pagamento="pendente", metodo_pagamento="pix")
+        self.pagamento2 = Pagamento.objects.create(pedido=self.pedido2, valor=200, status_pagamento="pendente", metodo_pagamento="boleto")
 
         # URLs
         self.list_url = reverse("parceria-pagamentos-list")
@@ -70,7 +70,7 @@ class TestPagamentoView(TestCaseUtils):
 
     def test_update_pagamento_de_outra_parceria_retorna_404(self):
         """PATCH /pagamentos/{id}/ de outra parceria deve retornar 404."""
-        payload = {"status": "confirmado"}
+        payload = {"status_pagamento": "confirmado"}
         response = self.auth_client.patch(self.detail_url_2, payload, format="json")
         self.assertResponse404(response)
 
