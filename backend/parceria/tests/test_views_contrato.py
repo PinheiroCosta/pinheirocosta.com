@@ -11,7 +11,7 @@ class TestContratoServicoView(TestCaseUtils):
 
         self.parceria1 = Parceria.objects.create(
             nome="Cliente 1",
-            tipo="cliente",
+            tipo_parceria="cliente",
             nome_projeto="projeto1",
             dominio="p1.com",
             proprietario=self.user
@@ -20,7 +20,7 @@ class TestContratoServicoView(TestCaseUtils):
 
         self.parceria2 = Parceria.objects.create(
             nome="Cliente 2",
-            tipo="cliente",
+            tipo_parceria="cliente",
             nome_projeto="projeto2",
             dominio="p2.com",
             proprietario=self.user_b
@@ -32,7 +32,7 @@ class TestContratoServicoView(TestCaseUtils):
             nome="Serviço Teste",
             descricao="desc",
             preco=100,
-            periodicidade="mensal"
+            periodicidade_servico="mensal"
         )
         self.contrato1 = ContratoServico.objects.create(parceria=self.parceria1, servico=self.servico)
         self.contrato2 = ContratoServico.objects.create(parceria=self.parceria2, servico=self.servico)

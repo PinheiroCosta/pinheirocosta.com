@@ -25,7 +25,7 @@ class TestPagamentoHistoricoView(TestCaseUtils):
 
         self.parceria1 = Parceria.objects.create(
             nome="Cliente 1",
-            tipo="cliente",
+            tipo_parceria="cliente",
             nome_projeto="projeto1",
             dominio="p1.com",
             proprietario=self.user
@@ -34,7 +34,7 @@ class TestPagamentoHistoricoView(TestCaseUtils):
 
         self.parceria2 = Parceria.objects.create(
             nome="Cliente 2",
-            tipo="cliente",
+            tipo_parceria="cliente",
             nome_projeto="projeto2",
             dominio="p2.com",
             proprietario=self.user_b
@@ -45,7 +45,7 @@ class TestPagamentoHistoricoView(TestCaseUtils):
         self.servico = Servico.objects.create(
             nome="Zola Site",
             preco=100,
-            periodicidade="mensal",
+            periodicidade_servico="mensal",
         )
         self.contrato1 = ContratoServico.objects.create(parceria=self.parceria1, servico=self.servico)
         self.contrato2 = ContratoServico.objects.create(parceria=self.parceria2, servico=self.servico)
@@ -66,25 +66,25 @@ class TestPagamentoHistoricoView(TestCaseUtils):
         self.pagamento1 = Pagamento.objects.create(
             pedido=self.pedido1,
             valor=100,
-            status="pendente",
-            metodo="pix",
+            status_pagamento="pendente",
+            metodo_pagamento="pix",
         )
         self.pagamento2 = Pagamento.objects.create(
             pedido=self.pedido2,
             valor=100,
-            status="pendente",
-            metodo="boleto",
+            status_pagamento="pendente",
+            metodo_pagamento="boleto",
         )
 
         # Histórico de pagamentos
         self.historico1 = PagamentoHistorico.objects.create(
             pagamento=self.pagamento1,
-            status="pendente",
+            status_historico_pagamento="pendente",
             detalhes={"msg": "Aguardando"},
         )
         self.historico2 = PagamentoHistorico.objects.create(
             pagamento=self.pagamento2,
-            status="confirmado",
+            status_historico_pagamento="confirmado",
             detalhes={"msg": "Pago"},
         )
 
@@ -110,7 +110,7 @@ class TestPagamentoHistoricoView(TestCaseUtils):
         """POST /pagamentohistorico/ não deve permitir criação via API."""
         payload = {
             "pagamento": self.pagamento1.id,
-            "status": "confirmado",
+            "status_historico_pagamento": "confirmado",
             "detalhes": {"msg": "tentativa"},
         }
         response = self.auth_client.post(self.list_url, payload, format="json")
@@ -118,7 +118,7 @@ class TestPagamentoHistoricoView(TestCaseUtils):
 
     def test_patch_nao_autorizado_retorna_403(self):
         """PATCH /pagamentohistorico/{id}/ não deve permitir edição."""
-        payload = {"status": "estornado"}
+        payload = {"status_historico_pagamento": "estornado"}
         response = self.auth_client.patch(self.detail_url_1, payload, format="json")
         self.assertResponse403(response)
 

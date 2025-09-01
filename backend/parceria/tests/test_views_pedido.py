@@ -10,7 +10,7 @@ class TestPedidoServicoView(TestCaseUtils):
         
         self.parceria = Parceria.objects.create(
             nome="Cliente 1",
-            tipo="cliente",
+            tipo_parceria="cliente",
             proprietario=self.user,
             nome_projeto="site1",
             dominio="site1.com.br",
@@ -19,7 +19,7 @@ class TestPedidoServicoView(TestCaseUtils):
 
         self.outro_parceiro = Parceria.objects.create(
             nome="Cliente 2",
-            tipo="cliente",
+            tipo_parceria="cliente",
             proprietario=self.user_b,
             nome_projeto="site2",
             dominio="site2.com.br",
@@ -30,7 +30,7 @@ class TestPedidoServicoView(TestCaseUtils):
             nome="Site Zola",
             descricao="Criação de site estático",
             preco=500,
-            periodicidade="avulso"
+            periodicidade_servico="avulso"
         )
         self.contrato = ContratoServico.objects.create(
             parceria=self.parceria,
