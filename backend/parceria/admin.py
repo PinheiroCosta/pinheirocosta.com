@@ -64,7 +64,7 @@ class ParceriaAdmin(admin.ModelAdmin):
 
 @admin.register(Servico)
 class ServicoAdmin(admin.ModelAdmin):
-    list_display = ('nome', 'preco')
+    list_display = ('nome', 'preco', 'periodicidade_servico')
     search_fields = ('nome',)
 
 
