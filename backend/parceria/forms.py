@@ -60,31 +60,31 @@ class ServicoContratadoForm(forms.ModelForm):
         model = ServicoContratado
         fields = "__all__"
 
-    def clean_cupom_promocional(self):
-        cupom = self.cleaned_data.get("cupom_promocional")
-        if not cupom:
-            return cupom
+    #def clean_cupom_promocional(self):
+    #    cupom = self.cleaned_data.get("cupom_promocional")
+    #    if not cupom:
+    #        return cupom
 
-        if not cupom.ativo:
-            raise forms.ValidationError("Este cupom não está ativo.")
+    #    if not cupom.ativo:
+    #        raise forms.ValidationError("Este cupom não está ativo.")
 
-        if cupom.validade and cupom.validade < timezone.now():
-            raise forms.ValidationError("Este cupom expirou.")
+    #    if cupom.validade and cupom.validade < timezone.now():
+    #        raise forms.ValidationError("Este cupom expirou.")
 
-        if cupom.uso_unico and cupom.data_uso is not None:
-            raise forms.ValidationError("Este cupom já foi utilizado e é de uso único.")
+    #    if cupom.uso_unico and cupom.data_uso is not None:
+    #        raise forms.ValidationError("Este cupom já foi utilizado e é de uso único.")
 
-        return cupom
+    #    return cupom
 
-    def save(self, commit=True):
-        instance = super().save(commit=False)
-        cupom = instance.cupom_promocional
+    #def save(self, commit=True):
+    #    instance = super().save(commit=False)
+    #    cupom = instance.cupom_promocional
 
-        if cupom and cupom.uso_unico and cupom.data_uso is None:
-            cupom.data_uso = timezone.now()
-            cupom.data_criacao = timezone.now()
-            cupom.save()
+    #    if cupom and cupom.uso_unico and cupom.data_uso is None:
+    #        cupom.data_uso = timezone.now()
+    #        cupom.data_criacao = timezone.now()
+    #        cupom.save()
 
-        if commit:
-            instance.save()
-        return instance
+    #    if commit:
+    #        instance.save()
+    #    return instance
