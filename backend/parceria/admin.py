@@ -153,12 +153,12 @@ class ServicoContratadoAdmin(admin.ModelAdmin):
         'recorrente',
     )
     list_filter = ('recorrente',)
-    search_fields = ('servico__nome', 'contrato_servico__parceria__nome', 'cupom_promocional__cupom')
+    search_fields = ('servico__nome', 'contrato_servico__parceria__nome')
 
     readonly_fields = ('contrato_servico',)
 
     def get_queryset(self, request):
         return super().get_queryset(request).select_related(
-            'servico', 'contrato_servico', 'cupom_promocional'
+            'servico', 'contrato_servico'
         )
 
