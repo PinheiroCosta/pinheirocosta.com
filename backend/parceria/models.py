@@ -3,81 +3,184 @@ from django.db import models
 from django.utils import timezone
 
 
-class Servico(models.Model):
-    class ServicoPeriodicidade(models.TextChoices):
-        AVULSO = 'avulso', 'Avulso'
-        MENSAL = 'mensal', 'Mensal'
-        ANUAL = 'anual', 'Anual'
+class BaseAtivoHistorico(models.Model):
+    """
+    Modelo abstrato para entidades com ciclo de vida (ativo, início, fim).
+    """
+    ativo = models.BooleanField(default=True)
+    data_inicio = models.DateTimeField(default=timezone.now)
+    data_fim = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        abstract = True
+
+
+class CupomPromocional(models.Model):
+    """
+    Representa um código promocional que pode ser aplicado a pedidos.
+    
+    - Pode oferecer desconto percentual ou valor fixo.
+    - Pode ter validade (data de expiração).
+    - Pode ser de uso único (uma vez aplicado, não pode ser reutilizado).
+    """
+
+    class TipoDesconto(models.TextChoices):
+        PERCENTUAL = 'percentual', 'Percentual (%)'
+        FIXO = 'fixo', 'Valor Fixo (R$)'
+
+    cupom = models.CharField(max_length=50, unique=True)
+    tipo = models.CharField(max_length=10, choices=TipoDesconto.choices)
+    valor = models.DecimalField(max_digits=8, decimal_places=2)
+    validade = models.DateTimeField(null=True, blank=True)
+    ativo = models.BooleanField(default=True)
+    uso_unico = models.BooleanField(default=False)
+
+    data_criacao = models.DateTimeField(auto_now_add=True)
+    data_uso = models.DateTimeField(null=True, blank=True, help_text="Data em que o código foi utilizado (para uso único).")
+
+    def __str__(self):
+        return self.cupom
+
+    def aplicar_desconto(self, valor_original: float) -> float:
+        """
+        Retorna o valor após aplicar o desconto.
+        Não altera o status do código; apenas calcula.
+        """
+        if not self.ativo:
+            return valor_original
+        if self.tipo == self.TipoDesconto.PERCENTUAL:
+            return valor_original * (1 - float(self.valor) / 100)
+        return max(valor_original - float(self.valor), 0)
+
+
+class Servico(BaseAtivoHistorico):
+    """
+    Representa um serviço disponível no catálogo da plataforma.
+    É a lista de opções que podem ser oferecidas aos clientes.
+    Aqui ficam informações estáticas como nome, descrição, e preço base.
+    """
 
     nome = models.CharField(max_length=100)
     descricao = models.TextField(blank=True)
-    preco = models.DecimalField(max_digits=8, decimal_places=2)
-    periodicidade_servico = models.CharField(
-        max_length=10,
-        choices=ServicoPeriodicidade.choices,
-        default=ServicoPeriodicidade.AVULSO,
-        verbose_name="Periodicidade"
-    )
+    preco_base = models.DecimalField(max_digits=8, decimal_places=2)
 
     def __str__(self):
         return self.nome
 
 
-class Parceria(models.Model):
-    class ParceriaTipo(models.TextChoices):
-        CLIENTE = 'cliente', 'Cliente'
-        MARCA = 'marca', 'Marca'
-        CONTEUDO = 'conteudo', 'Criador de conteúdo'
+class Parceria(BaseAtivoHistorico):
+    """
+    Representa uma relação de parceria com uma pessoa física ou jurídica.
+
+    Regras de auditoria e encerramento:
+    - Caso a parceria precise ser retomada no futuro, um **novo registro** deve ser criado,
+      preservando o histórico para auditoria.
+    """
+
+    class NaturezaParceria(models.TextChoices):
+        PF = "pf", "Pessoa Física"
+        PJ = "pj", "Pessoa Jurídica"
+
+    class CategoriaParceria(models.TextChoices):
+        CLIENTE = 'cliente', 'Cliente'                  # parceiro que contrata os serviços/produtos do site.
+        MARCA = 'marca', 'Marca'                        # empresas para co-marketing, licenciamento, divulgação.
+        CONTEUDO = 'conteudo', 'Criador de conteúdo'    # criadores de conteúdo, influenciadores, afiliados.
+        TECNOLOGIA = 'tecnologia', 'Tecnologia'         # integrações de API, provedores SaaS, hospedagem.
+        FORNECEDOR = 'fornecedor', 'Fornecedor'         # parceiros que entregam insumos/serviços para nós
+        DISTRIBUIDOR = 'distribuidor', 'Distribuidor'   # parceiros que levam o serviço a terceiros (marketplaces, revendedores).
+        SOCIAL = 'social', 'Social'                     # iniciativas de impacto social ou cultural.
+        COMUNIDADE = 'comunidade', 'Comunidade'         # grupos open source, fóruns, eventos.
 
     nome = models.CharField(max_length=100)
-    tipo_parceria = models.CharField(max_length=20, choices=ParceriaTipo.choices)
+    natureza = models.CharField(max_length=2, choices=NaturezaParceria.choices)
+    categoria = models.CharField(max_length=20, choices=CategoriaParceria.choices)
     proprietario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="parcerias_proprietario")
-    nome_projeto = models.CharField(max_length=100)
     dominio = models.CharField(max_length=100, blank=True, null=True)
-    data_criacao = models.DateTimeField(default=timezone.now)
+    
 
     def __str__(self):
-        return f"{self.nome_projeto} ({self.proprietario.get_full_name()})"
+        return f"{self.nome} ({self.proprietario.get_full_name()})"
 
 
 class ParceriaMembro(models.Model):
-    class ParceriaMembroRole(models.TextChoices):
-        PROPRIETARIO = 'proprietario', 'Proprietario'
-        COLABORADOR = 'colaborador', 'Colaborador'
+    """
+    Usuários vinculados a uma parceria.
+    Todo membro listado aqui é colaborador; o proprietário está definido em Parceria.proprietario.
+    """
 
     parceria = models.ForeignKey(Parceria, on_delete=models.CASCADE, related_name="membros")
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="parcerias_membro")
-    role_parceria_membro = models.CharField(max_length=20, choices=ParceriaMembroRole.choices, default=ParceriaMembroRole.COLABORADOR)
-    is_active = models.BooleanField(default=True)
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="parcerias_membro")
+    ativo = models.BooleanField(default=True)
     data_entrada = models.DateTimeField(default=timezone.now)
 
     class Meta:
-        unique_together = ("parceria", "user")
+        unique_together = ("parceria", "usuario")
         verbose_name = "Membro de Parceria"
         verbose_name_plural = "Membros de Parceria"
 
     def __str__(self):
-        return f"{self.user.get_username()} em {self.parceria.nome_projeto} ({self.role})"
+        return f"{self.usuario.get_username()} em {self.parceria.nome}"
 
 
-class ContratoServico(models.Model):
+class ContratoServico(BaseAtivoHistorico):
+    """
+    Representa o acordo formal entre a parceria (cliente) e a plataforma
+    para a entrega de um ou mais serviços. Define início, término, e observações gerais do contrato.
+    """
+
     parceria = models.ForeignKey(Parceria, on_delete=models.CASCADE, related_name='contratos')
-    servico = models.ForeignKey(Servico, on_delete=models.PROTECT)
-    data_inicio = models.DateTimeField(default=timezone.now)
-    data_fim = models.DateTimeField(blank=True, null=True)
-    cancelado = models.BooleanField(default=False)
     observacoes = models.TextField(blank=True)
 
     class Meta:
-        unique_together = ('parceria', 'servico', 'data_inicio')
         verbose_name = "Contrato de Serviço"
         verbose_name_plural = "Contratos de Serviço"
 
     def __str__(self):
-        return f"{self.parceria} - {self.servico} ({self.data_inicio})"
+        return f"{self.parceria} - ({self.data_inicio})"
 
 
-class PedidoServico(models.Model):
+class ServicoContratado(BaseAtivoHistorico):
+    """
+    Representa um serviço específico vinculado a um contrato de serviço.
+    Cada serviço pode ter ciclo próprio de uso e de cobrança.
+    """
+
+    contrato_servico = models.ForeignKey(
+        ContratoServico, on_delete=models.CASCADE, related_name="servicos_contratados"
+    )
+    servico = models.ForeignKey(
+        Servico, on_delete=models.CASCADE, related_name="servicos_contratados"
+    )
+    recorrente = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.servico.nome} - Contrato de servico: ({self.contrato_servico.id}) "
+
+
+class ContratoCobranca(models.Model):
+    """
+    Representa uma cobrança financeira associada a um serviço contratado.
+    É a obrigação de pagamento do cliente para manter o serviço ativo.
+    """
+
+    servico_contratado = models.ForeignKey(
+        ServicoContratado, on_delete=models.CASCADE, related_name="cobrancas"
+    )
+    valor = models.DecimalField(max_digits=10, decimal_places=2)
+    vencimento = models.DateField()
+    data_pagamento = models.DateField(null=True, blank=True)
+
+    def __str__(self):
+        return f"Cobrança {self.valor} - {self.servico_contratado.servico.nome}"
+
+
+class PedidoServico(BaseAtivoHistorico):
+    """
+    Intenção inicial do cliente: solicitação de um serviço.
+    Pode ou não evoluir para um contrato formal.
+    O status acompanha o ciclo do pedido (pendente → andamento → concluído/cancelado).
+    """
+
     class PedidoServicoStatus(models.TextChoices):
         PENDENTE = 'pendente', 'Pendente'
         EM_ANDAMENTO = 'em_andamento', 'Em andamento'
@@ -85,11 +188,6 @@ class PedidoServico(models.Model):
         CANCELADO = 'cancelado', 'Cancelado'
 
     parceria = models.ForeignKey(Parceria, on_delete=models.CASCADE, related_name='pedidos')
-    servico = models.ForeignKey(Servico, on_delete=models.PROTECT)
-    data_pedido = models.DateTimeField(default=timezone.now)
-    desconto = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
-    vencimento = models.DateTimeField(blank=True, null=True)
-    contrato = models.ForeignKey(ContratoServico, on_delete=models.SET_NULL, null=True, blank=True)
     status_pedido_servico = models.CharField(
         max_length=20,
         choices=PedidoServicoStatus.choices,
@@ -100,10 +198,31 @@ class PedidoServico(models.Model):
         verbose_name_plural = "Pedidos"
 
     def __str__(self):
-        return f"{self.servico.nome} - {self.parceria.nome_projeto}"
+        return f"Pedido {self.id} - {self.parceria.nome}"
+
+
+class PedidoItem(models.Model):
+    """
+    Item de um pedido de serviço. Permite que um pedido agrupe vários serviços.
+    """
+
+    pedido = models.ForeignKey(PedidoServico, on_delete=models.CASCADE, related_name="itens")
+    servico = models.ForeignKey(Servico, on_delete=models.PROTECT)
+    cupom_promocional = models.ForeignKey(
+        CupomPromocional, on_delete=models.CASCADE, related_name="itens_promocionais", null=True, blank=True
+    )
+    data_renovacao = models.DateTimeField(blank=True, null=True)
+    recorrente = models.BooleanField(default=False)
+    periodo_gratuito = models.IntegerField(default=0, help_text="Número de meses gratuitos")
 
 
 class TicketSuporte(models.Model):
+    """
+    Registro de solicitações de suporte abertas por clientes.
+    Pode ser sugestão, dúvida, problema ou outro.
+    Possui ciclo de vida (novo → análise → execução → concluído/rejeitado).
+    """
+
     class TicketSuporteTipo(models.TextChoices):
         SUGESTAO = 'sugestao', 'Sugestão de funcionalidade'
         AJUDA = 'ajuda', 'Ajuda ou dúvida'
@@ -124,7 +243,6 @@ class TicketSuporte(models.Model):
     status_ticket_suporte = models.CharField(max_length=20, choices=TicketSuporteStatus.choices, default=TicketSuporteStatus.NOVO)
     data_criacao = models.DateTimeField(auto_now_add=True)
     prazo_entrega = models.DateTimeField(blank=True, null=True)
-    resposta = models.TextField(blank=True)
 
     class Meta:
         verbose_name_plural = "Tickets"
@@ -133,32 +251,15 @@ class TicketSuporte(models.Model):
         return f"[{self.get_status_ticket_suporte_display()}] {self.titulo}"
 
 
-class Pagamento(models.Model):
-    class PagamentoMetodo(models.TextChoices):
-        PIX = 'pix', 'Pix'
-        BOLETO = 'boleto', 'Boleto bancário'
-        CREDITO = 'crédito', 'Cartão de crédito'
-        DEBITO = 'débito', 'Cartão de débito'
+class TicketMensagem(models.Model):
+    ticket = models.ForeignKey("TicketSuporte", on_delete=models.CASCADE, related_name="mensagens")
+    autor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    conteudo = models.TextField()
+    data_criacao = models.DateTimeField(auto_now_add=True)
 
-    class PagamentoStatus(models.TextChoices):
-        PENDENTE = 'pendente', 'Pendente'
-        CONFIRMADO = 'confirmado', 'Confirmado'
-        FALHOU = 'falhou', 'Falhou'
-        ESTORNADO = 'estornado', 'Estornado'
-
-    pedido = models.OneToOneField(PedidoServico, on_delete=models.CASCADE, related_name="pagamento")
-    valor = models.DecimalField(max_digits=8, decimal_places=2)
-    status_pagamento = models.CharField(max_length=20, choices=PagamentoStatus.choices, default=PagamentoStatus.PENDENTE)
-    metodo_pagamento = models.CharField(max_length=30, choices=PagamentoMetodo.choices)
-    criado_em = models.DateTimeField(auto_now_add=True)
-    atualizado_em = models.DateTimeField(auto_now=True)
+    class Meta:
+        ordering = ["data_criacao"]
 
     def __str__(self):
-        return f"{self.pedido} - {self.metodo_pagamento} - {self.status_pagamento}"
+        return f"Msg de {self.autor} em {self.data_criacao:%d/%m/%Y}"
 
-
-class PagamentoHistorico(models.Model):
-    pagamento = models.ForeignKey(Pagamento, on_delete=models.CASCADE, related_name="historico")
-    status_historico_pagamento = models.CharField(max_length=20, choices=Pagamento.PagamentoStatus.choices)
-    detalhes = models.JSONField(blank=True, null=True)
-    data = models.DateTimeField(auto_now_add=True)
