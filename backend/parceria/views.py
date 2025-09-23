@@ -14,20 +14,10 @@ class BaseClienteViewSet(viewsets.ModelViewSet):
         user = self.request.user
         model = self.queryset.model
 
-        if model == ContratoServico:
+        if model in [ContratoServico, PedidoServico]:
             return model.objects.filter(
-                parceria__membros__user=user,
-                parceria__membros__is_active=True
-            )
-        elif model == PedidoServico:
-            return model.objects.filter(
-                parceria__membros__user=user,
-                parceria__membros__is_active=True
-            )
-        elif model == Pagamento:
-            return model.objects.filter(
-                pedido__parceria__membros__user=user,
-                pedido__parceria__membros__is_active=True
+                parceria__membros__usuario=user,
+                parceria__membros__ativo=True
             )
         else:
             raise ImproperlyConfigured(f"Queryset não configurado para {model.__name__}")
@@ -37,20 +27,18 @@ class BaseClienteViewSet(viewsets.ModelViewSet):
         user = self.request.user
 
         if hasattr(obj, "parceria"):
-            if not obj.parceria.membros.filter(user=user, is_active=True).exists():
-                raise Http404
+            if not obj.parceria.membros.filter(usuario=user, ativo=True).exists():
+                raise PermissionDenied("Acesso negado.")
         elif hasattr(obj, "pedido") and hasattr(obj.pedido, "parceria"):
-            if not obj.pedido.parceria.membros.filter(user=user, is_active=True).exists():
-                raise Http404
-        else:
-            raise PermissionDenied("Acesso negado.")
+            if not obj.pedido.parceria.membros.filter(usuario=user, ativo=True).exists():
+                raise PermissionDenied("Acesso negado.")
 
         return obj
 
     def perform_create(self, serializer):
         parceria = Parceria.objects.filter(
-            membros__user=self.request.user,
-            membros__is_active=True
+            membros__usuario=self.request.user,
+            membros__ativo=True
         ).first()
         if not parceria:
             raise PermissionDenied("Usuário não está vinculado a uma parceria.")
@@ -66,6 +54,33 @@ class ServicoViewSet(viewsets.ReadOnlyModelViewSet):
 class PedidoServicoViewSet(BaseClienteViewSet):
     queryset = PedidoServico.objects.all()
     serializer_class = PedidoServicoSerializer
+
+    def perform_create(self, serializer):
+        parceria = Parceria.objects.filter(
+            membros__usuario=self.request.user,
+            membros__ativo=True
+        ).first()
+        if not parceria:
+            raise PermissionDenied("Usuário não está vinculado a uma parceria.")
+        pedido = serializer.save(parceria=parceria)
+
+        # Cria itens se vierem no request
+        itens_data = self.request.data.get("itens", [])
+        for item_data in itens_data:
+            servico_id = item_data.get("servico")
+            cupom_id = item_data.get("cupom_promocional")
+            recorrente = item_data.get("recorrente", False)
+            periodo_gratuito = item_data.get("periodo_gratuito", 0)
+            data_renovacao = item_data.get("data_renovacao")
+
+            PedidoItem.objects.create(
+                pedido=pedido,
+                servico_id=servico_id,
+                cupom_promocional_id=cupom_id,
+                recorrente=recorrente,
+                periodo_gratuito=periodo_gratuito,
+                data_renovacao=data_renovacao
+            )
 
     def destroy(self, request, *args, **kwargs):
         return Response(
@@ -85,55 +100,6 @@ class ContratoServicoViewSet(BaseClienteViewSet):
         )
 
 
-class PagamentoViewSet(BaseClienteViewSet):
-    queryset = Pagamento.objects.all()
-    serializer_class = PagamentoSerializer
-
-    def get_queryset(self):
-        user = self.request.user
-        return Pagamento.objects.filter(
-            pedido__parceria__proprietario=user
-        ) | Pagamento.objects.filter(
-            pedido__parceria__membros__user=user,
-            pedido__parceria__membros__is_active=True
-        )
-
-    def destroy(self, request, *args, **kwargs):
-        return Response(
-            {'detail': 'Exclusão de pagamentos não é permitida'},
-            status=status.HTTP_403_FORBIDDEN
-        )
-
-
-class PagamentoHistoricoViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    Histórico de alterações de status de pagamentos.
-    Apenas leitura. Filtrado pela parceria do usuário via pagamento.pedido.
-    """
-    lookup_field = "pk"             # Definição de lookup é importante para gerar o schema correto
-    lookup_value_regex = r"\d+"     # assim o schema gera indices de tipos inteiros ao invés de string
-    serializer_class = PagamentoHistoricoSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get_queryset(self):
-        user = self.request.user
-        return PagamentoHistorico.objects.filter(
-            pagamento__pedido__parceria__membros__user=user,
-            pagamento__pedido__parceria__membros__is_active=True
-        ).distinct()
-
-    def create(self, request, *args, **kwargs):
-        return Response({'detail': 'Criação não permitida.'}, status=status.HTTP_403_FORBIDDEN)
-
-    def update(self, request, *args, **kwargs):
-        return Response({'detail': 'Edição não permitida.'}, status=status.HTTP_403_FORBIDDEN)
-
-    def partial_update(self, request, *args, **kwargs):
-        return Response({'detail': 'Edição não permitida.'}, status=status.HTTP_403_FORBIDDEN)
-
-    def destroy(self, request, *args, **kwargs):
-        return Response({'detail': 'Exclusão não permitida.'}, status=status.HTTP_403_FORBIDDEN)
-
 
 class TicketSuporteViewSet(BaseClienteViewSet):
     queryset = TicketSuporte.objects.all()
@@ -145,16 +111,16 @@ class TicketSuporteViewSet(BaseClienteViewSet):
         return TicketSuporte.objects.filter(
             parceria__proprietario=user
         ) | TicketSuporte.objects.filter(
-            parceria__membros__user=user,
-            parceria__membros__is_active=True
+            parceria__membros__usuario=user,
+            parceria__membros__ativo=True
         )
 
     def perform_create(self, serializer):
         parceria = Parceria.objects.filter(
             proprietario=self.request.user
         ).first() or Parceria.objects.filter(
-            membros__user=self.request.user,
-            membros__is_active=True
+            membros__usuario=self.request.user,
+            membros__ativo=True
         ).first()
 
         if not parceria:
@@ -167,3 +133,9 @@ class TicketSuporteViewSet(BaseClienteViewSet):
             {'detail': 'Exclusão de Tickets não é permitida.'},
             status=status.HTTP_403_FORBIDDEN
         )
+
+
+class CupomPromocionalViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = CupomPromocional.objects.filter(ativo=True)
+    serializer_class = CupomPromocionalSerializer
+    permission_classes = [permissions.IsAuthenticated]

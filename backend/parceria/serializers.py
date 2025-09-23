@@ -1,22 +1,47 @@
 from rest_framework import serializers
 from rest_framework.exceptions import PermissionDenied
-from .models import Parceria, Servico, ContratoServico, PedidoServico, Pagamento, PagamentoHistorico, TicketSuporte
+from .models import Parceria, Servico, ContratoServico, PedidoServico, TicketSuporte, PedidoItem, CupomPromocional, ServicoContratado
+
+
+class CupomPromocionalSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CupomPromocional
+        fields = ['id', 'cupom', 'tipo', 'valor', 'validade', 'ativo', 'uso_unico', 'data_uso']
 
 
 class ServicoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Servico
-        fields = ['id', 'nome', 'descricao', 'periodicidade_servico', 'preco']
+        fields = ['id', 'nome', 'descricao', 'preco_base']
+
+
+class PedidoItemSerializer(serializers.ModelSerializer):
+    servico = ServicoSerializer(read_only=True)
+    cupom_promocional = CupomPromocionalSerializer(read_only=True)
+    
+    class Meta:
+        model = PedidoItem
+        fields = ['id', 'servico', 'cupom_promocional', 'data_renovacao', 'recorrente', 'periodo_gratuito']
+
+
+class ServicoContratadoSerializer(serializers.ModelSerializer):
+    servico = ServicoSerializer(read_only=True)
+    cupom_promocional = CupomPromocionalSerializer(read_only=True)
+
+    class Meta:
+        model = ServicoContratado
+        fields = ['id', 'servico', 'cupom_promocional', 'data_inicio', 'data_fim', 'recorrente']
 
 
 class PedidoServicoSerializer(serializers.ModelSerializer):
+    itens = PedidoItemSerializer(many=True, read_only=True)
+
     class Meta:
         model = PedidoServico
-        fields = ['id', 'servico', 'contrato', 'status_pedido_servico', 'data_pedido', 'desconto', 'vencimento']
-        read_only_fields = ['data_pedido', 'status_pedido_servico']
+        fields = ['id', 'parceria', 'status_pedido_servico', 'itens']
+        read_only_fields = ['status_pedido_servico']
 
     def create(self, validated_data):
-        contrato = validated_data["contrato"]
         user = self.context["request"].user
         try:
             parceria = Parceria.objects.get(proprietario=user)
@@ -24,39 +49,28 @@ class PedidoServicoSerializer(serializers.ModelSerializer):
             raise PermissionDenied("Usuário não está vinculado a uma parceria.")
         if contrato.parceria != parceria:
             raise PermissionDenied("Contrato não pertence à sua parceria.")
-        return super().create(validated_data)
+        return super().create({**validated_data, "parceria": parceria})
 
 
 class ContratoServicoSerializer(serializers.ModelSerializer):
+    servicos_contratados = ServicoContratadoSerializer(many=True, read_only=True)
+
     class Meta:
         model = ContratoServico
-        fields = ['id', 'servico', 'parceria', 'data_inicio', 'data_fim', 'cancelado', 'observacoes']
-        read_only_fields = ['parceria', 'data_inicio', 'data_fim', 'cancelado']
+        fields = ['id', 'parceria', 'data_inicio', 'data_fim', 'ativo', 'observacoes', 'servicos_contratados']
+        read_only_fields = ['parceria', 'data_inicio', 'ativo']
 
     def create(self, validated_data):
         user = self.context["request"].user
         try:
-            parceria = Parceria.objects.get(membros__user=user, membros__is_active=True)
+            parceria = Parceria.objects.get(membros__usuario=user, membros__ativo=True)
         except Parceria.DoesNotExist:
             raise PermissionDenied("Usuário não está vinculado a uma parceria.")
         return super().create({**validated_data, "parceria": parceria})
 
 
-class PagamentoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Pagamento
-        fields = ['id', 'pedido', 'status_pagamento', 'valor', 'metodo_pagamento', 'criado_em', 'atualizado_em']
-
-
-class PagamentoHistoricoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PagamentoHistorico
-        fields = ['id', 'pagamento', 'status_historico_pagamento', 'detalhes', 'data']
-        read_only_fields = fields
-
-
 class TicketSuporteSerializer(serializers.ModelSerializer):
     class Meta:
         model = TicketSuporte
-        fields = ['id', 'titulo', 'descricao', 'tipo_ticket_suporte', 'status_ticket_suporte', 'data_criacao']
-        read_only_fields = ['status', 'data_criacao']
+        fields = ['id', 'titulo', 'descricao', 'tipo_ticket_suporte', 'status_ticket_suporte', 'data_criacao', 'prazo_entrega']
+        read_only_fields = ['status_ticket_suporte', 'data_criacao']
