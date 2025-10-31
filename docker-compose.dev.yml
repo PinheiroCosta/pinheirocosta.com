@@ -1,5 +1,3 @@
-version: '3.5'
-
 networks:
   romweb_dev_network:
     external: true
