@@ -10,8 +10,6 @@ services:
   db:
     image: "postgres:alpine"
     env_file: backend/.env.prod
-    ports:
-      - "5432:5432"
     volumes:
       - dbdata:/var/lib/postgresql/data:delegated
 
@@ -20,8 +18,6 @@ services:
 
   result:
     image: "redis:alpine"
-    ports:
-      - "6379:6379"
     volumes:
       - redisdata:/data
     command: ["redis-server", "--save", "", "--appendonly", "no"]
