@@ -7,56 +7,49 @@ class TestPedidoServicoView(TestCaseUtils):
     def setUp(self):
         super().setUp()
         self.view_url = "/api/parceria/pedidos/"
-        
+
         self.parceria = Parceria.objects.create(
             nome="Cliente 1",
-            tipo_parceria="cliente",
+            natureza="pf",
+            categoria="cliente",
             proprietario=self.user,
-            nome_projeto="site1",
             dominio="site1.com.br",
         )
-        ParceriaMembro.objects.create(parceria=self.parceria, user=self.user, is_active=True)
+        ParceriaMembro.objects.create(parceria=self.parceria, usuario=self.user, ativo=True)
 
         self.outro_parceiro = Parceria.objects.create(
             nome="Cliente 2",
-            tipo_parceria="cliente",
+            natureza="pf",
+            categoria="cliente",
             proprietario=self.user_b,
-            nome_projeto="site2",
             dominio="site2.com.br",
         )
-        ParceriaMembro.objects.create(parceria=self.outro_parceiro, user=self.user_b, is_active=True)
+        ParceriaMembro.objects.create(parceria=self.outro_parceiro, usuario=self.user_b, ativo=True)
 
         self.servico = Servico.objects.create(
             nome="Site Zola",
             descricao="Criação de site estático",
-            preco=500,
-            periodicidade_servico="avulso"
+            preco_base=500,
         )
         self.contrato = ContratoServico.objects.create(
             parceria=self.parceria,
-            servico=self.servico
+            observacoes="Criado pela Suite de testes"
         )
         self.outro_contrato = ContratoServico.objects.create(
             parceria=self.outro_parceiro,
-            servico=self.servico
+            observacoes="criado pela suite de testes"
         )
 
     def test_lista_pedidos_do_usuario(self):
         """Deve retornar apenas pedidos da parceria do usuário autenticado"""
         pedido = PedidoServico.objects.create(
             parceria=self.parceria,
-            servico=self.servico,
-            contrato=self.contrato,
-            desconto=0,
-            vencimento=timezone.now() + timezone.timedelta(days=30),
+            status_pedido_servico="pendente",
         )
 
         PedidoServico.objects.create(  # Outro usuário
             parceria=self.outro_parceiro,
-            servico=self.servico,
-            contrato=self.outro_contrato,
-            desconto=0,
-            vencimento=timezone.now() + timezone.timedelta(days=30),
+            status_pedido_servico="pendente",
         )
 
         resp = self.auth_client.get(self.view_url)
@@ -69,21 +62,30 @@ class TestPedidoServicoView(TestCaseUtils):
     def test_criacao_pedido_valido(self):
         """Deve permitir criação de pedido vinculado a contrato da parceria do usuário"""
         payload = {
-            "contrato": self.contrato.id,
-            "servico": self.servico.id,
-            "desconto": "0.00",
-            "vencimento": "2099-12-31T12:00:00Z",
+            "itens": [
+                {"servico": self.servico.id}
+            ]
         }
         resp = self.auth_client.post(self.view_url, payload, format="json")
         self.assertResponse201(resp)
 
+        # validações extras mínimas
+        pedido_id = resp.data.get("id")
+        self.assertIsNotNone(pedido_id)
+        pedido = PedidoServico.objects.get(id=pedido_id)
+        self.assertEqual(pedido.parceria.id, self.parceria.id)
+        self.assertEqual(pedido.itens.count(), 1)
+        self.assertEqual(pedido.itens.first().servico.id, self.servico.id)
+
     def test_criacao_pedido_contrato_de_terceiro(self):
         """Não deve permitir criação de pedido com contrato de outro usuário"""
+        # remove vínculo do usuário (desativa o membro)
+        ParceriaMembro.objects.filter(parceria=self.parceria, usuario=self.user).update(ativo=False)
+
         payload = {
-            "contrato": self.outro_contrato.id,
-            "servico": self.outro_contrato.servico.id,
-            "desconto": "0.00",
-            "vencimento": "2099-12-31T12:00:00Z",
+            "itens": [
+                {"servico": self.servico.id}
+            ]
         }
         resp = self.auth_client.post(self.view_url, payload, format="json")
         self.assertResponse403(resp)
@@ -92,10 +94,7 @@ class TestPedidoServicoView(TestCaseUtils):
         """Usuário não deve acessar pedido de outro parceiro"""
         outro_pedido = PedidoServico.objects.create(
             parceria=self.outro_parceiro,
-            servico=self.servico,
-            contrato=self.outro_contrato,
-            desconto=0,
-            vencimento=timezone.now() + timezone.timedelta(days=30),
+            status_pedido_servico="pendente",
         )
         url = f"/api/parceria/pedidos/{outro_pedido.id}/"
         resp = self.auth_client.get(url)
@@ -105,10 +104,7 @@ class TestPedidoServicoView(TestCaseUtils):
         """DELETE não deve ser permitido"""
         pedido = PedidoServico.objects.create(
             parceria=self.parceria,
-            servico=self.servico,
-            contrato=self.contrato,
-            desconto=0,
-            vencimento=timezone.now() + timezone.timedelta(days=30),
+            status_pedido_servico="pendente",
         )
         url = f"/api/parceria/pedidos/{pedido.id}/"
         resp = self.auth_client.delete(url)

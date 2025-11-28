@@ -15,14 +15,12 @@ class TestServicoView(TestCaseUtils):
         self.servico = Servico.objects.create(
             nome="Site Zola",
             descricao="Criação de site estático",
-            preco=500,
-            periodicidade_servico="avulso"
+            preco_base=500,
         )
         self.servico = Servico.objects.create(
             nome="Suporte e Manutenção",
             descricao="Manutenção de Sites estáticos",
-            preco=50,
-            periodicidade_servico="mensal"
+            preco_base=50,
         )
         self.detail_url = f"/api/parceria/servicos/{self.servico.id}/"
 

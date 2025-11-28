@@ -11,31 +11,30 @@ class TestContratoServicoView(TestCaseUtils):
 
         self.parceria1 = Parceria.objects.create(
             nome="Cliente 1",
-            tipo_parceria="cliente",
-            nome_projeto="projeto1",
+            natureza="pf",
+            categoria="cliente",
             dominio="p1.com",
             proprietario=self.user
         )
-        ParceriaMembro.objects.create(parceria=self.parceria1, user=self.user, is_active=True)
+        ParceriaMembro.objects.create(parceria=self.parceria1, usuario=self.user, ativo=True)
 
         self.parceria2 = Parceria.objects.create(
             nome="Cliente 2",
-            tipo_parceria="cliente",
-            nome_projeto="projeto2",
+            natureza="pf",
+            categoria="cliente",
             dominio="p2.com",
             proprietario=self.user_b
         )
-        ParceriaMembro.objects.create(parceria=self.parceria2, user=self.user_b, is_active=True)
+        ParceriaMembro.objects.create(parceria=self.parceria2, usuario=self.user_b, ativo=True)
 
         # Serviço e contratos
         self.servico = Servico.objects.create(
             nome="Serviço Teste",
             descricao="desc",
-            preco=100,
-            periodicidade_servico="mensal"
+            preco_base=100,
         )
-        self.contrato1 = ContratoServico.objects.create(parceria=self.parceria1, servico=self.servico)
-        self.contrato2 = ContratoServico.objects.create(parceria=self.parceria2, servico=self.servico)
+        self.contrato1 = ContratoServico.objects.create(parceria=self.parceria1, observacoes="Criado pela suite de testes")
+        self.contrato2 = ContratoServico.objects.create(parceria=self.parceria2, observacoes="Criado pela suite de testes")
 
         # URLs
         self.list_url = reverse("parceria-contratos-list")
