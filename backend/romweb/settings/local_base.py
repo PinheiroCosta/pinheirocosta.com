@@ -1,5 +1,5 @@
 from .base import *
-
+from decouple import config
 
 DEBUG = True
 
@@ -36,6 +36,13 @@ EMAIL_PORT = 1025
 
 LOG_REQUESTS = True
 
+# HTTP_LOG_ENABLED
+# ---------------------------------------------------------
+# Enable/disable backend HTTP request/response logging.
+# Used only for debugging communication with microservices.
+# WARNING: Keep disabled in production unless 100% necessary.
+HTTP_LOG_ENABLED = False
+
 # Logging
 LOGGING = {
     "version": 1,
@@ -45,7 +52,7 @@ LOGGING = {
     },
     "formatters": {
         "standard": {
-            "format": "%(levelname)-8s [%(asctime)s] [%(correlation_id)s] %(name)s: %(message)s"
+            "format": "[%(asctime)s] [%(correlation_id)s] [%(levelname)s] %(name)s: %(message)s"
         },
     },
     "handlers": {
@@ -62,6 +69,11 @@ LOGGING = {
         "django_guid": {
             "handlers": ["console"],
             "level": "WARNING",
+            "propagate": False,
+        },
+        "backend.http": {
+            "handlers": ["console"],
+            "level": "DEBUG",
             "propagate": False,
         },
     },
