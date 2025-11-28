@@ -14,11 +14,12 @@ class TestTicketSuporteViewSet(TestCaseUtils):
         super().setUp()
         self.parceria = Parceria.objects.create(
             nome="Projeto Teste",
-            tipo_parceria="cliente",
+            natureza="pf",
+            categoria="cliente",
             proprietario=self.user,
-            nome_projeto="Site Teste"
+            dominio="site-teste.com"
         )
-        self.parceria.membros.create(user=self.user, is_active=True)
+        self.parceria.membros.create(usuario=self.user, ativo=True)
         self.list_url = reverse("parceria-tickets-list")
 
     def test_list_tickets_autenticado(self):

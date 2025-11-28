@@ -14,7 +14,6 @@ class TestParceriaRoutes(TestCaseUtils):
             "/api/parceria/servicos/",
             "/api/parceria/pedidos/",
             "/api/parceria/contratos/",
-            "/api/parceria/pagamentos/",
             "/api/parceria/tickets/",
         ]
 

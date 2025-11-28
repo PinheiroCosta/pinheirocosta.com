@@ -64,18 +64,16 @@ class PedidoServicoViewSet(BaseClienteViewSet):
         if not parceria:
             raise PermissionDenied("Usuário não está vinculado a uma parceria.")
 
+        pedido = serializer.save(parceria=parceria)
+
         # Cria itens se vierem no request
         itens_data = self.request.data.get("itens", [])
         for item_data in itens_data:
-            servico_id = item_data.get("servico")
-            recorrente = item_data.get("recorrente", False)
-            data_renovacao = item_data.get("data_renovacao")
-
             PedidoItem.objects.create(
                 pedido=pedido,
-                servico_id=servico_id,
-                recorrente=recorrente,
-                data_renovacao=data_renovacao
+                servico_id=item_data.get("servico"),
+                recorrente=item_data.get("recorrente", False),
+                data_renovacao=item_data.get("data_renovacao"),
             )
 
 

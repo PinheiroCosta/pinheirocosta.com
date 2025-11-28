@@ -31,7 +31,7 @@ class PedidoServicoSerializer(serializers.ModelSerializer):
     class Meta:
         model = PedidoServico
         fields = ['id', 'parceria', 'status_pedido_servico', 'itens']
-        read_only_fields = ['status_pedido_servico']
+        read_only_fields = ['parceria', 'status_pedido_servico']
 
 
 class ContratoServicoSerializer(serializers.ModelSerializer):
