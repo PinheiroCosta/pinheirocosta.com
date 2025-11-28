@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Parceria, Servico, PedidoServico, PedidoItem, TicketSuporte, ContratoServico, ServicoContratado, CupomPromocional
+from .models import Parceria, Servico, PedidoServico, PedidoItem, TicketSuporte, ContratoServico, ServicoContratado
 from .forms import ParceriaForm, PedidoServicoForm, PedidoItemForm, ServicoContratadoForm
 
 
@@ -25,7 +25,7 @@ class PedidoItemInline(admin.TabularInline):
     model = PedidoItem
     form = PedidoItemForm
     extra = 0
-    fields = ('servico', 'data_renovacao', 'recorrente', 'periodo_gratuito')
+    fields = ('servico', 'data_renovacao', 'recorrente')
     readonly_fields = ('data_renovacao',)
 
     def has_change_permission(self, request, obj=None):
@@ -115,7 +115,7 @@ class TicketSuporteAdmin(admin.ModelAdmin):
     def get_readonly_fields(self, request, obj=None):
         # Se for superuser, pode editar tudo
         if request.user.is_superuser:
-            return
+            return ()
         # Caso contrário, restringe
         return ("data_criacao", "prazo_entrega", "status_ticket_suporte")
 
@@ -130,16 +130,6 @@ class ContratoServicoAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         return super().get_queryset(request).select_related('parceria')
-
-
-@admin.register(CupomPromocional)
-class CupomPromocionalAdmin(admin.ModelAdmin):
-    list_display = ('cupom', 'tipo', 'valor', 'validade', 'ativo', 'uso_unico', 'data_uso')
-    list_filter = ('tipo', 'ativo', 'uso_unico')
-    search_fields = ('cupom',)
-    readonly_fields = ('data_uso',)
-    date_hierarchy = 'validade'
-
 
 
 @admin.register(ServicoContratado)
