@@ -8,8 +8,10 @@ facilitando manutenção, testes e evolução das regras.
 from django.db import transaction
 from django.utils import timezone
 from rest_framework.exceptions import PermissionDenied
+from django.core.exceptions import ValidationError
 
 from .models import (
+    Parceria,
     PedidoServico,
     PedidoItem,
     ContratoServico,
@@ -22,7 +24,7 @@ from .models import (
 # Pedidos
 # ============================================================
 
-def criar_pedido(parceria, itens, status_pedido_servico=None):
+def criar_pedido(parceria: Parceria, itens: list[dict], status_pedido_servico: str = None):
     """
     Cria um pedido com múltiplos itens de serviço.
 
@@ -58,3 +60,45 @@ def criar_pedido(parceria, itens, status_pedido_servico=None):
 
         return pedido
 
+def concluir_pedido(pedido: PedidoServico) -> PedidoServico:
+    """
+    Marca pedido como concluído.
+
+    Regras:
+    1. somente pedidos em andamento podem ser concluídos
+    2. pedidos sem itens não pode ser concluído.
+    3. pedidos recorrentes sem data de renovação não podem ser concluídos.
+    4. Pedidos com Serviços inativos não podem ser concluídos.
+    """
+
+    with transaction.atomic():
+        pedido.refresh_from_db() # evita concluir objeto desatualizado
+
+        # Regra 1:somente pedidos em andamento podem ser concluídos
+        if pedido.status_pedido_servico != PedidoServico.PedidoServicoStatus.EM_ANDAMENTO:
+            raise ValidationError("Somente pedidos em andamento podem ser concluídos.")
+
+        # Regra 2:pedidos sem itens não pode ser concluído.
+        itens = list(pedido.itens.select_related("servico"))
+        if not itens:
+            raise ValidationError("Pedido sem itens não pode ser concluído.")
+
+        for item in itens:
+            # Regra 3:pedidos recorrentes sem data de renovação não podem ser concluídos.
+            if item.recorrente and not item.data_renovacao:
+                raise ValidationError(
+                    f"Item {item.id} recorrente sem data de renovação."
+                )
+
+            # Regra 4: Pedidos com Serviços inativos não podem ser concluídos.
+            if not item.servico.ativo:
+                raise ValidationError(
+                    f"Serviço '{item.servico.nome}' está inativo."
+                )
+
+        pedido.status_pedido_servico = PedidoServico.PedidoServicoStatus.CONCLUIDO
+        pedido.data_fim = timezone.now()
+
+        pedido.save(update_fields=["status_pedido_servico", "data_fim"])
+
+        return pedido
