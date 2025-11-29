@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied
 from .models import *
 from .serializers import *
+from . import services
 
 
 class BaseClienteViewSet(viewsets.ModelViewSet):
@@ -56,25 +57,30 @@ class PedidoServicoViewSet(BaseClienteViewSet):
     serializer_class = PedidoServicoSerializer
 
     def perform_create(self, serializer):
-        user = self.request.user
         parceria = Parceria.objects.filter(
-            membros__usuario=user,
+            membros__usuario=self.request.user,
             membros__ativo=True
         ).first()
-        if not parceria:
-            raise PermissionDenied("Usuário não está vinculado a uma parceria.")
 
-        pedido = serializer.save(parceria=parceria)
+        itens_raw = self.request.data.get("itens", [])
 
+        itens = []
         # Cria itens se vierem no request
-        itens_data = self.request.data.get("itens", [])
-        for item_data in itens_data:
-            PedidoItem.objects.create(
-                pedido=pedido,
-                servico_id=item_data.get("servico"),
-                recorrente=item_data.get("recorrente", False),
-                data_renovacao=item_data.get("data_renovacao"),
-            )
+        for item_data in itens_raw:
+            servico = Servico.objects.get(pk=item_data["servico"])
+            itens.append({
+                "servico": servico,
+                "recorrente": item_data.get("recorrente", False),
+                "data_renovacao": item_data.get("data_renovacao"),
+            })
+
+        pedido = services.criar_pedido(
+            parceria=parceria,
+            itens=itens,
+            status_pedido_servico=self.request.data.get("status_pedido_servico"),
+        )
+
+        serializer.instance = pedido
 
 
     def destroy(self, request, *args, **kwargs):
