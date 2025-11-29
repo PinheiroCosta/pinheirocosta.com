@@ -1,6 +1,7 @@
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.http import Http404
 from rest_framework import viewsets, permissions, status
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied
 from .models import *
@@ -55,6 +56,30 @@ class ServicoViewSet(viewsets.ReadOnlyModelViewSet):
 class PedidoServicoViewSet(BaseClienteViewSet):
     queryset = PedidoServico.objects.all()
     serializer_class = PedidoServicoSerializer
+
+    @action(detail=True, methods=["post"], url_path="concluir")
+    def concluir(self, request, pk=None):
+        pedido = self.get_object()
+
+        # Permissão: garantir que o pedido pertence à parceria do usuário
+        parceria = Parceria.objects.filter(
+            membros__usuario=request.user,
+            membros__ativo=True
+        ).first()
+
+        if pedido.parceria != parceria:
+            return Response(
+                {"detail": "Acesso não autorizado ao pedido."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        try:
+            pedido = services.concluir_pedido(pedido)
+        except ValidationError as e:
+            return Response({"detail": e.message}, status=400)
+
+        serializer = self.get_serializer(pedido)
+        return Response(serializer.data, status=200)
 
     def perform_create(self, serializer):
         parceria = Parceria.objects.filter(

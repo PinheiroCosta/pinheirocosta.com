@@ -1,6 +1,6 @@
 from django.utils import timezone
 from common.tests.test_utils import TestCaseUtils
-from parceria.models import PedidoServico, Servico, ContratoServico, Parceria, ParceriaMembro
+from parceria.models import PedidoServico, PedidoItem, Servico, ContratoServico, Parceria, ParceriaMembro
 
 
 class TestPedidoServicoView(TestCaseUtils):
@@ -109,3 +109,135 @@ class TestPedidoServicoView(TestCaseUtils):
         url = f"/api/parceria/pedidos/{pedido.id}/"
         resp = self.auth_client.delete(url)
         self.assertResponse403(resp)
+
+    # ------------------------------------------------------------------------
+    # /api/parceria/pedidos/{pedido.id}/concluir/
+    # ------------------------------------------------------------------------
+    def test_concluir_pedido_em_andamento(self):
+        """Deve concluir pedido em andamento e retornar dados atualizados"""
+        pedido = PedidoServico.objects.create(
+            parceria=self.parceria,
+            status_pedido_servico=PedidoServico.PedidoServicoStatus.EM_ANDAMENTO,
+        )
+        PedidoItem.objects.create(pedido=pedido, servico=self.servico)
+
+        url = f"/api/parceria/pedidos/{pedido.id}/concluir/"
+        resp = self.auth_client.post(url)
+
+        self.assertResponse200(resp)
+        pedido.refresh_from_db()
+        self.assertEqual(pedido.status_pedido_servico, PedidoServico.PedidoServicoStatus.CONCLUIDO)
+        self.assertIsNotNone(pedido.data_fim)
+
+    def test_concluir_pedido_pendente(self):
+        """Pedidos pendentes não devem ser concluídos"""
+        pedido = PedidoServico.objects.create(
+            parceria=self.parceria,
+            status_pedido_servico=PedidoServico.PedidoServicoStatus.PENDENTE,
+        )
+        PedidoItem.objects.create(pedido=pedido, servico=self.servico)
+
+        url = f"/api/parceria/pedidos/{pedido.id}/concluir/"
+        resp = self.auth_client.post(url)
+
+        self.assertResponse400(resp)
+        pedido.refresh_from_db()
+        self.assertEqual(pedido.status_pedido_servico, PedidoServico.PedidoServicoStatus.PENDENTE)
+
+    def test_concluir_pedido_ja_concluido(self):
+        """Pedido já concluído não pode ser concluído novamente"""
+        pedido = PedidoServico.objects.create(
+            parceria=self.parceria,
+            status_pedido_servico=PedidoServico.PedidoServicoStatus.CONCLUIDO,
+        )
+        PedidoItem.objects.create(pedido=pedido, servico=self.servico)
+
+        url = f"/api/parceria/pedidos/{pedido.id}/concluir/"
+        resp = self.auth_client.post(url)
+
+        self.assertResponse400(resp)
+
+    def test_concluir_pedido_sem_itens(self):
+        """Pedido sem itens não pode ser concluído"""
+        pedido = PedidoServico.objects.create(
+            parceria=self.parceria,
+            status_pedido_servico=PedidoServico.PedidoServicoStatus.EM_ANDAMENTO,
+        )
+
+        url = f"/api/parceria/pedidos/{pedido.id}/concluir/"
+        resp = self.auth_client.post(url)
+
+        self.assertResponse400(resp)
+
+    def test_concluir_item_recorrente_sem_data_renovacao(self):
+        """Itens recorrentes exigem data de renovação"""
+        pedido = PedidoServico.objects.create(
+            parceria=self.parceria,
+            status_pedido_servico=PedidoServico.PedidoServicoStatus.EM_ANDAMENTO,
+        )
+        PedidoItem.objects.create(
+            pedido=pedido,
+            servico=self.servico,
+            recorrente=True,
+            data_renovacao=None,
+        )
+
+        url = f"/api/parceria/pedidos/{pedido.id}/concluir/"
+        resp = self.auth_client.post(url)
+
+        self.assertResponse400(resp)
+
+    def test_concluir_pedido_outro_usuario(self):
+        """Usuário não deve concluir pedido de outra parceria"""
+        pedido = PedidoServico.objects.create(
+            parceria=self.outro_parceiro,
+            status_pedido_servico=PedidoServico.PedidoServicoStatus.EM_ANDAMENTO,
+        )
+        PedidoItem.objects.create(pedido=pedido, servico=self.servico)
+
+        url = f"/api/parceria/pedidos/{pedido.id}/concluir/"
+        resp = self.auth_client.post(url)
+
+        self.assertResponse404(resp)
+
+    def test_concluir_pedido_servico_inativo(self):
+        """Serviço inativo em item deve impedir conclusão"""
+        servico_inativo = Servico.objects.create(
+            nome="X",
+            preco_base=100,
+            ativo=False
+        )
+
+        pedido = PedidoServico.objects.create(
+            parceria=self.parceria,
+            status_pedido_servico=PedidoServico.PedidoServicoStatus.EM_ANDAMENTO,
+        )
+        PedidoItem.objects.create(pedido=pedido, servico=servico_inativo)
+
+        url = f"/api/parceria/pedidos/{pedido.id}/concluir/"
+        resp = self.auth_client.post(url)
+
+        self.assertResponse400(resp)
+
+    def test_concluir_pedido_atomicidade(self):
+        """Falha na validação não deve alterar status nem registrar data"""
+        pedido = PedidoServico.objects.create(
+            parceria=self.parceria,
+            status_pedido_servico=PedidoServico.PedidoServicoStatus.EM_ANDAMENTO,
+        )
+        # item inválido → recorrente sem data
+        PedidoItem.objects.create(
+            pedido=pedido,
+            servico=self.servico,
+            recorrente=True,
+            data_renovacao=None,
+        )
+
+        url = f"/api/parceria/pedidos/{pedido.id}/concluir/"
+        resp = self.auth_client.post(url)
+        self.assertResponse400(resp)
+
+        pedido.refresh_from_db()
+        self.assertEqual(pedido.status_pedido_servico, PedidoServico.PedidoServicoStatus.EM_ANDAMENTO)
+        self.assertIsNone(pedido.data_fim)
+
