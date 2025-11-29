@@ -28,9 +28,9 @@ def criar_pedido(parceria: Parceria, itens: list[dict], status_pedido_servico: s
     """
     Cria um pedido com múltiplos itens de serviço.
 
-    itens: lista de dicts {"servico": Servico, "recorrente": bool, "data_renovacao": datetime}
+    itens: {"servico": Servico, "recorrente": bool, "data_renovacao": datetime}
 
-    Regras aplicadas:
+    Regras:
     - atomicidade
     - validação de serviços
     - criação consistente de itens
@@ -97,6 +97,32 @@ def concluir_pedido(pedido: PedidoServico) -> PedidoServico:
                 )
 
         pedido.status_pedido_servico = PedidoServico.PedidoServicoStatus.CONCLUIDO
+        pedido.data_fim = timezone.now()
+
+        pedido.save(update_fields=["status_pedido_servico", "data_fim"])
+
+        return pedido
+
+
+def cancelar_pedido(pedido: PedidoServico) -> PedidoServico:
+    """
+    Marca um pedido como cancelado
+
+    1. Somente EM_ANDAMENTO ou PENDENTE podem ser cancelados.
+    2. Registra data_fim e cancelado_por (se houver campo).
+    """
+    status_cancelaveis = (
+        PedidoServico.PedidoServicoStatus.EM_ANDAMENTO,
+        PedidoServico.PedidoServicoStatus.PENDENTE,
+    )
+
+    with transaction.atomic():
+        pedido.refresh_from_db() # evita cancelar objeto desatualizado
+
+        if pedido.status_pedido_servico not in status_cancelaveis:
+            raise ValidationError(f"pedido no status '{pedido.status_pedido_servico}' não pode ser cancelado. status permitidos: 'PENDENTE e EM_ANDAMENTO'")
+
+        pedido.status_pedido_servico = PedidoServico.PedidoServicoStatus.CANCELADO
         pedido.data_fim = timezone.now()
 
         pedido.save(update_fields=["status_pedido_servico", "data_fim"])
