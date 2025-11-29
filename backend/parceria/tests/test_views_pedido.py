@@ -241,3 +241,130 @@ class TestPedidoServicoView(TestCaseUtils):
         self.assertEqual(pedido.status_pedido_servico, PedidoServico.PedidoServicoStatus.EM_ANDAMENTO)
         self.assertIsNone(pedido.data_fim)
 
+    # ------------------------------------------------------------------------
+    # /api/parceria/pedidos/{pedido.id}/cancelar/
+    # ------------------------------------------------------------------------
+
+    def test_cancelar_pedido_em_andamento(self):
+        """Deve cancelar pedido EM_ANDAMENTO e registrar data_fim"""
+        pedido = PedidoServico.objects.create(
+            parceria=self.parceria,
+            status_pedido_servico=PedidoServico.PedidoServicoStatus.EM_ANDAMENTO
+        )
+        PedidoItem.objects.create(
+            pedido=pedido,
+            servico=self.servico,
+            recorrente=False,
+            data_renovacao=None,
+        )
+
+        url = f"/api/parceria/pedidos/{pedido.id}/cancelar/"
+        resp = self.auth_client.post(url)
+        self.assertResponse200(resp)
+
+        pedido.refresh_from_db()
+        self.assertEqual(pedido.status_pedido_servico, PedidoServico.PedidoServicoStatus.CANCELADO)
+        self.assertIsNotNone(pedido.data_fim)
+
+    def test_cancelar_pedido_pendente(self):
+        """Deve cancelar pedido pendente"""
+        pedido = PedidoServico.objects.create(
+            parceria=self.parceria,
+            status_pedido_servico=PedidoServico.PedidoServicoStatus.PENDENTE
+        )
+        PedidoItem.objects.create(
+            pedido=pedido,
+            servico=self.servico,
+            recorrente=False,
+            data_renovacao=None,
+        )
+
+        url = f"/api/parceria/pedidos/{pedido.id}/cancelar/"
+        resp = self.auth_client.post(url)
+        self.assertResponse200(resp)
+
+        pedido.refresh_from_db()
+        self.assertEqual(pedido.status_pedido_servico, PedidoServico.PedidoServicoStatus.CANCELADO)
+        self.assertIsNotNone(pedido.data_fim)
+
+
+    def test_cancelar_pedido_ja_cancelado(self):
+        """Pedido já cancelado não deve ser cancelado novamente"""
+        pedido = PedidoServico.objects.create(
+            parceria=self.parceria,
+            status_pedido_servico=PedidoServico.PedidoServicoStatus.CANCELADO
+        )
+        PedidoItem.objects.create(
+            pedido=pedido,
+            servico=self.servico,
+            recorrente=False,
+            data_renovacao=None,
+        )
+
+        url = f"/api/parceria/pedidos/{pedido.id}/cancelar/"
+        resp = self.auth_client.post(url)
+        self.assertResponse400(resp)
+
+        pedido.refresh_from_db()
+        self.assertEqual(pedido.status_pedido_servico, PedidoServico.PedidoServicoStatus.CANCELADO)
+
+
+    def test_cancelar_pedido_outro_usuario(self):
+        """Usuário não deve cancelar pedido de outra parceria"""
+        pedido = PedidoServico.objects.create(
+            parceria=self.outro_parceiro,
+            status_pedido_servico=PedidoServico.PedidoServicoStatus.PENDENTE,
+        )
+        PedidoItem.objects.create(
+            pedido=pedido,
+            servico=self.servico,
+            recorrente=True,
+        )
+
+        url = f"/api/parceria/pedidos/{pedido.id}/cancelar/"
+        resp = self.auth_client.post(url)
+
+        self.assertResponse404(resp)
+
+        pedido.refresh_from_db()
+        self.assertEqual(pedido.status_pedido_servico, PedidoServico.PedidoServicoStatus.PENDENTE)
+        self.assertIsNone(pedido.data_fim)
+
+    def test_cancelar_pedido_atomicidade(self):
+        """Falha deve manter status original e não registrar data_fim"""
+        pedido = PedidoServico.objects.create(
+            parceria=self.parceria,
+            # item inválido → pedido CONCLUIDO
+            status_pedido_servico=PedidoServico.PedidoServicoStatus.CONCLUIDO,
+        )
+        PedidoItem.objects.create(
+            pedido=pedido,
+            servico=self.servico,
+            recorrente=True,
+            data_renovacao=None,
+        )
+
+        url = f"/api/parceria/pedidos/{pedido.id}/cancelar/"
+        resp = self.auth_client.post(url)
+        self.assertResponse400(resp)
+
+        pedido.refresh_from_db()
+        self.assertEqual(pedido.status_pedido_servico, PedidoServico.PedidoServicoStatus.CONCLUIDO)
+        self.assertIsNone(pedido.data_fim)
+
+
+    def test_cancelar_pedido_sem_itens(self):
+        """Pedido sem itens deve ser cancelável"""
+        pedido = PedidoServico.objects.create(
+            parceria=self.parceria,
+            status_pedido_servico=PedidoServico.PedidoServicoStatus.EM_ANDAMENTO,
+        )
+
+        url = f"/api/parceria/pedidos/{pedido.id}/cancelar/"
+        resp = self.auth_client.post(url)
+
+        self.assertResponse200(resp)
+
+        pedido.refresh_from_db()
+        self.assertEqual(pedido.status_pedido_servico, PedidoServico.PedidoServicoStatus.CANCELADO)
+        self.assertIsNotNone(pedido.data_fim)

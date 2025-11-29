@@ -81,6 +81,29 @@ class PedidoServicoViewSet(BaseClienteViewSet):
         serializer = self.get_serializer(pedido)
         return Response(serializer.data, status=200)
 
+    @action(detail=True, methods=["post"], url_path="cancelar")
+    def cancelar(self, request, pk=None):
+        pedido = self.get_object()
+
+        parceria = Parceria.objects.filter(
+            membros__usuario=request.user,
+            membros__ativo=True
+        ).first()
+
+        if pedido.parceria != parceria:
+            return Response(
+                {"detail": "Acesso não autorizado ao pedido."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        try:
+            pedido = services.cancelar_pedido(pedido)
+        except ValidationError as e:
+            return Response({"detail": e.message}, status=400)
+
+        serializer = self.get_serializer(pedido)
+        return Response(serializer.data, status=200)
+
     def perform_create(self, serializer):
         parceria = Parceria.objects.filter(
             membros__usuario=self.request.user,
