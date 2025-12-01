@@ -52,6 +52,8 @@ class ContratoServicoSerializer(serializers.ModelSerializer):
 
 
 class TicketSuporteSerializer(serializers.ModelSerializer):
+    tipo_ticket_suporte = serializers.CharField(required=False, allow_null=True)
+
     class Meta:
         model = TicketSuporte
         fields = ['id', 'titulo', 'descricao', 'tipo_ticket_suporte', 'status_ticket_suporte', 'data_criacao', 'prazo_entrega']

@@ -157,12 +157,16 @@ class TicketSuporteViewSet(BaseClienteViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        return TicketSuporte.objects.filter(
-            parceria__proprietario=user
-        ) | TicketSuporte.objects.filter(
-            parceria__membros__usuario=user,
-            parceria__membros__ativo=True
-        )
+        return (
+            TicketSuporte.objects.filter(parceria__proprietario=user)
+            | TicketSuporte.objects.filter(parceria__membros__usuario=user, parceria__membros__ativo=True)
+        ).distinct()
+        #return TicketSuporte.objects.filter(
+        #    parceria__proprietario=user
+        #) | TicketSuporte.objects.filter(
+        #    parceria__membros__usuario=user,
+        #    parceria__membros__ativo=True
+        #)
 
     def perform_create(self, serializer):
         parceria = Parceria.objects.filter(
@@ -175,7 +179,18 @@ class TicketSuporteViewSet(BaseClienteViewSet):
         if not parceria:
             raise PermissionDenied("Usuário não está vinculado a uma parceria.")
 
-        serializer.save(parceria=parceria)
+        titulo = serializer.validated_data.get("titulo")
+        descricao = serializer.validated_data.get("descricao")
+        tipo_ticket = serializer.validated_data.get("tipo_ticket_suporte")
+
+        ticket = services.criar_ticket(
+            parceria=parceria,
+            tipo_ticket=tipo_ticket,
+            titulo=titulo,
+            descricao=descricao
+        )
+
+        serializer.instance = ticket
 
     def destroy(self, request, *args, **kwargs):
         return Response(
