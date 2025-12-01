@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.urls import reverse
+from django.contrib.auth import get_user_model
 
 from model_bakery import baker
 from rest_framework.test import APIClient
@@ -25,6 +26,27 @@ class TestCaseUtils(TestCase):
         self.auth_client_b = APIClient()
         self.auth_client_b.login(email=self.user.email, password=self._user_password)
 
+
+    def create_user(self, **kwargs):
+        """
+        Cria usuário realista usando model_bakery,
+        garantindo que senha seja corretamente definida.
+        """
+        User = get_user_model()
+        password = kwargs.pop("password", "123456")
+
+        user = User.objects.create(**kwargs)
+        user.set_password(password)
+        user.save()
+        return user
+
+    def get_authenticated_client(self, user):
+        """
+        gera um client autenticado pronto para fazer requisições
+        """
+        client = APIClient()
+        client.login(email=user.email, password="123456")
+        return client
 
     def reverse(self, name, *args, **kwargs):
         """Reverse a url, convenience to avoid having to import reverse in tests"""
