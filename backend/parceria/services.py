@@ -8,7 +8,8 @@ facilitando manutenção, testes e evolução das regras.
 from django.db import transaction
 from django.utils import timezone
 from rest_framework.exceptions import PermissionDenied
-from django.core.exceptions import ValidationError
+#from django.core.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError
 
 from .models import (
     Parceria,
@@ -19,6 +20,68 @@ from .models import (
     TicketSuporte,
 )
 
+# ============================================================
+# Parceria
+# ============================================================
+
+# ============================================================
+# Servicos
+# ============================================================
+
+# ============================================================
+# Contratos
+# ============================================================
+
+# ============================================================
+# Tickets
+# ============================================================
+
+def criar_ticket(
+        parceria: Parceria,
+        tipo_ticket: str,
+        titulo: str,
+        descricao: str
+):
+    """
+    Cria um ticket de suporte.
+
+    mensagem: {"autor": User, "conteudo": conteudo}.
+
+    Regras:
+    - parceria obrigatoria
+    - descrição obrigatoria e limitada a 4000 caracteres.
+    - titulo limitado a 60 caracteres.
+    - tipo padrão se não informado
+    - atomicidade
+    """
+    DESC_CHAR_LIMIT = 4000
+    TITULO_CHAR_LIMIT = 60
+
+    if not parceria:
+        raise PermissionDenied("Usuário não está vinculado a uma parceria.")
+
+    if not descricao or len(descricao.strip()) == 0:
+        raise ValidationError("Descrição do ticket é obrigatoria.")
+
+    if len(descricao) > DESC_CHAR_LIMIT:
+        raise ValidationError(f"Descrição excede o limite de {DESC_CHAR_LIMIT} caracteres.")
+
+    if len(titulo) > TITULO_CHAR_LIMIT:
+        raise ValidationError(f"Titulo excede o limite de {TITULO_CHAR_LIMIT} caracteres.")
+
+    if not tipo_ticket:
+        tipo_ticket = TicketSuporte.TicketSuporteTipo.OUTRO
+
+    with transaction.atomic():
+        ticket = TicketSuporte.objects.create(
+            parceria=parceria,
+            tipo_ticket_suporte=tipo_ticket,
+            titulo=titulo,
+            descricao=descricao,
+            status_ticket_suporte=TicketSuporte.TicketSuporteStatus.NOVO,
+            data_criacao=timezone.now()
+        )
+        return ticket
 
 # ============================================================
 # Pedidos
@@ -128,3 +191,5 @@ def cancelar_pedido(pedido: PedidoServico) -> PedidoServico:
         pedido.save(update_fields=["status_pedido_servico", "data_fim"])
 
         return pedido
+
+
