@@ -25,6 +25,14 @@ class BaseClienteViewSet(viewsets.ModelViewSet):
             raise ImproperlyConfigured(f"Queryset não configurado para {model.__name__}")
 
     def get_object(self):
+        """
+        A visibilidade e o acesso a TicketsSuporte, PedidoServico e ContratoServico
+        são estritamente determinados pela relação parceria.membros.
+        Usuários sem vínculo ativo com a parceria do recurso recebem 404 por design,
+        garantindo isolamento entre clientes. Em cenários de operação cruzada
+        entre parcerias, será necessário adicionar o operador como membro da
+        parceria-alvo ou fornecer credenciais específicas para aquela parceria.
+        """
         obj = super().get_object()
         user = self.request.user
 
@@ -155,18 +163,44 @@ class TicketSuporteViewSet(BaseClienteViewSet):
     serializer_class = TicketSuporteSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    @action(detail=True, methods=["post"], url_path="responder")
+    def responder(self, request, pk=None):
+        ticket = self.get_object()
+
+        parceria = Parceria.objects.filter(
+            membros__usuario=request.user,
+            membros__ativo=True
+        ).first()
+
+        if ticket.parceria != parceria:
+            return Response(
+                {"detail": "Acesso não autorizado ao ticket."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        conteudo = request.data.get("conteudo")
+        if not conteudo:
+            return Response({"detail": "Campo 'conteudo' é obrigatório."}, status=400)
+
+        try:
+            mensagem = services.responder_ticket(
+                ticket=ticket,
+                usuario=request.user,
+                conteudo=conteudo,
+            )
+        except ValidationError as e:
+            return Response({"detail": e.message}, status=400)
+
+        serializer = self.get_serializer(ticket)
+        return Response(serializer.data, status=200)
+
+
     def get_queryset(self):
         user = self.request.user
         return (
             TicketSuporte.objects.filter(parceria__proprietario=user)
             | TicketSuporte.objects.filter(parceria__membros__usuario=user, parceria__membros__ativo=True)
         ).distinct()
-        #return TicketSuporte.objects.filter(
-        #    parceria__proprietario=user
-        #) | TicketSuporte.objects.filter(
-        #    parceria__membros__usuario=user,
-        #    parceria__membros__ativo=True
-        #)
 
     def perform_create(self, serializer):
         parceria = Parceria.objects.filter(

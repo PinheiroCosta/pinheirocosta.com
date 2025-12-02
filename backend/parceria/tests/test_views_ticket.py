@@ -2,7 +2,7 @@ from rest_framework import status
 from django.urls import reverse
 
 from common.tests.test_utils import TestCaseUtils
-from parceria.models import TicketSuporte, Parceria
+from parceria.models import TicketSuporte, TicketMensagem, Parceria
 
 
 class TestTicketSuporteViewSet(TestCaseUtils):
@@ -82,7 +82,7 @@ class TestTicketSuporteViewSet(TestCaseUtils):
         self.assertTrue(TicketSuporte.objects.filter(id=ticket.id).exists())
 
 # -------------------------------------------------------------------------
-#
+# criar ticket
 # -------------------------------------------------------------------------
     def test_create_ticket_descricao_curta_invalida(self):
         payload = {
@@ -155,5 +155,140 @@ class TestTicketSuporteViewSet(TestCaseUtils):
             "descricao": "x" * 4001,  # inválido segundo a regra de criar_ticket()
         }
         response = self.auth_client.post(self.list_url, payload)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+# -------------------------------------------------------------------------
+# Responder Ticket
+# -------------------------------------------------------------------------
+    def test_responder_ticket_sucesso(self):
+        ticket = TicketSuporte.objects.create(
+            parceria=self.parceria,
+            tipo_ticket_suporte="problema",
+            titulo="Teste",
+            descricao="Desc"
+        )
+
+        url = f"/api/parceria/tickets/{ticket.id}/responder/"
+        response = self.auth_client.post(url, {"conteudo": "Resposta válida"})
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # mensagem registrada
+        self.assertTrue(TicketMensagem.objects.filter(ticket=ticket).exists())
+
+        # ticket retornado no serializer
+        self.assertEqual(response.data["id"], ticket.id)
+
+    def test_responder_ticket_muda_status_de_novo_para_em_analise(self):
+        ticket = TicketSuporte.objects.create(
+            parceria=self.parceria,
+            tipo_ticket_suporte="problema",
+            titulo="Teste",
+            descricao="Desc",
+            status_ticket_suporte=TicketSuporte.TicketSuporteStatus.NOVO
+        )
+
+        url = f"/api/parceria/tickets/{ticket.id}/responder/"
+        response = self.auth_client.post(url, {"conteudo": "Informação adicional"})
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        ticket.refresh_from_db()
+        self.assertEqual(ticket.status_ticket_suporte, TicketSuporte.TicketSuporteStatus.EM_ANALISE)
+
+    def test_responder_ticket_mantem_status_se_ja_estiver_em_analise(self):
+        ticket = TicketSuporte.objects.create(
+            parceria=self.parceria,
+            tipo_ticket_suporte="problema",
+            titulo="Teste",
+            descricao="Desc",
+            status_ticket_suporte=TicketSuporte.TicketSuporteStatus.EM_ANALISE
+        )
+
+        url = f"/api/parceria/tickets/{ticket.id}/responder/"
+        response = self.auth_client.post(url, {"conteudo": "OK"})
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        ticket.refresh_from_db()
+        self.assertEqual(ticket.status_ticket_suporte, TicketSuporte.TicketSuporteStatus.EM_ANALISE)
+
+    def test_responder_ticket_conteudo_longo_invalido(self):
+        ticket = TicketSuporte.objects.create(
+            parceria=self.parceria,
+            titulo="Teste",
+            descricao="Desc"
+        )
+
+        url = f"/api/parceria/tickets/{ticket.id}/responder/"
+        response = self.auth_client.post(url, {"conteudo": "x" * 4001})
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_responder_ticket_conteudo_vazio(self):
+        ticket = TicketSuporte.objects.create(
+            parceria=self.parceria,
+            titulo="Teste",
+            descricao="Desc"
+        )
+
+        url = f"/api/parceria/tickets/{ticket.id}/responder/"
+        response = self.auth_client.post(url, {"conteudo": ""})
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_responder_ticket_fechado_retorna_erro(self):
+        ticket = TicketSuporte.objects.create(
+            parceria=self.parceria,
+            titulo="Teste",
+            descricao="Desc",
+            status_ticket_suporte=TicketSuporte.TicketSuporteStatus.CONCLUIDO
+        )
+
+        url = f"/api/parceria/tickets/{ticket.id}/responder/"
+        response = self.auth_client.post(url, {"conteudo": "Tentativa inválida"})
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_responder_ticket_usuario_sem_parceria_recebe_404(self):
+        ticket = TicketSuporte.objects.create(
+            parceria=self.parceria,
+            titulo="Teste",
+            descricao="Desc"
+        )
+
+        user = self.create_user(email="novo@ex.com", password="123456")
+        client = self.get_authenticated_client(user)
+
+        url = f"/api/parceria/tickets/{ticket.id}/responder/"
+        response = client.post(url, {"conteudo": "msg"})
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_responder_ticket_de_outra_parceria_retorna_404(self):
+        outra = Parceria.objects.create(nome="Outra", proprietario=self.user_b)
+
+        ticket = TicketSuporte.objects.create(
+            parceria=outra,
+            titulo="Teste",
+            descricao="Desc"
+        )
+
+        url = f"/api/parceria/tickets/{ticket.id}/responder/"
+        response = self.auth_client.post(url, {"conteudo": "msg"})
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_responder_ticket_usa_service_para_regra_de_negocio(self):
+        ticket = TicketSuporte.objects.create(
+            parceria=self.parceria,
+            titulo="Teste",
+            descricao="Desc"
+        )
+
+        url = f"/api/parceria/tickets/{ticket.id}/responder/"
+        response = self.auth_client.post(url, {"conteudo": "x" * 4001})
+
+        # Garantia que o service aplicou a regra e não a view
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 

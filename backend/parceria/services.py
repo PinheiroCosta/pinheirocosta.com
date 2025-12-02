@@ -18,6 +18,7 @@ from .models import (
     ContratoServico,
     Servico,
     TicketSuporte,
+    TicketMensagem,
 )
 
 # ============================================================
@@ -82,6 +83,41 @@ def criar_ticket(
             data_criacao=timezone.now()
         )
         return ticket
+
+
+def responder_ticket(ticket: TicketSuporte, usuario, conteudo: str) -> TicketMensagem:
+    """
+    Registra uma resposta em um ticket de suporte.
+    Regras:
+    - Apenas tickets não fechados podem receber respostas.
+    - Se o ticket estiver em estado NOVO, muda automaticamente para EM_ANALISE.
+    """
+
+    CONT_CHAR_LIMIT = 4000
+
+    if not usuario or not usuario.is_authenticated:
+        raise ValidationError("Usuário não autenticado.")
+
+    if ticket.status_ticket_suporte == TicketSuporte.TicketSuporteStatus.CONCLUIDO:
+        raise ValidationError("Não é permitido responder um ticket marcado como concluido.")
+
+    if ticket.status_ticket_suporte == TicketSuporte.TicketSuporteStatus.REJEITADO:
+        raise ValidationError("Não é permitido responder um ticket marcado como rejeitado.")
+
+    if len(conteudo) > CONT_CHAR_LIMIT:
+        raise ValidationError(f"A mensagem excede o limite de {CONT_CHAR_LIMIT} caracteres.")
+
+    if ticket.status_ticket_suporte == TicketSuporte.TicketSuporteStatus.NOVO:
+        ticket.status_ticket_suporte = TicketSuporte.TicketSuporteStatus.EM_ANALISE
+        ticket.save(update_fields=["status_ticket_suporte"])
+
+    mensagem = TicketMensagem.objects.create(
+        ticket=ticket,
+        autor=usuario,
+        conteudo=conteudo,
+    )
+
+    return mensagem
 
 # ============================================================
 # Pedidos
