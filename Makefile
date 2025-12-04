@@ -39,7 +39,7 @@ docker_create_db_volume:
 docker_create_dev_network:
 	@echo -e "\033[32mCriando Rede Docker para comunicação entre serviços.\033[0m"
 	docker network create romweb_dev_network
-	
+
 docker_up_build:
 	docker-compose -f ${DOCKER_COMPOSE_FILE} up -d --build
 
@@ -58,7 +58,7 @@ docker_update_schema:
 
 docker_down:
 	@echo -e "\033[32m[INFO] Parando e removendo containers\033[0m"
-	docker-compose -f ${DOCKER_COMPOSE_FILE} down
+	docker-compose -f ${DOCKER_COMPOSE_FILE} down --remove-orphans
 
 docker_dev_up:
 	@echo -e "\033[32m[INFO] Subindo ambiente de desenvolvimento\033[0m"
@@ -125,7 +125,9 @@ docker_cleanup_frontend:
 	@echo -e "\033[32m[INFO] Parando e removendo container frontend\033[0m"
 	@docker-compose -f ${DOCKER_COMPOSE_FILE} stop frontend
 	@docker-compose -f ${DOCKER_COMPOSE_FILE} rm -sf frontend
-	
+
+docker_remove_stale_contenttypes:
+	docker-compose -f ${DOCKER_COMPOSE_FILE} run --rm backend bash -c 'python ./manage.py remove_stale_contenttypes'
 # ==== Targets Compostos ====
 
 docker_setup:
@@ -151,8 +153,8 @@ docker_prod_up:
 	$(MAKE) docker_cleanup_frontend
 
 deploy_rolling_update:
-	$(MAKE) docker_setup  
-	$(MAKE) docker_prod_up  
-	$(MAKE) docker_db_restore  
+	$(MAKE) docker_setup
+	$(MAKE) docker_prod_up
+	$(MAKE) docker_db_restore
 	@echo -e "\033[32m[INFO] Rolling Update concluído!\033[0m"
 
