@@ -8,7 +8,6 @@ facilitando manutenção, testes e evolução das regras.
 from django.db import transaction
 from django.utils import timezone
 from rest_framework.exceptions import PermissionDenied
-#from django.core.exceptions import ValidationError
 from rest_framework.exceptions import ValidationError
 
 from .models import (
