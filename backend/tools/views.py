@@ -1,5 +1,6 @@
 import random
 import requests
+from common.utils.http.client import http_request
 from django.views.generic import TemplateView
 from django.http import JsonResponse
 from django_ratelimit.decorators import ratelimit
@@ -51,7 +52,8 @@ class ToolViewSet(viewsets.ModelViewSet):
 
         for attempt in range(MAX_RETRIES):
             try:
-                response = requests.post(
+                response = http_request(
+                    "POST",
                     tool.api_url,
                     json=request.data,
                     headers={"Content-Type": "application/json"},
