@@ -46,19 +46,7 @@ const Footer = () => {
         <Row className="footer-text">
           <Col className="text-center">
             <small className="text-muted">
-              Fork do 
-              <a href="https://github.com/vintasoftware/django-react-boilerplate" 
-                 target="_blank" 
-                 rel="noopener noreferrer"
-                 className="text-decoration-none"
-              > boilerplate da Vinta</a>.
-            </small>
-          </Col>
-        </Row>
-        <Row className="footer-text">
-          <Col className="text-center">
-            <small className="text-muted">
-              © {new Date().getFullYear()} PinheiroCosta. 
+              © {new Date().getFullYear()} PinheiroCosta.
               Todos os direitos reservados.
             </small>
           </Col>
