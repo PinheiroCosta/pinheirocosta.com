@@ -75,6 +75,14 @@ MIDDLEWARE.insert(  # insert RequestIDMiddleware on the top
     0, "log_request_id.middleware.RequestIDMiddleware"
 )
 
+
+# HTTP_LOG_ENABLED
+# ---------------------------------------------------------
+# Enable/disable backend HTTP request/response logging.
+# Used only for debugging communication with microservices.
+# WARNING: Keep disabled in production unless 100% necessary.
+HTTP_LOG_ENABLED = False
+
 LOG_REQUEST_ID_HEADER = "HTTP_X_REQUEST_ID"
 LOG_REQUESTS = True
 
