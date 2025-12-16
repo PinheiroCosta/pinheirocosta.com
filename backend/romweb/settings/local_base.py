@@ -22,6 +22,14 @@ STORAGES = {
     },
 }
 
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": config("REDIS_URL")+"/0",
+    }
+
+}
+
 AUTH_PASSWORD_VALIDATORS = []  # allow easy passwords only on local
 
 # Celery

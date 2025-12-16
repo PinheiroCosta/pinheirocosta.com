@@ -7,6 +7,7 @@ from rest_framework.exceptions import PermissionDenied
 from .models import *
 from .serializers import *
 from . import services
+from common.mixins import IdempotencyMixin
 
 
 class BaseClienteViewSet(viewsets.ModelViewSet):
@@ -61,7 +62,8 @@ class ServicoViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
 
-class PedidoServicoViewSet(BaseClienteViewSet):
+class PedidoServicoViewSet(IdempotencyMixin, BaseClienteViewSet):
+    # IdempotencyMixin deve vir antes para interceptar create()
     queryset = PedidoServico.objects.all()
     serializer_class = PedidoServicoSerializer
 

@@ -261,6 +261,9 @@ DEFENDER_COOLOFF_TIME = 300  # 5 minutes
 DEFENDER_LOCKOUT_TEMPLATE = "defender/lockout.html"
 DEFENDER_REDIS_URL = config("REDIS_URL")
 
+# Idempotency
+IDEMPOTENCY_TTL = 120
+
 # Django-tinymce
 TINYMCE_DEFAULT_CONFIG = {
     "height": 500,

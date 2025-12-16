@@ -66,7 +66,12 @@ class TestPedidoServicoView(TestCaseUtils):
                 {"servico": self.servico.id}
             ]
         }
-        resp = self.auth_client.post(self.view_url, payload, format="json")
+        resp = self.auth_client.post(
+            self.view_url,
+            payload,
+            format="json",
+            HTTP_IDEMPOTENCY_KEY="pedido-valido-1"
+        )
         self.assertResponse201(resp)
 
         # validações extras mínimas
@@ -87,7 +92,12 @@ class TestPedidoServicoView(TestCaseUtils):
                 {"servico": self.servico.id}
             ]
         }
-        resp = self.auth_client.post(self.view_url, payload, format="json")
+        resp = self.auth_client.post(
+            self.view_url,
+            payload,
+            format="json",
+            HTTP_IDEMPOTENCY_KEY="pedido-terceiro-1"
+        )
         self.assertResponse403(resp)
 
     def test_detalhe_pedido_outro_usuario(self):
@@ -368,3 +378,81 @@ class TestPedidoServicoView(TestCaseUtils):
         pedido.refresh_from_db()
         self.assertEqual(pedido.status_pedido_servico, PedidoServico.PedidoServicoStatus.CANCELADO)
         self.assertIsNotNone(pedido.data_fim)
+
+# ----------------------------------------------------------------------------------------
+# Idempotencia
+# ----------------------------------------------------------------------------------------
+# Obs: concorrência real (race condition) não é coberta aqui,
+# pois exige testes paralelos/threaded.
+
+
+def test_criacao_pedido_idempotente_replay(self):
+    """POST com mesma Idempotency-Key deve retornar replay e não criar duplicado"""
+    payload = {
+        "itens": [{"servico": self.servico.id}]
+    }
+    headers = {
+        "HTTP_IDEMPOTENCY_KEY": "pedido-123"
+    }
+
+    resp1 = self.auth_client.post(
+        self.view_url, payload, format="json", **headers
+    )
+    self.assertResponse201(resp1)
+
+    resp2 = self.auth_client.post(
+        self.view_url, payload, format="json", **headers
+    )
+    self.assertResponse201(resp2)
+
+    self.assertEqual(resp1.data["id"], resp2.data["id"])
+    self.assertEqual(
+        PedidoServico.objects.filter(parceria=self.parceria).count(), 1
+    )
+
+def test_idempotency_key_com_payload_diferente(self):
+    """Mesmo Idempotency-Key com payload diferente deve criar novo pedido"""
+    headers = {
+        "HTTP_IDEMPOTENCY_KEY": "pedido-456"
+    }
+
+    payload_1 = {
+        "itens": [{"servico": self.servico.id}]
+    }
+    payload_2 = {
+        "itens": [
+            {"servico": self.servico.id},
+            {"servico": self.servico.id},
+        ]
+    }
+
+    resp1 = self.auth_client.post(
+        self.view_url, payload_1, format="json", **headers
+    )
+    self.assertResponse201(resp1)
+
+    resp2 = self.auth_client.post(
+        self.view_url, payload_2, format="json", **headers
+    )
+    self.assertResponse201(resp2)
+
+    self.assertNotEqual(resp1.data["id"], resp2.data["id"])
+    self.assertEqual(
+        PedidoServico.objects.filter(parceria=self.parceria).count(), 2
+    )
+
+def test_criacao_pedido_sem_idempotency_key(self):
+    """POST sem Idempotency-Key deve ser rejeitado"""
+    payload = {
+        "itens": [{"servico": self.servico.id}]
+    }
+
+    resp = self.auth_client.post(
+        self.view_url, payload, format="json"
+    )
+
+    self.assertResponse400(resp)
+    self.assertEqual(
+        PedidoServico.objects.filter(parceria=self.parceria).count(), 0
+    )
+
