@@ -1,3 +1,7 @@
+import Prism from "prismjs";
+import "prismjs/themes/prism-tomorrow.css";
+import "prismjs/components/prism-python";
+import "prismjs/components/prism-javascript";
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Container } from "react-bootstrap";
@@ -10,6 +14,14 @@ const BlogPostPage: React.FC = () => {
   const [post, setPost] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!post?.conteudo) return;
+
+    requestAnimationFrame(()=> {
+      Prism.highlightAll();
+    });
+  }, [post]);
 
   useEffect(() => {
     if (!slug) return;
