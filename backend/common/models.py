@@ -97,16 +97,6 @@ class AboutMe(models.Model):
         unique=True, blank=True, null=True
     )  # Slug para URL amigável
 
-    def save(self, *args, **kwargs):
-        try:
-            old = AboutMe.objects.get(id=self.id)
-            if old.about_image and old.about_image != self.about_image:
-                if os.path.isfile(old.about_image.path):
-                    os.remove(old.about_image.path)
-        except AboutMe.DoesNotExist:
-            pass
-        super().save(*args, **kwargs)
-
     def __str__(self):
         return "Informações sobre o dono do site"
 
@@ -114,5 +104,5 @@ class AboutMe(models.Model):
 @receiver(models.signals.post_delete, sender=AboutMe)
 def auto_delete_file_on_delete(sender, instance, **kwargs):
     """Deleta arquivo do sistema quando o objeto AboutMe é removido."""
-    if instance.about_image and os.path.isfile(instance.about_image.path):
-        os.remove(instance.about_image.path)
+    if instance.about_image:
+        instance.about_image.delete(save=False)
