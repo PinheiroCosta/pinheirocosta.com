@@ -249,6 +249,7 @@ CSP_IMG_SRC = [
     "https://cdn.jsdelivr.net/npm/swagger-ui-dist@latest/",
     "https://cdn.redoc.ly/redoc/",
     "https://cdn.buymeacoffee.com",
+    config("AWS_S3_CUSTOM_DOMAIN", default=""),
 ]
 CSP_FRAME_SRC = [
     "https://www.google.com",

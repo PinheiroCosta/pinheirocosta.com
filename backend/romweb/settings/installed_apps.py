@@ -1,5 +1,5 @@
 def validate_app_dependencies(optional_apps, dependencies):
-    enabled_apps = {app for app, enabled in optional_apps.items() if enabled} 
+    enabled_apps = {app for app, enabled in optional_apps.items() if enabled}
     for app, deps in dependencies.items():
         if app in enabled_apps:
             missing = [dep for dep in deps if dep not in enabled_apps and dep not in BASE_APPS]
@@ -30,6 +30,7 @@ BASE_APPS = [
     "users",
     "common",
     "tinymce",
+    "storages",
 ]
 
 OPTIONAL_APPS = {

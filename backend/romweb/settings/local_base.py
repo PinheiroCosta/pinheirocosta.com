@@ -13,9 +13,25 @@ STATIC_URL = "/static/"
 MEDIA_ROOT = base_dir_join("media")
 MEDIA_URL = "/media/"
 
+USE_R2 = config("USE_R2", default=False, cast=bool)
 STORAGES = {
     "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
+        "BACKEND": (
+            "common.storage_backends.MediaR2Storage"
+            if USE_R2
+            else "django.core.files.storage.FileSystemStorage"
+        ),
+        "OPTIONS": {
+            "bucket_name": config("AWS_STORAGE_BUCKET_NAME"),
+            "access_key": config("AWS_ACCESS_KEY_ID"),
+            "secret_key": config("AWS_SECRET_ACCESS_KEY"),
+            "endpoint_url": config("AWS_S3_ENDPOINT_URL"),
+            "custom_domain": config("AWS_S3_CUSTOM_DOMAIN"),
+            "region_name": "auto",
+            "addressing_style": "path",
+            "default_acl": None,
+            "querystring_auth": False,
+        },
     },
     "staticfiles": {
         "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",

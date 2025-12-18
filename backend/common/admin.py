@@ -42,12 +42,20 @@ class AboutMeAdmin(admin.ModelAdmin):
 
     def preview(self, obj):
         """Previsualização da imagem no Django Admin."""
-        if obj.about_image and hasattr(obj.about_image, "url"):
+        if not obj.about_image:
+            return "(Sem Imagem)"
+
+        url = getattr(obj.about_image, "url", None)
+        if not url:
+            return "Imagem indisponível"
+
+        try:
             return format_html(
                 '<img src="{}" width="200" style="object-fit:contain;"/>',
-                obj.about_image.url,
+                url,
             )
-        return "(Sem imagem)"
+        except Exception:
+            return "Erro ao carregar imagem"
 
 
 admin.site.register(ParametroSistema)

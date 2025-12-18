@@ -51,10 +51,21 @@ CELERY_SEND_TASK_ERROR_EMAILS = True
 # Redbeat https://redbeat.readthedocs.io/en/latest/config.html#redbeat-redis-url
 redbeat_redis_url = config("REDBEAT_REDIS_URL", default="")
 
-# Whitenoise
+# Storage
 STORAGES = {
     "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
+        "BACKEND": "common.storage_backends.MediaR2Storage",
+        "OPTIONS": {
+            "bucket_name": config("AWS_STORAGE_BUCKET_NAME"),
+            "access_key": config("AWS_ACCESS_KEY_ID"),
+            "secret_key": config("AWS_SECRET_ACCESS_KEY"),
+            "endpoint_url": config("AWS_S3_ENDPOINT_URL"),
+            "custom_domain": config("AWS_S3_CUSTOM_DOMAIN"),
+            "region_name": "auto",
+            "addressing_style": "path",
+            "default_acl": None,
+            "querystring_auth": False,
+        },
     },
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
