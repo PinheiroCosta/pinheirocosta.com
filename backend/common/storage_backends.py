@@ -5,4 +5,3 @@ from django.conf import settings
 class MediaR2Storage(S3Boto3Storage):
     default_acl = None
     file_overwrite = False
-

@@ -266,16 +266,21 @@ DEFENDER_REDIS_URL = config("REDIS_URL")
 IDEMPOTENCY_TTL = 120
 
 # Django-tinymce
+TINYMCE_FILE_STORAGE = "common.storage_backends.MediaR2Storage"
 TINYMCE_DEFAULT_CONFIG = {
     "height": 500,
     "width": "100%",
     "menubar": True,
-    "plugins": "advlist autolink lists link image charmap preview anchor codesample "
+    "plugins": "advlist autolink lists link image charmap preview anchor codesample media "
     "searchreplace visualblocks code fullscreen insertdatetime media table code help wordcount",
     "toolbar": "undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | "
     "bullist numlist outdent indent | link image media | code codesample",
     "image_advtab": True,
     "media_live_embeds": True,
+    "images_upload_url": "/blog/tinymce/upload/",
+    "images_upload_credentials": True,
+    "automatic_uploads": True,
+    "images_reuse_filename": False,
 }
 
 # RECAPTCHA CONFIG
