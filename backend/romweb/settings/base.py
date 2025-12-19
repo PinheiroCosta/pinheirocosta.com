@@ -280,7 +280,7 @@ TINYMCE_DEFAULT_CONFIG = {
     "images_upload_url": "/blog/tinymce/upload/",
     "images_upload_credentials": True,
     "automatic_uploads": True,
-    "images_reuse_filename": False,
+    "images_reuse_filename": True,
 }
 
 # RECAPTCHA CONFIG
