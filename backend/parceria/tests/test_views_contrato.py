@@ -14,18 +14,22 @@ class TestContratoServicoView(TestCaseUtils):
             natureza="pf",
             categoria="cliente",
             dominio="p1.com",
-            proprietario=self.user
+            proprietario=self.user,
         )
-        ParceriaMembro.objects.create(parceria=self.parceria1, usuario=self.user, ativo=True)
+        ParceriaMembro.objects.create(
+            parceria=self.parceria1, usuario=self.user, ativo=True
+        )
 
         self.parceria2 = Parceria.objects.create(
             nome="Cliente 2",
             natureza="pf",
             categoria="cliente",
             dominio="p2.com",
-            proprietario=self.user_b
+            proprietario=self.user_b,
         )
-        ParceriaMembro.objects.create(parceria=self.parceria2, usuario=self.user_b, ativo=True)
+        ParceriaMembro.objects.create(
+            parceria=self.parceria2, usuario=self.user_b, ativo=True
+        )
 
         # Serviço e contratos
         self.servico = Servico.objects.create(
@@ -33,13 +37,21 @@ class TestContratoServicoView(TestCaseUtils):
             descricao="desc",
             preco_base=100,
         )
-        self.contrato1 = ContratoServico.objects.create(parceria=self.parceria1, observacoes="Criado pela suite de testes")
-        self.contrato2 = ContratoServico.objects.create(parceria=self.parceria2, observacoes="Criado pela suite de testes")
+        self.contrato1 = ContratoServico.objects.create(
+            parceria=self.parceria1, observacoes="Criado pela suite de testes"
+        )
+        self.contrato2 = ContratoServico.objects.create(
+            parceria=self.parceria2, observacoes="Criado pela suite de testes"
+        )
 
         # URLs
         self.list_url = reverse("parceria-contratos-list")
-        self.detail_url_1 = reverse("parceria-contratos-detail", args=[self.contrato1.id])
-        self.detail_url_2 = reverse("parceria-contratos-detail", args=[self.contrato2.id])
+        self.detail_url_1 = reverse(
+            "parceria-contratos-detail", args=[self.contrato1.id]
+        )
+        self.detail_url_2 = reverse(
+            "parceria-contratos-detail", args=[self.contrato2.id]
+        )
 
     def test_list_retorna_somente_contratos_do_usuario(self):
         response = self.auth_client.get(self.list_url)
@@ -81,4 +93,3 @@ class TestContratoServicoView(TestCaseUtils):
         for url in urls:
             response = client.get(url)
             self.assertIn(response.status_code, (403, 401))
-

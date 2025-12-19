@@ -77,11 +77,11 @@ WHITENOISE_MAX_AGE = 31536000
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": config("REDIS_URL")+"/0",
+        "LOCATION": config("REDIS_URL") + "/0",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
             "PARSER_CLASS": "redis.connectionHiredisParser",
-        }
+        },
     }
 }
 

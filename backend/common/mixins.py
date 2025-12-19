@@ -17,14 +17,14 @@ class IdempotencyMixin:
       ou delegar explicitamente para este mixin.
     """
 
-    ttl = settings.IDEMPOTENCY_TTL # segundos
+    ttl = settings.IDEMPOTENCY_TTL  # segundos
 
     def create(self, request, *args, **kwargs):
         key = request.headers.get("Idempotency-Key")
         if not key:
             return Response(
                 {"detail": "Missing Idempotency-Key"},
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         redis = get_redis_connection("default")
@@ -41,9 +41,7 @@ class IdempotencyMixin:
         if cached and cached != b"processing":
             saved = json.loads(cached)
             return Response(
-                saved["data"],
-                status=saved["status"],
-                headers=saved.get("headers", {})
+                saved["data"], status=saved["status"], headers=saved.get("headers", {})
             )
 
         # SETNX (NX) + TTL (EX)
@@ -67,7 +65,7 @@ class IdempotencyMixin:
         payload = {
             "status": response.status_code,
             "data": response.data,
-            "headers": {}, # evita headers sensíveis
+            "headers": {},  # evita headers sensíveis
         }
         redis.set(redis_key, json.dumps(payload), ex=self.ttl)
 

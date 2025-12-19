@@ -45,6 +45,7 @@ class PublicURLsTests(TestCase):
     def test_optional_urls_import(self):
         """Smoke test: importa todos OPTIONAL_APPS sem incluir no urlpatterns"""
         from importlib import import_module
+
         OPTIONAL_APPS = {
             "blog": "blog.urls_registry",
             "tools": "tools.urls_registry",
@@ -55,4 +56,6 @@ class PublicURLsTests(TestCase):
             if getattr(settings, "OPTIONAL_APPS", {}).get(app, False):
                 with self.subTest(app=app):
                     mod = import_module(module_path)
-                    self.assertTrue(hasattr(mod, "URLPATTERNS") or hasattr(mod, "ROUTES"))
+                    self.assertTrue(
+                        hasattr(mod, "URLPATTERNS") or hasattr(mod, "ROUTES")
+                    )

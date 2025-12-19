@@ -4,6 +4,7 @@ from django.core.files.storage import default_storage
 IMAGE_MIME_PREFIX = "image/"
 VIDEO_MIME_PREFIX = "video/"
 
+
 def upload_blog_media(file):
     content_type = file.content_type or ""
 

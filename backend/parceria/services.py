@@ -36,12 +36,8 @@ from .models import (
 # Tickets
 # ============================================================
 
-def criar_ticket(
-        parceria: Parceria,
-        tipo_ticket: str,
-        titulo: str,
-        descricao: str
-):
+
+def criar_ticket(parceria: Parceria, tipo_ticket: str, titulo: str, descricao: str):
     """
     Cria um ticket de suporte.
 
@@ -64,10 +60,14 @@ def criar_ticket(
         raise ValidationError("Descrição do ticket é obrigatoria.")
 
     if len(descricao) > DESC_CHAR_LIMIT:
-        raise ValidationError(f"Descrição excede o limite de {DESC_CHAR_LIMIT} caracteres.")
+        raise ValidationError(
+            f"Descrição excede o limite de {DESC_CHAR_LIMIT} caracteres."
+        )
 
     if len(titulo) > TITULO_CHAR_LIMIT:
-        raise ValidationError(f"Titulo excede o limite de {TITULO_CHAR_LIMIT} caracteres.")
+        raise ValidationError(
+            f"Titulo excede o limite de {TITULO_CHAR_LIMIT} caracteres."
+        )
 
     if not tipo_ticket:
         tipo_ticket = TicketSuporte.TicketSuporteTipo.OUTRO
@@ -79,7 +79,7 @@ def criar_ticket(
             titulo=titulo,
             descricao=descricao,
             status_ticket_suporte=TicketSuporte.TicketSuporteStatus.NOVO,
-            data_criacao=timezone.now()
+            data_criacao=timezone.now(),
         )
         return ticket
 
@@ -98,13 +98,19 @@ def responder_ticket(ticket: TicketSuporte, usuario, conteudo: str) -> TicketMen
         raise ValidationError("Usuário não autenticado.")
 
     if ticket.status_ticket_suporte == TicketSuporte.TicketSuporteStatus.CONCLUIDO:
-        raise ValidationError("Não é permitido responder um ticket marcado como concluido.")
+        raise ValidationError(
+            "Não é permitido responder um ticket marcado como concluido."
+        )
 
     if ticket.status_ticket_suporte == TicketSuporte.TicketSuporteStatus.REJEITADO:
-        raise ValidationError("Não é permitido responder um ticket marcado como rejeitado.")
+        raise ValidationError(
+            "Não é permitido responder um ticket marcado como rejeitado."
+        )
 
     if len(conteudo) > CONT_CHAR_LIMIT:
-        raise ValidationError(f"A mensagem excede o limite de {CONT_CHAR_LIMIT} caracteres.")
+        raise ValidationError(
+            f"A mensagem excede o limite de {CONT_CHAR_LIMIT} caracteres."
+        )
 
     if ticket.status_ticket_suporte == TicketSuporte.TicketSuporteStatus.NOVO:
         ticket.status_ticket_suporte = TicketSuporte.TicketSuporteStatus.EM_ANALISE
@@ -118,11 +124,15 @@ def responder_ticket(ticket: TicketSuporte, usuario, conteudo: str) -> TicketMen
 
     return mensagem
 
+
 # ============================================================
 # Pedidos
 # ============================================================
 
-def criar_pedido(parceria: Parceria, itens: list[dict], status_pedido_servico: str = None):
+
+def criar_pedido(
+    parceria: Parceria, itens: list[dict], status_pedido_servico: str = None
+):
     """
     Cria um pedido com múltiplos itens de serviço.
 
@@ -158,6 +168,7 @@ def criar_pedido(parceria: Parceria, itens: list[dict], status_pedido_servico: s
 
         return pedido
 
+
 def concluir_pedido(pedido: PedidoServico) -> PedidoServico:
     """
     Marca pedido como concluído.
@@ -170,10 +181,13 @@ def concluir_pedido(pedido: PedidoServico) -> PedidoServico:
     """
 
     with transaction.atomic():
-        pedido.refresh_from_db() # evita concluir objeto desatualizado
+        pedido.refresh_from_db()  # evita concluir objeto desatualizado
 
         # Regra 1:somente pedidos em andamento podem ser concluídos
-        if pedido.status_pedido_servico != PedidoServico.PedidoServicoStatus.EM_ANDAMENTO:
+        if (
+            pedido.status_pedido_servico
+            != PedidoServico.PedidoServicoStatus.EM_ANDAMENTO
+        ):
             raise ValidationError("Somente pedidos em andamento podem ser concluídos.")
 
         # Regra 2:pedidos sem itens não pode ser concluído.
@@ -190,9 +204,7 @@ def concluir_pedido(pedido: PedidoServico) -> PedidoServico:
 
             # Regra 4: Pedidos com Serviços inativos não podem ser concluídos.
             if not item.servico.ativo:
-                raise ValidationError(
-                    f"Serviço '{item.servico.nome}' está inativo."
-                )
+                raise ValidationError(f"Serviço '{item.servico.nome}' está inativo.")
 
         pedido.status_pedido_servico = PedidoServico.PedidoServicoStatus.CONCLUIDO
         pedido.data_fim = timezone.now()
@@ -215,10 +227,12 @@ def cancelar_pedido(pedido: PedidoServico) -> PedidoServico:
     )
 
     with transaction.atomic():
-        pedido.refresh_from_db() # evita cancelar objeto desatualizado
+        pedido.refresh_from_db()  # evita cancelar objeto desatualizado
 
         if pedido.status_pedido_servico not in status_cancelaveis:
-            raise ValidationError(f"pedido no status '{pedido.status_pedido_servico}' não pode ser cancelado. status permitidos: 'PENDENTE e EM_ANDAMENTO'")
+            raise ValidationError(
+                f"pedido no status '{pedido.status_pedido_servico}' não pode ser cancelado. status permitidos: 'PENDENTE e EM_ANDAMENTO'"
+            )
 
         pedido.status_pedido_servico = PedidoServico.PedidoServicoStatus.CANCELADO
         pedido.data_fim = timezone.now()
@@ -226,5 +240,3 @@ def cancelar_pedido(pedido: PedidoServico) -> PedidoServico:
         pedido.save(update_fields=["status_pedido_servico", "data_fim"])
 
         return pedido
-
-

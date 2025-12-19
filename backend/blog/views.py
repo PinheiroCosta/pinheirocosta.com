@@ -11,7 +11,6 @@ from .serializers import BlogPostSerializer
 from .services.media_upload import upload_blog_media
 
 
-
 class BlogPostDetailView(TemplateView):
     """Serve o template base para o frontend (SPA)."""
 
@@ -47,4 +46,3 @@ def tinymce_upload(request):
         return JsonResponse({"error": str(e)}, status=400)
 
     return JsonResponse({"location": url})
-

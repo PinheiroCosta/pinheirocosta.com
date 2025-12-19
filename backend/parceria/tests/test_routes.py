@@ -6,6 +6,7 @@ class TestParceriaRoutes(TestCaseUtils):
     """
     Verifica se as principais rotas da API de parceria estão corretamente registradas no Django.
     """
+
     def test_parceria_routes_exist(self):
         """
         Garante que todas as rotas esperadas da API de parceria possam ser resolvidas sem erro.

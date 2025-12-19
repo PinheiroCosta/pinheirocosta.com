@@ -7,6 +7,7 @@ class TestParceriaPermissions(TestCaseUtils):
     """
     Verifica regras de acesso e proteção de dados da API de parceria.
     """
+
     def setUp(self):
         """
         Prepara um usuário não autenticado e um objeto pertencente a outro usuário.
@@ -20,6 +21,6 @@ class TestParceriaPermissions(TestCaseUtils):
         """
         Usuário não autenticado deve receber 403 ao tentar acessar detalhes de um serviço.
         """
-        client = self.client  
+        client = self.client
         response = client.get(self.url)
         self.assertResponse403(response)

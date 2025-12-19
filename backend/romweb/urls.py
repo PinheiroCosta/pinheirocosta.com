@@ -26,8 +26,7 @@ sitemaps = {
     "privacy": StaticPrivacySitemap,
 }
 
-urlpatterns = [
-]
+urlpatterns = []
 
 OPTIONAL_URLS = {
     "blog": "blog.urls_registry",
@@ -68,11 +67,7 @@ urlpatterns = [
     ),
     path("tinymce/", include("tinymce.urls")),
     # drf-spectacular
-    path(
-        "api/schema/",
-        SpectacularAPIView.as_view(),
-        name="schema"
-    ),
+    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path(
         "api/schema/swagger-ui/",
         SpectacularSwaggerView.as_view(url_name="schema"),

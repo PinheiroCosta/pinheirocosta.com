@@ -3,8 +3,7 @@ from .routes import routes as motd_routes
 from . import urls as motd_urls
 
 
-SITEMAPS = {
-}
+SITEMAPS = {}
 
 URLPATTERNS = [
     path("motd/", include((motd_urls, "motd"), namespace="motd")),

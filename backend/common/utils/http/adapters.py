@@ -7,6 +7,7 @@ logger = logging.getLogger("backend.http")
 
 SENSITIVE_HEADERS = {"authorization", "cookie", "set-cookie"}
 
+
 class LoggingHTTPAdapter(HTTPAdapter):
     """
     Adapter that logs outgoing HTTP requests/responses.
@@ -14,16 +15,17 @@ class LoggingHTTPAdapter(HTTPAdapter):
 
     Do not enable in production unless debugging microservice issues.
     """
+
     def __init__(
-            self,
-            log_request_body=True,
-            log_response_body=True,
-            log_headers=False,
-            log_url=True,
-            log_method=True,
-            log_enabled=False,
-            *args,
-            **kwargs
+        self,
+        log_request_body=True,
+        log_response_body=True,
+        log_headers=False,
+        log_url=True,
+        log_method=True,
+        log_enabled=False,
+        *args,
+        **kwargs,
     ):
         super().__init__(*args, **kwargs)
         self.log_request_body = log_request_body

@@ -1,6 +1,13 @@
 from django.utils import timezone
 from common.tests.test_utils import TestCaseUtils
-from parceria.models import PedidoServico, PedidoItem, Servico, ContratoServico, Parceria, ParceriaMembro
+from parceria.models import (
+    PedidoServico,
+    PedidoItem,
+    Servico,
+    ContratoServico,
+    Parceria,
+    ParceriaMembro,
+)
 
 
 class TestPedidoServicoView(TestCaseUtils):
@@ -15,7 +22,9 @@ class TestPedidoServicoView(TestCaseUtils):
             proprietario=self.user,
             dominio="site1.com.br",
         )
-        ParceriaMembro.objects.create(parceria=self.parceria, usuario=self.user, ativo=True)
+        ParceriaMembro.objects.create(
+            parceria=self.parceria, usuario=self.user, ativo=True
+        )
 
         self.outro_parceiro = Parceria.objects.create(
             nome="Cliente 2",
@@ -24,7 +33,9 @@ class TestPedidoServicoView(TestCaseUtils):
             proprietario=self.user_b,
             dominio="site2.com.br",
         )
-        ParceriaMembro.objects.create(parceria=self.outro_parceiro, usuario=self.user_b, ativo=True)
+        ParceriaMembro.objects.create(
+            parceria=self.outro_parceiro, usuario=self.user_b, ativo=True
+        )
 
         self.servico = Servico.objects.create(
             nome="Site Zola",
@@ -32,12 +43,10 @@ class TestPedidoServicoView(TestCaseUtils):
             preco_base=500,
         )
         self.contrato = ContratoServico.objects.create(
-            parceria=self.parceria,
-            observacoes="Criado pela Suite de testes"
+            parceria=self.parceria, observacoes="Criado pela Suite de testes"
         )
         self.outro_contrato = ContratoServico.objects.create(
-            parceria=self.outro_parceiro,
-            observacoes="criado pela suite de testes"
+            parceria=self.outro_parceiro, observacoes="criado pela suite de testes"
         )
 
     def test_lista_pedidos_do_usuario(self):
@@ -54,23 +63,19 @@ class TestPedidoServicoView(TestCaseUtils):
 
         resp = self.auth_client.get(self.view_url)
         self.assertResponse200(resp)
-        ids = [p["id"] for p in resp.data['results']]
+        ids = [p["id"] for p in resp.data["results"]]
         self.assertIn(pedido.id, ids)
         self.assertEqual(resp.data["count"], 1)
         self.assertEqual(len(resp.data["results"]), 1)
 
     def test_criacao_pedido_valido(self):
         """Deve permitir criação de pedido vinculado a contrato da parceria do usuário"""
-        payload = {
-            "itens": [
-                {"servico": self.servico.id}
-            ]
-        }
+        payload = {"itens": [{"servico": self.servico.id}]}
         resp = self.auth_client.post(
             self.view_url,
             payload,
             format="json",
-            HTTP_IDEMPOTENCY_KEY="pedido-valido-1"
+            HTTP_IDEMPOTENCY_KEY="pedido-valido-1",
         )
         self.assertResponse201(resp)
 
@@ -85,18 +90,16 @@ class TestPedidoServicoView(TestCaseUtils):
     def test_criacao_pedido_contrato_de_terceiro(self):
         """Não deve permitir criação de pedido com contrato de outro usuário"""
         # remove vínculo do usuário (desativa o membro)
-        ParceriaMembro.objects.filter(parceria=self.parceria, usuario=self.user).update(ativo=False)
+        ParceriaMembro.objects.filter(parceria=self.parceria, usuario=self.user).update(
+            ativo=False
+        )
 
-        payload = {
-            "itens": [
-                {"servico": self.servico.id}
-            ]
-        }
+        payload = {"itens": [{"servico": self.servico.id}]}
         resp = self.auth_client.post(
             self.view_url,
             payload,
             format="json",
-            HTTP_IDEMPOTENCY_KEY="pedido-terceiro-1"
+            HTTP_IDEMPOTENCY_KEY="pedido-terceiro-1",
         )
         self.assertResponse403(resp)
 
@@ -136,7 +139,9 @@ class TestPedidoServicoView(TestCaseUtils):
 
         self.assertResponse200(resp)
         pedido.refresh_from_db()
-        self.assertEqual(pedido.status_pedido_servico, PedidoServico.PedidoServicoStatus.CONCLUIDO)
+        self.assertEqual(
+            pedido.status_pedido_servico, PedidoServico.PedidoServicoStatus.CONCLUIDO
+        )
         self.assertIsNotNone(pedido.data_fim)
 
     def test_concluir_pedido_pendente(self):
@@ -152,7 +157,9 @@ class TestPedidoServicoView(TestCaseUtils):
 
         self.assertResponse400(resp)
         pedido.refresh_from_db()
-        self.assertEqual(pedido.status_pedido_servico, PedidoServico.PedidoServicoStatus.PENDENTE)
+        self.assertEqual(
+            pedido.status_pedido_servico, PedidoServico.PedidoServicoStatus.PENDENTE
+        )
 
     def test_concluir_pedido_ja_concluido(self):
         """Pedido já concluído não pode ser concluído novamente"""
@@ -212,11 +219,7 @@ class TestPedidoServicoView(TestCaseUtils):
 
     def test_concluir_pedido_servico_inativo(self):
         """Serviço inativo em item deve impedir conclusão"""
-        servico_inativo = Servico.objects.create(
-            nome="X",
-            preco_base=100,
-            ativo=False
-        )
+        servico_inativo = Servico.objects.create(nome="X", preco_base=100, ativo=False)
 
         pedido = PedidoServico.objects.create(
             parceria=self.parceria,
@@ -248,7 +251,9 @@ class TestPedidoServicoView(TestCaseUtils):
         self.assertResponse400(resp)
 
         pedido.refresh_from_db()
-        self.assertEqual(pedido.status_pedido_servico, PedidoServico.PedidoServicoStatus.EM_ANDAMENTO)
+        self.assertEqual(
+            pedido.status_pedido_servico, PedidoServico.PedidoServicoStatus.EM_ANDAMENTO
+        )
         self.assertIsNone(pedido.data_fim)
 
     # ------------------------------------------------------------------------
@@ -259,7 +264,7 @@ class TestPedidoServicoView(TestCaseUtils):
         """Deve cancelar pedido EM_ANDAMENTO e registrar data_fim"""
         pedido = PedidoServico.objects.create(
             parceria=self.parceria,
-            status_pedido_servico=PedidoServico.PedidoServicoStatus.EM_ANDAMENTO
+            status_pedido_servico=PedidoServico.PedidoServicoStatus.EM_ANDAMENTO,
         )
         PedidoItem.objects.create(
             pedido=pedido,
@@ -273,14 +278,16 @@ class TestPedidoServicoView(TestCaseUtils):
         self.assertResponse200(resp)
 
         pedido.refresh_from_db()
-        self.assertEqual(pedido.status_pedido_servico, PedidoServico.PedidoServicoStatus.CANCELADO)
+        self.assertEqual(
+            pedido.status_pedido_servico, PedidoServico.PedidoServicoStatus.CANCELADO
+        )
         self.assertIsNotNone(pedido.data_fim)
 
     def test_cancelar_pedido_pendente(self):
         """Deve cancelar pedido pendente"""
         pedido = PedidoServico.objects.create(
             parceria=self.parceria,
-            status_pedido_servico=PedidoServico.PedidoServicoStatus.PENDENTE
+            status_pedido_servico=PedidoServico.PedidoServicoStatus.PENDENTE,
         )
         PedidoItem.objects.create(
             pedido=pedido,
@@ -294,15 +301,16 @@ class TestPedidoServicoView(TestCaseUtils):
         self.assertResponse200(resp)
 
         pedido.refresh_from_db()
-        self.assertEqual(pedido.status_pedido_servico, PedidoServico.PedidoServicoStatus.CANCELADO)
+        self.assertEqual(
+            pedido.status_pedido_servico, PedidoServico.PedidoServicoStatus.CANCELADO
+        )
         self.assertIsNotNone(pedido.data_fim)
-
 
     def test_cancelar_pedido_ja_cancelado(self):
         """Pedido já cancelado não deve ser cancelado novamente"""
         pedido = PedidoServico.objects.create(
             parceria=self.parceria,
-            status_pedido_servico=PedidoServico.PedidoServicoStatus.CANCELADO
+            status_pedido_servico=PedidoServico.PedidoServicoStatus.CANCELADO,
         )
         PedidoItem.objects.create(
             pedido=pedido,
@@ -316,8 +324,9 @@ class TestPedidoServicoView(TestCaseUtils):
         self.assertResponse400(resp)
 
         pedido.refresh_from_db()
-        self.assertEqual(pedido.status_pedido_servico, PedidoServico.PedidoServicoStatus.CANCELADO)
-
+        self.assertEqual(
+            pedido.status_pedido_servico, PedidoServico.PedidoServicoStatus.CANCELADO
+        )
 
     def test_cancelar_pedido_outro_usuario(self):
         """Usuário não deve cancelar pedido de outra parceria"""
@@ -337,7 +346,9 @@ class TestPedidoServicoView(TestCaseUtils):
         self.assertResponse404(resp)
 
         pedido.refresh_from_db()
-        self.assertEqual(pedido.status_pedido_servico, PedidoServico.PedidoServicoStatus.PENDENTE)
+        self.assertEqual(
+            pedido.status_pedido_servico, PedidoServico.PedidoServicoStatus.PENDENTE
+        )
         self.assertIsNone(pedido.data_fim)
 
     def test_cancelar_pedido_atomicidade(self):
@@ -359,9 +370,10 @@ class TestPedidoServicoView(TestCaseUtils):
         self.assertResponse400(resp)
 
         pedido.refresh_from_db()
-        self.assertEqual(pedido.status_pedido_servico, PedidoServico.PedidoServicoStatus.CONCLUIDO)
+        self.assertEqual(
+            pedido.status_pedido_servico, PedidoServico.PedidoServicoStatus.CONCLUIDO
+        )
         self.assertIsNone(pedido.data_fim)
-
 
     def test_cancelar_pedido_sem_itens(self):
         """Pedido sem itens deve ser cancelável"""
@@ -376,8 +388,11 @@ class TestPedidoServicoView(TestCaseUtils):
         self.assertResponse200(resp)
 
         pedido.refresh_from_db()
-        self.assertEqual(pedido.status_pedido_servico, PedidoServico.PedidoServicoStatus.CANCELADO)
+        self.assertEqual(
+            pedido.status_pedido_servico, PedidoServico.PedidoServicoStatus.CANCELADO
+        )
         self.assertIsNotNone(pedido.data_fim)
+
 
 # ----------------------------------------------------------------------------------------
 # Idempotencia
@@ -388,37 +403,24 @@ class TestPedidoServicoView(TestCaseUtils):
 
 def test_criacao_pedido_idempotente_replay(self):
     """POST com mesma Idempotency-Key deve retornar replay e não criar duplicado"""
-    payload = {
-        "itens": [{"servico": self.servico.id}]
-    }
-    headers = {
-        "HTTP_IDEMPOTENCY_KEY": "pedido-123"
-    }
+    payload = {"itens": [{"servico": self.servico.id}]}
+    headers = {"HTTP_IDEMPOTENCY_KEY": "pedido-123"}
 
-    resp1 = self.auth_client.post(
-        self.view_url, payload, format="json", **headers
-    )
+    resp1 = self.auth_client.post(self.view_url, payload, format="json", **headers)
     self.assertResponse201(resp1)
 
-    resp2 = self.auth_client.post(
-        self.view_url, payload, format="json", **headers
-    )
+    resp2 = self.auth_client.post(self.view_url, payload, format="json", **headers)
     self.assertResponse201(resp2)
 
     self.assertEqual(resp1.data["id"], resp2.data["id"])
-    self.assertEqual(
-        PedidoServico.objects.filter(parceria=self.parceria).count(), 1
-    )
+    self.assertEqual(PedidoServico.objects.filter(parceria=self.parceria).count(), 1)
+
 
 def test_idempotency_key_com_payload_diferente(self):
     """Mesmo Idempotency-Key com payload diferente deve criar novo pedido"""
-    headers = {
-        "HTTP_IDEMPOTENCY_KEY": "pedido-456"
-    }
+    headers = {"HTTP_IDEMPOTENCY_KEY": "pedido-456"}
 
-    payload_1 = {
-        "itens": [{"servico": self.servico.id}]
-    }
+    payload_1 = {"itens": [{"servico": self.servico.id}]}
     payload_2 = {
         "itens": [
             {"servico": self.servico.id},
@@ -426,33 +428,21 @@ def test_idempotency_key_com_payload_diferente(self):
         ]
     }
 
-    resp1 = self.auth_client.post(
-        self.view_url, payload_1, format="json", **headers
-    )
+    resp1 = self.auth_client.post(self.view_url, payload_1, format="json", **headers)
     self.assertResponse201(resp1)
 
-    resp2 = self.auth_client.post(
-        self.view_url, payload_2, format="json", **headers
-    )
+    resp2 = self.auth_client.post(self.view_url, payload_2, format="json", **headers)
     self.assertResponse201(resp2)
 
     self.assertNotEqual(resp1.data["id"], resp2.data["id"])
-    self.assertEqual(
-        PedidoServico.objects.filter(parceria=self.parceria).count(), 2
-    )
+    self.assertEqual(PedidoServico.objects.filter(parceria=self.parceria).count(), 2)
+
 
 def test_criacao_pedido_sem_idempotency_key(self):
     """POST sem Idempotency-Key deve ser rejeitado"""
-    payload = {
-        "itens": [{"servico": self.servico.id}]
-    }
+    payload = {"itens": [{"servico": self.servico.id}]}
 
-    resp = self.auth_client.post(
-        self.view_url, payload, format="json"
-    )
+    resp = self.auth_client.post(self.view_url, payload, format="json")
 
     self.assertResponse400(resp)
-    self.assertEqual(
-        PedidoServico.objects.filter(parceria=self.parceria).count(), 0
-    )
-
+    self.assertEqual(PedidoServico.objects.filter(parceria=self.parceria).count(), 0)

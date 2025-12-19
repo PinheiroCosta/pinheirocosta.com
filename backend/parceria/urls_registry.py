@@ -4,11 +4,15 @@ from .routes import routes
 
 router = DefaultRouter()
 for route in routes:
-    router.register(route["regex"].replace("parcerias/", ""), route["viewset"], basename=route["basename"])
+    router.register(
+        route["regex"].replace("parcerias/", ""),
+        route["viewset"],
+        basename=route["basename"],
+    )
 
 URLPATTERNS = [
     path("api/parcerias/", include((router.urls, "parcerias"), namespace="parcerias")),
 ]
 
 SITEMAPS = {}
-ROUTES = routes  
+ROUTES = routes

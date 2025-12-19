@@ -17,7 +17,7 @@ class TestTicketSuporteViewSet(TestCaseUtils):
             natureza="pf",
             categoria="cliente",
             proprietario=self.user,
-            dominio="site-teste.com"
+            dominio="site-teste.com",
         )
         self.parceria.membros.create(usuario=self.user, ativo=True)
         self.list_url = reverse("parceria-tickets-list")
@@ -41,7 +41,9 @@ class TestTicketSuporteViewSet(TestCaseUtils):
         }
         response = self.auth_client.post(self.list_url, payload)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertTrue(TicketSuporte.objects.filter(titulo="Nova funcionalidade").exists())
+        self.assertTrue(
+            TicketSuporte.objects.filter(titulo="Nova funcionalidade").exists()
+        )
 
     def test_retrieve_ticket(self):
         ticket = TicketSuporte.objects.create(
@@ -81,9 +83,9 @@ class TestTicketSuporteViewSet(TestCaseUtils):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertTrue(TicketSuporte.objects.filter(id=ticket.id).exists())
 
-# -------------------------------------------------------------------------
-# criar ticket
-# -------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
+    # criar ticket
+    # -------------------------------------------------------------------------
     def test_create_ticket_descricao_curta_invalida(self):
         payload = {
             "titulo": "Ticket inválido",
@@ -103,16 +105,15 @@ class TestTicketSuporteViewSet(TestCaseUtils):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_create_ticket_tipo_default_quando_omitido(self):
-        payload = {
-            "titulo": "Sem tipo enviado",
-            "descricao": "Apenas teste."
-        }
+        payload = {"titulo": "Sem tipo enviado", "descricao": "Apenas teste."}
         response = self.auth_client.post(self.list_url, payload)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         ticket = TicketSuporte.objects.get(id=response.data["id"])
         # Deve ter sido usado o tipo default do service
-        self.assertEqual(ticket.tipo_ticket_suporte, TicketSuporte.TicketSuporteTipo.OUTRO)
+        self.assertEqual(
+            ticket.tipo_ticket_suporte, TicketSuporte.TicketSuporteTipo.OUTRO
+        )
 
     def test_create_ticket_sem_parceria_retornando_forbidden(self):
         user_sem_parceria = self.create_user(email="novo@ex.com", password="123456")
@@ -121,7 +122,7 @@ class TestTicketSuporteViewSet(TestCaseUtils):
         payload = {
             "titulo": "Teste sem parceria",
             "descricao": "Teste.",
-            "tipo_ticket_suporte": "problema"
+            "tipo_ticket_suporte": "problema",
         }
 
         response = client.post(self.list_url, payload)
@@ -136,7 +137,7 @@ class TestTicketSuporteViewSet(TestCaseUtils):
             parceria=self.parceria,
             tipo_ticket_suporte="problema",
             titulo="Duplicidade",
-            descricao="Teste duplicidade."
+            descricao="Teste duplicidade.",
         )
 
         response = self.auth_client.get(self.list_url)
@@ -157,15 +158,15 @@ class TestTicketSuporteViewSet(TestCaseUtils):
         response = self.auth_client.post(self.list_url, payload)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-# -------------------------------------------------------------------------
-# Responder Ticket
-# -------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
+    # Responder Ticket
+    # -------------------------------------------------------------------------
     def test_responder_ticket_sucesso(self):
         ticket = TicketSuporte.objects.create(
             parceria=self.parceria,
             tipo_ticket_suporte="problema",
             titulo="Teste",
-            descricao="Desc"
+            descricao="Desc",
         )
 
         url = f"/api/parceria/tickets/{ticket.id}/responder/"
@@ -185,7 +186,7 @@ class TestTicketSuporteViewSet(TestCaseUtils):
             tipo_ticket_suporte="problema",
             titulo="Teste",
             descricao="Desc",
-            status_ticket_suporte=TicketSuporte.TicketSuporteStatus.NOVO
+            status_ticket_suporte=TicketSuporte.TicketSuporteStatus.NOVO,
         )
 
         url = f"/api/parceria/tickets/{ticket.id}/responder/"
@@ -194,7 +195,9 @@ class TestTicketSuporteViewSet(TestCaseUtils):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         ticket.refresh_from_db()
-        self.assertEqual(ticket.status_ticket_suporte, TicketSuporte.TicketSuporteStatus.EM_ANALISE)
+        self.assertEqual(
+            ticket.status_ticket_suporte, TicketSuporte.TicketSuporteStatus.EM_ANALISE
+        )
 
     def test_responder_ticket_mantem_status_se_ja_estiver_em_analise(self):
         ticket = TicketSuporte.objects.create(
@@ -202,7 +205,7 @@ class TestTicketSuporteViewSet(TestCaseUtils):
             tipo_ticket_suporte="problema",
             titulo="Teste",
             descricao="Desc",
-            status_ticket_suporte=TicketSuporte.TicketSuporteStatus.EM_ANALISE
+            status_ticket_suporte=TicketSuporte.TicketSuporteStatus.EM_ANALISE,
         )
 
         url = f"/api/parceria/tickets/{ticket.id}/responder/"
@@ -211,13 +214,13 @@ class TestTicketSuporteViewSet(TestCaseUtils):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         ticket.refresh_from_db()
-        self.assertEqual(ticket.status_ticket_suporte, TicketSuporte.TicketSuporteStatus.EM_ANALISE)
+        self.assertEqual(
+            ticket.status_ticket_suporte, TicketSuporte.TicketSuporteStatus.EM_ANALISE
+        )
 
     def test_responder_ticket_conteudo_longo_invalido(self):
         ticket = TicketSuporte.objects.create(
-            parceria=self.parceria,
-            titulo="Teste",
-            descricao="Desc"
+            parceria=self.parceria, titulo="Teste", descricao="Desc"
         )
 
         url = f"/api/parceria/tickets/{ticket.id}/responder/"
@@ -227,9 +230,7 @@ class TestTicketSuporteViewSet(TestCaseUtils):
 
     def test_responder_ticket_conteudo_vazio(self):
         ticket = TicketSuporte.objects.create(
-            parceria=self.parceria,
-            titulo="Teste",
-            descricao="Desc"
+            parceria=self.parceria, titulo="Teste", descricao="Desc"
         )
 
         url = f"/api/parceria/tickets/{ticket.id}/responder/"
@@ -242,7 +243,7 @@ class TestTicketSuporteViewSet(TestCaseUtils):
             parceria=self.parceria,
             titulo="Teste",
             descricao="Desc",
-            status_ticket_suporte=TicketSuporte.TicketSuporteStatus.CONCLUIDO
+            status_ticket_suporte=TicketSuporte.TicketSuporteStatus.CONCLUIDO,
         )
 
         url = f"/api/parceria/tickets/{ticket.id}/responder/"
@@ -252,9 +253,7 @@ class TestTicketSuporteViewSet(TestCaseUtils):
 
     def test_responder_ticket_usuario_sem_parceria_recebe_404(self):
         ticket = TicketSuporte.objects.create(
-            parceria=self.parceria,
-            titulo="Teste",
-            descricao="Desc"
+            parceria=self.parceria, titulo="Teste", descricao="Desc"
         )
 
         user = self.create_user(email="novo@ex.com", password="123456")
@@ -269,9 +268,7 @@ class TestTicketSuporteViewSet(TestCaseUtils):
         outra = Parceria.objects.create(nome="Outra", proprietario=self.user_b)
 
         ticket = TicketSuporte.objects.create(
-            parceria=outra,
-            titulo="Teste",
-            descricao="Desc"
+            parceria=outra, titulo="Teste", descricao="Desc"
         )
 
         url = f"/api/parceria/tickets/{ticket.id}/responder/"
@@ -281,9 +278,7 @@ class TestTicketSuporteViewSet(TestCaseUtils):
 
     def test_responder_ticket_usa_service_para_regra_de_negocio(self):
         ticket = TicketSuporte.objects.create(
-            parceria=self.parceria,
-            titulo="Teste",
-            descricao="Desc"
+            parceria=self.parceria, titulo="Teste", descricao="Desc"
         )
 
         url = f"/api/parceria/tickets/{ticket.id}/responder/"
@@ -291,4 +286,3 @@ class TestTicketSuporteViewSet(TestCaseUtils):
 
         # Garantia que o service aplicou a regra e não a view
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-

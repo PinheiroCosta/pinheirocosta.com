@@ -27,7 +27,6 @@ DATABASES = {
 }
 
 
-
 MIDDLEWARE = [
     "django.middleware.gzip.GZipMiddleware",
     "django.middleware.security.SecurityMiddleware",
@@ -295,27 +294,27 @@ JAZZMIN_SETTINGS = {
     "welcome_sign": None,
     "site_icon": None,
     "copyright": "- PinheiroCosta.com",
-    "show_ui_builder":  True,
+    "show_ui_builder": True,
     "icons": {
-         "auth": "fas fa-users-cog",
-         "users.User": "fas fa-user",
-         "auth.Group": "fas fa-users",
-         "blog.Tag": "fas fa-tags",
-         "blog.BlogPost": "fas fa-book",
-         "defender.AccessAttempt": "fas fa-shield",
-         "common.RobotsTxt": "fas fa-sitemap",
-         "common.ProfessionalContactMessage": "fas fa-envelope",
-         "common.AboutMe": "fas fa-address-card",
-         "common.ParametroSistema": "fas fa-key",
-         "motd.MOTD": "fas fa-quote-left",
-         "motd.MOTDConfig": "fas fa-gears",
-         "tools.Tool": "fas fa-gear",
-         "tools.ToolField": "fas fa-gears",
-         "parceria.Parceria": "fas fa-handshake",
-         "parceria.PedidoServico": "fas fa-cart-shopping",
-         "parceria.Servico": "fas fa-shop",
-         "parceria.TicketSuporte": "fas fa-comment-medical",
-         "parceria.ContratoServico": "fas fa-file-signature",
+        "auth": "fas fa-users-cog",
+        "users.User": "fas fa-user",
+        "auth.Group": "fas fa-users",
+        "blog.Tag": "fas fa-tags",
+        "blog.BlogPost": "fas fa-book",
+        "defender.AccessAttempt": "fas fa-shield",
+        "common.RobotsTxt": "fas fa-sitemap",
+        "common.ProfessionalContactMessage": "fas fa-envelope",
+        "common.AboutMe": "fas fa-address-card",
+        "common.ParametroSistema": "fas fa-key",
+        "motd.MOTD": "fas fa-quote-left",
+        "motd.MOTDConfig": "fas fa-gears",
+        "tools.Tool": "fas fa-gear",
+        "tools.ToolField": "fas fa-gears",
+        "parceria.Parceria": "fas fa-handshake",
+        "parceria.PedidoServico": "fas fa-cart-shopping",
+        "parceria.Servico": "fas fa-shop",
+        "parceria.TicketSuporte": "fas fa-comment-medical",
+        "parceria.ContratoServico": "fas fa-file-signature",
     },
 }
 JAZZMIN_UI_TWEAKS = {
@@ -346,6 +345,6 @@ JAZZMIN_UI_TWEAKS = {
         "info": "btn-info",
         "warning": "btn-warning",
         "danger": "btn-danger",
-        "success": "btn-success"
-    }
+        "success": "btn-success",
+    },
 }

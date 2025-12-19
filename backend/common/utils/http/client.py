@@ -4,7 +4,10 @@ from django.conf import settings
 from .adapters import LoggingHTTPAdapter
 
 
-LOG_ENABLED = getattr(settings, "HTTP_LOG_ENABLED",)
+LOG_ENABLED = getattr(
+    settings,
+    "HTTP_LOG_ENABLED",
+)
 
 session = requests.Session()
 adapter = LoggingHTTPAdapter(
@@ -18,6 +21,7 @@ adapter = LoggingHTTPAdapter(
 
 session.mount("http://", adapter)
 session.mount("https://", adapter)
+
 
 def http_request(method, url, **kwargs):
     if not LOG_ENABLED:

@@ -59,12 +59,10 @@ class TestTinyMCEUploadView(TestCaseUtils):
 
         # Usuários únicos para evitar IntegrityError
         self.user_staff = self.create_user(
-            email=f"staff_{uuid4()}@test.com",
-            is_staff=True
+            email=f"staff_{uuid4()}@test.com", is_staff=True
         )
         self.user_normal = self.create_user(
-            email=f"normal_{uuid4()}@test.com",
-            is_staff=False
+            email=f"normal_{uuid4()}@test.com", is_staff=False
         )
 
         # Clientes autenticados
@@ -100,7 +98,9 @@ class TestTinyMCEUploadView(TestCaseUtils):
         response = self.auth_client_staff.post(self.url, {"file": file})
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.json()["location"], "https://cdn.example.com/blog/images/x.jpg")
+        self.assertEqual(
+            response.json()["location"], "https://cdn.example.com/blog/images/x.jpg"
+        )
 
         # Verifica que o arquivo passado para o serviço de upload é o correto
         called_file = mock_upload.call_args[0][0]
@@ -136,6 +136,7 @@ class TestAboutMeAdminPreview(TestCaseUtils):
         """
         Cria um modelo de teste dinâmico com apenas o campo about_image.
         """
+
         class AboutMeTestModel(models.Model):
             about_image = models.ImageField(upload_to="about/", null=True, blank=True)
 
@@ -163,6 +164,7 @@ class TestAboutMeAdminPreview(TestCaseUtils):
         """
         Verifica que o preview retorna uma tag <img> com a URL correta quando existe about_image.
         """
+
         class FakeImage:
             url = "https://cdn.example.com/test.jpg"
 
@@ -171,4 +173,3 @@ class TestAboutMeAdminPreview(TestCaseUtils):
         result = self.admin.preview(obj)
         self.assertIn("img", result)
         self.assertIn("https://cdn.example.com/test.jpg", result)
-
