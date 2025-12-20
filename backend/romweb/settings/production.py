@@ -80,7 +80,6 @@ CACHES = {
         "LOCATION": config("REDIS_URL") + "/0",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            "PARSER_CLASS": "redis.connectionHiredisParser",
         },
     }
 }
